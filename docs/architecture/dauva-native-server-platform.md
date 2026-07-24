@@ -1,6 +1,6 @@
 # Dauva native server platform
 
-Status: **Proposed, implementation starting**
+Status: **Phase 1 implemented and live**
 
 Last updated: 2026-07-24
 
@@ -129,9 +129,20 @@ The existing API already provides useful foundations:
 - safe deletion;
 - a Docker client used for existing Compose-managed Servers.
 
-The current API database does not yet pin Seed versions or manifest digests and
-does not persist a complete agreement acceptance record. Those are required
-before the registry becomes authoritative.
+The API now persists the selected resource preset, resolved non-secret options,
+Seed version, Seed manifest digest, and compiled registry digest for every
+native Server. Agreement acceptance is stored in a separate audit record with
+the Server, Seed, agreement, accepting user, URL, revision, and timestamp.
+
+Seed v1 is implemented as JSON Schema plus stricter policy validation. The
+registry contains three Pods and six sanitized Seeds. Minecraft Fabric is
+stable; Valheim, Core Keeper, Satisfactory, Factorio, and Enshrouded remain
+draft until their own native lifecycle tests are complete.
+
+The native Docker Branch and Pterodactyl Branch are registered side by side.
+After the successful Minecraft acceptance test, native Docker became the
+default Branch for new Servers. Existing Servers were not adopted, restarted,
+or otherwise modified.
 
 ## Target architecture
 
@@ -255,17 +266,15 @@ identities. Creating the same Server command twice must not create duplicates.
 
 ## Storage model
 
-The recommended initial Leaf layout is:
+The implemented initial Leaf layout is:
 
 ```text
 /mnt/data/dauva/
   servers/<server-id>/
-    data/
-    saves/
-    config/
-    cache/
-  backups/<server-id>/
-  agent/
+    .dauva-owned.json
+    volumes/
+      data/
+      backups/
 ```
 
 The exact host paths are Agent implementation details and do not appear in
@@ -412,7 +421,7 @@ multi-Leaf placement follow after the first reliable native Server.
 
 ## Delivery plan
 
-### Phase 0: contract and registry
+### Phase 0: contract and registry — complete
 
 - Define and validate Seed v1.
 - Convert the six real Compose Servers into draft manifests.
@@ -422,7 +431,7 @@ multi-Leaf placement follow after the first reliable native Server.
 - Add complete agreement audit persistence.
 - Compile a deterministic Seed Library index in CI.
 
-### Phase 1: Minecraft vertical slice
+### Phase 1: Minecraft vertical slice — complete
 
 - Create a native Minecraft Fabric Seed from the proven live configuration.
 - Include the backup companion component.
@@ -434,13 +443,22 @@ multi-Leaf placement follow after the first reliable native Server.
 
 Acceptance criteria:
 
-- no Pterodactyl API or Egg is involved;
-- repeating a create request cannot duplicate the Server;
-- a host or API restart preserves control and state;
-- a failed Sprouting operation is actionable and safely retryable;
-- deleting the test Server removes only its owned runtime data according to
-  the selected backup-retention policy;
-- the existing Minecraft Server remains uninterrupted.
+- no Pterodactyl API or Egg was involved;
+- the API and Docker resources retain a stable Dauva Server identity;
+- an API restart preserved control and state;
+- failed availability and stopped-health states were actionable and covered by
+  regression tests;
+- create, healthy status, stop, start, restart, and name-confirmed delete all
+  succeeded through the live portal;
+- deleting the test Server removed its two containers, private network, owned
+  storage, instance record, and agreement audit record;
+- the existing Minecraft Server and the other five existing game Servers
+  remained uninterrupted.
+
+The acceptance Server used an automatically allocated port in the configured
+native pool and was removed after the test. Candidate Seeds were enabled only
+for the acceptance window and disabled again after promotion of Minecraft
+Fabric `1.0.0` to stable.
 
 ### Phase 2: current Server set
 

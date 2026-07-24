@@ -614,8 +614,8 @@
     {
       "schemaVersion": "dauva.dev/seed/v1",
       "id": "minecraft-fabric",
-      "version": "1.0.0-rc.1",
-      "status": "candidate",
+      "version": "1.0.0",
+      "status": "stable",
       "podId": "minecraft",
       "metadata": {
         "title": {
@@ -976,7 +976,7 @@
         "update": false,
         "console": false
       },
-      "manifestDigest": "sha256:246219c99b4c9752b1def1d3a25850d1bc5ee86c2b27ad269238ac7a97f004ed"
+      "manifestDigest": "sha256:28892f4af36ee2198279761315e14d01bf97ef090fc1c11cd16c77423a3987a1"
     },
     {
       "schemaVersion": "dauva.dev/seed/v1",
@@ -1414,5 +1414,5 @@
       "manifestDigest": "sha256:2e1aa84e7f4ffc9639f757c64608d06198241232c2c6813f815cc590d5b3dc23"
     }
   ],
-  "registryDigest": "sha256:8b08928bbe7124cfbc3349530e737dee80e681221c185166c443e9bab30669c7"
+  "registryDigest": "sha256:c20638336ca789ece5547b39c9f449873cebd05d2cc07c815bc517cbae0a8f4b"
 }
