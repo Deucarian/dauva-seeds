@@ -258,7 +258,7 @@ identities. Creating the same Server command twice must not create duplicates.
 The recommended initial Leaf layout is:
 
 ```text
-/srv/dauva/
+/mnt/data/dauva/
   servers/<server-id>/
     data/
     saves/
@@ -271,6 +271,11 @@ The recommended initial Leaf layout is:
 The exact host paths are Agent implementation details and do not appear in
 public Seed manifests. Seeds declare logical volume roles; the Agent resolves
 those roles to approved storage roots.
+
+On the first Debian Leaf this root lives on the dedicated 1 TB Docker/data
+filesystem, not on the smaller operating-system filesystem. Local companion
+backups initially share that data disk; off-host backup storage remains a
+separate operational milestone.
 
 Storage rules:
 
