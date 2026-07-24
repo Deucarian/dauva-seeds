@@ -1,0 +1,192 @@
+{
+  "schemaVersion": "dauva.dev/seed/v1",
+  "id": "satisfactory",
+  "version": "0.1.0",
+  "status": "draft",
+  "podId": "factory",
+  "metadata": {
+    "title": {
+      "en": "Satisfactory",
+      "nl": "Satisfactory",
+      "de": "Satisfactory"
+    },
+    "description": {
+      "en": "A persistent Satisfactory Server based on the active Debian container.",
+      "nl": "Een blijvende Satisfactory-Server op basis van de actieve Debian-container.",
+      "de": "Ein persistenter Satisfactory-Server auf Basis des aktiven Debian-Containers."
+    },
+    "icon": "settings"
+  },
+  "compatibility": {
+    "operatingSystems": [
+      "linux"
+    ],
+    "architectures": [
+      "amd64"
+    ]
+  },
+  "components": [
+    {
+      "id": "server",
+      "role": "primary",
+      "image": "docker.io/wolveix/satisfactory-server@sha256:e103700ae6ae4c50f19dac80eadb2a805c5b885e179ae2a40850e967bf189efd",
+      "environment": {
+        "AUTOSAVENUM": "10",
+        "DISABLESEASONALEVENTS": "false",
+        "ROOTLESS": "false",
+        "SKIPUPDATE": "false"
+      },
+      "optionEnvironment": {
+        "max-players": "MAXPLAYERS",
+        "max-tick-rate": "MAXTICKRATE"
+      },
+      "agreementEnvironment": {},
+      "secretEnvironment": {},
+      "runtimeEnvironment": {
+        "primaryPort": "SERVERGAMEPORT",
+        "timezone": "TZ"
+      },
+      "volumeMounts": [
+        {
+          "volumeId": "config",
+          "target": "/config",
+          "readOnly": false
+        }
+      ],
+      "dependsOn": [],
+      "health": {
+        "source": "container",
+        "startupGraceSeconds": 1200
+      }
+    }
+  ],
+  "volumes": [
+    {
+      "id": "config",
+      "role": "data",
+      "retention": "delete-with-server"
+    }
+  ],
+  "ports": [
+    {
+      "id": "game",
+      "componentId": "server",
+      "containerPort": 7777,
+      "protocols": [
+        "tcp",
+        "udp"
+      ],
+      "exposure": "public",
+      "purpose": "game",
+      "primary": true,
+      "sharedHostPort": true,
+      "environment": "SERVERGAMEPORT"
+    },
+    {
+      "id": "messaging",
+      "componentId": "server",
+      "containerPort": 8888,
+      "protocols": [
+        "tcp"
+      ],
+      "exposure": "public",
+      "purpose": "messaging",
+      "primary": false,
+      "sharedHostPort": true,
+      "environment": "SERVERMESSAGINGPORT"
+    }
+  ],
+  "resources": {
+    "defaultPresetId": "balanced",
+    "presets": [
+      {
+        "id": "balanced",
+        "title": {
+          "en": "Balanced",
+          "nl": "Gebalanceerd",
+          "de": "Ausgewogen"
+        },
+        "description": {
+          "en": "Minimum practical resources for a small factory.",
+          "nl": "Minimaal praktische resources voor een kleine fabriek.",
+          "de": "Praktische Mindestressourcen für eine kleine Fabrik."
+        },
+        "memoryMb": 6144,
+        "diskMb": 30720,
+        "cpuPercent": 250
+      }
+    ]
+  },
+  "inputs": [
+    {
+      "key": "accept-steam-agreement",
+      "type": "agreement",
+      "label": {
+        "en": "Steam Subscriber Agreement",
+        "nl": "Steam Subscriber Agreement",
+        "de": "Steam-Nutzungsvertrag"
+      },
+      "help": {
+        "en": "I have read and accept the Steam Subscriber Agreement and the applicable Satisfactory terms.",
+        "nl": "Ik heb de Steam Subscriber Agreement en de toepasselijke Satisfactory-voorwaarden gelezen en accepteer deze.",
+        "de": "Ich habe den Steam-Nutzungsvertrag und die anwendbaren Satisfactory-Bedingungen gelesen und akzeptiert."
+      },
+      "required": true,
+      "defaultValue": "false",
+      "url": "https://store.steampowered.com/subscriber_agreement/",
+      "revision": "official-current"
+    },
+    {
+      "key": "max-players",
+      "type": "integer",
+      "label": {
+        "en": "Maximum players",
+        "nl": "Maximumaantal spelers",
+        "de": "Maximale Spielerzahl"
+      },
+      "help": {
+        "en": "Maximum simultaneous players.",
+        "nl": "Maximaal aantal gelijktijdige spelers.",
+        "de": "Maximale Anzahl gleichzeitiger Spieler."
+      },
+      "required": true,
+      "defaultValue": "8",
+      "minLength": 1,
+      "maxLength": 2
+    },
+    {
+      "key": "max-tick-rate",
+      "type": "integer",
+      "label": {
+        "en": "Maximum tick rate",
+        "nl": "Maximale tickrate",
+        "de": "Maximale Tickrate"
+      },
+      "help": {
+        "en": "Upper simulation tick-rate limit.",
+        "nl": "Bovengrens voor de simulatietickrate.",
+        "de": "Obergrenze für die Simulations-Tickrate."
+      },
+      "required": true,
+      "defaultValue": "30",
+      "minLength": 1,
+      "maxLength": 3
+    }
+  ],
+  "secrets": [],
+  "lifecycle": {
+    "startOrder": [
+      "server"
+    ],
+    "stopOrder": [
+      "server"
+    ],
+    "stopTimeoutSeconds": 180
+  },
+  "capabilities": {
+    "backup": false,
+    "restore": false,
+    "update": false,
+    "console": false
+  }
+}

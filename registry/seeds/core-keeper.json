@@ -1,0 +1,216 @@
+{
+  "schemaVersion": "dauva.dev/seed/v1",
+  "id": "core-keeper",
+  "version": "0.1.0",
+  "status": "draft",
+  "podId": "survival",
+  "metadata": {
+    "title": {
+      "en": "Core Keeper",
+      "nl": "Core Keeper",
+      "de": "Core Keeper"
+    },
+    "description": {
+      "en": "A persistent Core Keeper Server derived from the active Debian runtime.",
+      "nl": "Een blijvende Core Keeper-Server afgeleid van de actieve Debian-runtime.",
+      "de": "Ein persistenter Core-Keeper-Server, abgeleitet von der aktiven Debian-Laufzeit."
+    },
+    "icon": "gem"
+  },
+  "compatibility": {
+    "operatingSystems": [
+      "linux"
+    ],
+    "architectures": [
+      "amd64"
+    ]
+  },
+  "components": [
+    {
+      "id": "server",
+      "role": "primary",
+      "image": "docker.io/escaping/core-keeper-dedicated@sha256:6531227708c06db6850731609e2df3e0940e63149395c743f12a0ce5f0c34ead",
+      "environment": {
+        "MODS_ENABLED": "false",
+        "WORLD_INDEX": "0",
+        "WORLD_MODE": "0"
+      },
+      "optionEnvironment": {
+        "max-players": "MAX_PLAYERS",
+        "world-name": "WORLD_NAME",
+        "world-seed": "WORLD_SEED"
+      },
+      "agreementEnvironment": {},
+      "secretEnvironment": {
+        "server-password": "PASSWORD"
+      },
+      "runtimeEnvironment": {
+        "primaryPort": "SERVER_PORT"
+      },
+      "volumeMounts": [
+        {
+          "volumeId": "data",
+          "target": "/home/steam/core-keeper-data",
+          "readOnly": false
+        },
+        {
+          "volumeId": "game",
+          "target": "/home/steam/core-keeper-dedicated",
+          "readOnly": false
+        }
+      ],
+      "dependsOn": [],
+      "health": {
+        "source": "running",
+        "startupGraceSeconds": 900
+      }
+    }
+  ],
+  "volumes": [
+    {
+      "id": "data",
+      "role": "data",
+      "retention": "delete-with-server"
+    },
+    {
+      "id": "game",
+      "role": "cache",
+      "retention": "disposable"
+    }
+  ],
+  "ports": [
+    {
+      "id": "game",
+      "componentId": "server",
+      "containerPort": 28080,
+      "protocols": [
+        "udp"
+      ],
+      "exposure": "public",
+      "purpose": "game",
+      "primary": true,
+      "sharedHostPort": true,
+      "environment": "SERVER_PORT"
+    }
+  ],
+  "resources": {
+    "defaultPresetId": "balanced",
+    "presets": [
+      {
+        "id": "balanced",
+        "title": {
+          "en": "Balanced",
+          "nl": "Gebalanceerd",
+          "de": "Ausgewogen"
+        },
+        "description": {
+          "en": "Recommended starting resources for a small group.",
+          "nl": "Aanbevolen startresources voor een kleine groep.",
+          "de": "Empfohlene Startressourcen für eine kleine Gruppe."
+        },
+        "memoryMb": 3072,
+        "diskMb": 12288,
+        "cpuPercent": 150
+      }
+    ]
+  },
+  "inputs": [
+    {
+      "key": "accept-steam-agreement",
+      "type": "agreement",
+      "label": {
+        "en": "Steam Subscriber Agreement",
+        "nl": "Steam Subscriber Agreement",
+        "de": "Steam-Nutzungsvertrag"
+      },
+      "help": {
+        "en": "I have read and accept the Steam Subscriber Agreement and the applicable Core Keeper terms.",
+        "nl": "Ik heb de Steam Subscriber Agreement en de toepasselijke Core Keeper-voorwaarden gelezen en accepteer deze.",
+        "de": "Ich habe den Steam-Nutzungsvertrag und die anwendbaren Core-Keeper-Bedingungen gelesen und akzeptiert."
+      },
+      "required": true,
+      "defaultValue": "false",
+      "url": "https://store.steampowered.com/subscriber_agreement/",
+      "revision": "official-current"
+    },
+    {
+      "key": "world-name",
+      "type": "string",
+      "label": {
+        "en": "World name",
+        "nl": "Wereldnaam",
+        "de": "Weltname"
+      },
+      "help": {
+        "en": "Name of the persistent world.",
+        "nl": "Naam van de blijvende wereld.",
+        "de": "Name der persistenten Welt."
+      },
+      "required": true,
+      "defaultValue": "Dauva",
+      "minLength": 3,
+      "maxLength": 64
+    },
+    {
+      "key": "world-seed",
+      "type": "string",
+      "label": {
+        "en": "World seed",
+        "nl": "World seed",
+        "de": "Welt-Seed"
+      },
+      "help": {
+        "en": "Optional deterministic world seed.",
+        "nl": "Optionele vaste seed voor de wereldgeneratie.",
+        "de": "Optionaler deterministischer Seed für die Weltgenerierung."
+      },
+      "required": false,
+      "defaultValue": "",
+      "maxLength": 64
+    },
+    {
+      "key": "max-players",
+      "type": "integer",
+      "label": {
+        "en": "Maximum players",
+        "nl": "Maximumaantal spelers",
+        "de": "Maximale Spielerzahl"
+      },
+      "help": {
+        "en": "Maximum simultaneous players.",
+        "nl": "Maximaal aantal gelijktijdige spelers.",
+        "de": "Maximale Anzahl gleichzeitiger Spieler."
+      },
+      "required": true,
+      "defaultValue": "8",
+      "minLength": 1,
+      "maxLength": 2
+    }
+  ],
+  "secrets": [
+    {
+      "key": "server-password",
+      "source": "admin",
+      "label": {
+        "en": "Server password",
+        "nl": "Serverwachtwoord",
+        "de": "Serverpasswort"
+      }
+    }
+  ],
+  "lifecycle": {
+    "startOrder": [
+      "server"
+    ],
+    "stopOrder": [
+      "server"
+    ],
+    "stopTimeoutSeconds": 120
+  },
+  "capabilities": {
+    "backup": false,
+    "restore": false,
+    "update": false,
+    "console": false
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "dauva.dev/pod/v1",
+  "id": "minecraft",
+  "status": "stable",
+  "metadata": {
+    "title": {
+      "en": "Minecraft",
+      "nl": "Minecraft",
+      "de": "Minecraft"
+    },
+    "description": {
+      "en": "Curated Minecraft Java Servers with persistent worlds and native backups.",
+      "nl": "Beheerde Minecraft Java-Servers met blijvende werelden en native back-ups.",
+      "de": "Kuratierte Minecraft-Java-Server mit persistenten Welten und nativen Backups."
+    },
+    "icon": "shield"
+  }
+}

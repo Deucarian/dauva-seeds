@@ -1,0 +1,162 @@
+{
+  "schemaVersion": "dauva.dev/seed/v1",
+  "id": "enshrouded",
+  "version": "0.1.0",
+  "status": "draft",
+  "podId": "survival",
+  "metadata": {
+    "title": {
+      "en": "Enshrouded",
+      "nl": "Enshrouded",
+      "de": "Enshrouded"
+    },
+    "description": {
+      "en": "A Windows-through-Proton Enshrouded Server with persistent save data.",
+      "nl": "Een Enshrouded-Server via Proton met blijvende savedata.",
+      "de": "Ein Enshrouded-Server über Proton mit persistenten Spielständen."
+    },
+    "icon": "flame"
+  },
+  "compatibility": {
+    "operatingSystems": [
+      "linux"
+    ],
+    "architectures": [
+      "amd64"
+    ]
+  },
+  "components": [
+    {
+      "id": "server",
+      "role": "primary",
+      "image": "docker.io/sknnr/enshrouded-dedicated-server@sha256:45d8b62209fb60889068b3d679dd6d9af0e530516e46752a5f7c82a0bbb5366d",
+      "environment": {},
+      "optionEnvironment": {},
+      "agreementEnvironment": {},
+      "secretEnvironment": {},
+      "runtimeEnvironment": {},
+      "volumeMounts": [
+        {
+          "volumeId": "saves",
+          "target": "/home/steam/enshrouded/savegame",
+          "readOnly": false
+        },
+        {
+          "volumeId": "config",
+          "target": "/home/steam/enshrouded/dauva-config",
+          "readOnly": false
+        }
+      ],
+      "dependsOn": [],
+      "health": {
+        "source": "running",
+        "startupGraceSeconds": 1800
+      }
+    }
+  ],
+  "volumes": [
+    {
+      "id": "saves",
+      "role": "save",
+      "retention": "delete-with-server"
+    },
+    {
+      "id": "config",
+      "role": "config",
+      "retention": "delete-with-server"
+    }
+  ],
+  "ports": [
+    {
+      "id": "game",
+      "componentId": "server",
+      "containerPort": 15637,
+      "protocols": [
+        "udp"
+      ],
+      "exposure": "public",
+      "purpose": "game",
+      "primary": true,
+      "sharedHostPort": true
+    },
+    {
+      "id": "query",
+      "componentId": "server",
+      "containerPort": 27015,
+      "protocols": [
+        "udp"
+      ],
+      "exposure": "public",
+      "purpose": "query",
+      "primary": false,
+      "sharedHostPort": true
+    }
+  ],
+  "resources": {
+    "defaultPresetId": "large",
+    "presets": [
+      {
+        "id": "large",
+        "title": {
+          "en": "Large",
+          "nl": "Groot",
+          "de": "Groß"
+        },
+        "description": {
+          "en": "Minimum target for the current Proton-based runtime.",
+          "nl": "Minimaal doel voor de huidige Proton-runtime.",
+          "de": "Mindestziel für die aktuelle Proton-basierte Laufzeit."
+        },
+        "memoryMb": 8192,
+        "diskMb": 40960,
+        "cpuPercent": 300
+      }
+    ]
+  },
+  "inputs": [
+    {
+      "key": "accept-steam-agreement",
+      "type": "agreement",
+      "label": {
+        "en": "Steam Subscriber Agreement",
+        "nl": "Steam Subscriber Agreement",
+        "de": "Steam-Nutzungsvertrag"
+      },
+      "help": {
+        "en": "I have read and accept the Steam Subscriber Agreement and the applicable Enshrouded terms.",
+        "nl": "Ik heb de Steam Subscriber Agreement en de toepasselijke Enshrouded-voorwaarden gelezen en accepteer deze.",
+        "de": "Ich habe den Steam-Nutzungsvertrag und die anwendbaren Enshrouded-Bedingungen gelesen und akzeptiert."
+      },
+      "required": true,
+      "defaultValue": "false",
+      "url": "https://store.steampowered.com/subscriber_agreement/",
+      "revision": "official-current"
+    }
+  ],
+  "secrets": [
+    {
+      "key": "admin-password",
+      "source": "admin",
+      "label": {
+        "en": "Administrator password",
+        "nl": "Beheerderswachtwoord",
+        "de": "Administratorpasswort"
+      }
+    }
+  ],
+  "lifecycle": {
+    "startOrder": [
+      "server"
+    ],
+    "stopOrder": [
+      "server"
+    ],
+    "stopTimeoutSeconds": 180
+  },
+  "capabilities": {
+    "backup": false,
+    "restore": false,
+    "update": false,
+    "console": false
+  }
+}

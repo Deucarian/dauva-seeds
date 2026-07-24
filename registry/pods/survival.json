@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "dauva.dev/pod/v1",
+  "id": "survival",
+  "status": "draft",
+  "metadata": {
+    "title": {
+      "en": "Survival",
+      "nl": "Survival",
+      "de": "Survival"
+    },
+    "description": {
+      "en": "Persistent cooperative survival Servers with larger downloads and multiple UDP ports.",
+      "nl": "Blijvende coöperatieve survival-Servers met grotere downloads en meerdere UDP-poorten.",
+      "de": "Persistente kooperative Survival-Server mit größeren Downloads und mehreren UDP-Ports."
+    },
+    "icon": "leaf"
+  }
+}

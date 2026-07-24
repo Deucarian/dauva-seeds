@@ -1,0 +1,170 @@
+{
+  "schemaVersion": "dauva.dev/seed/v1",
+  "id": "factorio",
+  "version": "0.1.0",
+  "status": "draft",
+  "podId": "factory",
+  "metadata": {
+    "title": {
+      "en": "Factorio",
+      "nl": "Factorio",
+      "de": "Factorio"
+    },
+    "description": {
+      "en": "A persistent Factorio headless Server with separate game and RCON ports.",
+      "nl": "Een blijvende Factorio headless Server met aparte game- en RCON-poorten.",
+      "de": "Ein persistenter Factorio-Headless-Server mit getrennten Spiel- und RCON-Ports."
+    },
+    "icon": "settings"
+  },
+  "compatibility": {
+    "operatingSystems": [
+      "linux"
+    ],
+    "architectures": [
+      "amd64"
+    ]
+  },
+  "components": [
+    {
+      "id": "server",
+      "role": "primary",
+      "image": "docker.io/factoriotools/factorio@sha256:f7942281d7d3a54fd7e5b1aca57428fce4f035aabdb1cb798473f7b78778fb49",
+      "environment": {
+        "GENERATE_NEW_SAVE": "true",
+        "LOAD_LATEST_SAVE": "true",
+        "UPDATE_MODS_ON_START": "false"
+      },
+      "optionEnvironment": {
+        "save-name": "SAVE_NAME"
+      },
+      "agreementEnvironment": {},
+      "secretEnvironment": {},
+      "runtimeEnvironment": {
+        "primaryPort": "PORT"
+      },
+      "volumeMounts": [
+        {
+          "volumeId": "data",
+          "target": "/factorio",
+          "readOnly": false
+        }
+      ],
+      "dependsOn": [],
+      "health": {
+        "source": "running",
+        "startupGraceSeconds": 600
+      }
+    }
+  ],
+  "volumes": [
+    {
+      "id": "data",
+      "role": "data",
+      "retention": "delete-with-server"
+    }
+  ],
+  "ports": [
+    {
+      "id": "game",
+      "componentId": "server",
+      "containerPort": 34197,
+      "protocols": [
+        "udp"
+      ],
+      "exposure": "public",
+      "purpose": "game",
+      "primary": true,
+      "sharedHostPort": true,
+      "environment": "PORT"
+    },
+    {
+      "id": "rcon",
+      "componentId": "server",
+      "containerPort": 27015,
+      "protocols": [
+        "tcp"
+      ],
+      "exposure": "private",
+      "purpose": "rcon",
+      "primary": false,
+      "sharedHostPort": true,
+      "environment": "RCON_PORT"
+    }
+  ],
+  "resources": {
+    "defaultPresetId": "balanced",
+    "presets": [
+      {
+        "id": "balanced",
+        "title": {
+          "en": "Balanced",
+          "nl": "Gebalanceerd",
+          "de": "Ausgewogen"
+        },
+        "description": {
+          "en": "Recommended for an established factory with a small group.",
+          "nl": "Aanbevolen voor een bestaande fabriek met een kleine groep.",
+          "de": "Empfohlen für eine bestehende Fabrik mit einer kleinen Gruppe."
+        },
+        "memoryMb": 3072,
+        "diskMb": 12288,
+        "cpuPercent": 200
+      }
+    ]
+  },
+  "inputs": [
+    {
+      "key": "accept-factorio-terms",
+      "type": "agreement",
+      "label": {
+        "en": "Factorio Terms of Service",
+        "nl": "Factorio-gebruiksvoorwaarden",
+        "de": "Factorio-Nutzungsbedingungen"
+      },
+      "help": {
+        "en": "I have read and accept the official Factorio Terms of Service.",
+        "nl": "Ik heb de officiële Factorio-gebruiksvoorwaarden gelezen en accepteer deze.",
+        "de": "Ich habe die offiziellen Factorio-Nutzungsbedingungen gelesen und akzeptiert."
+      },
+      "required": true,
+      "defaultValue": "false",
+      "url": "https://www.factorio.com/terms-of-service",
+      "revision": "2024-10-10"
+    },
+    {
+      "key": "save-name",
+      "type": "string",
+      "label": {
+        "en": "Save name",
+        "nl": "Savenaam",
+        "de": "Spielstandname"
+      },
+      "help": {
+        "en": "Name used when a new save is generated.",
+        "nl": "Naam die wordt gebruikt bij het maken van een nieuwe save.",
+        "de": "Name für einen neu erzeugten Spielstand."
+      },
+      "required": true,
+      "defaultValue": "dauva",
+      "minLength": 3,
+      "maxLength": 64
+    }
+  ],
+  "secrets": [],
+  "lifecycle": {
+    "startOrder": [
+      "server"
+    ],
+    "stopOrder": [
+      "server"
+    ],
+    "stopTimeoutSeconds": 120
+  },
+  "capabilities": {
+    "backup": false,
+    "restore": false,
+    "update": false,
+    "console": false
+  }
+}

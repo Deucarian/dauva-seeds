@@ -1,0 +1,241 @@
+{
+  "schemaVersion": "dauva.dev/seed/v1",
+  "id": "valheim",
+  "version": "0.1.0",
+  "status": "draft",
+  "podId": "survival",
+  "metadata": {
+    "title": {
+      "en": "Valheim",
+      "nl": "Valheim",
+      "de": "Valheim"
+    },
+    "description": {
+      "en": "A persistent Valheim Server based on the proven Debian Compose runtime.",
+      "nl": "Een blijvende Valheim-Server op basis van de bewezen Debian Compose-runtime.",
+      "de": "Ein persistenter Valheim-Server auf Basis der bewährten Debian-Compose-Laufzeit."
+    },
+    "icon": "shield"
+  },
+  "compatibility": {
+    "operatingSystems": [
+      "linux"
+    ],
+    "architectures": [
+      "amd64"
+    ]
+  },
+  "components": [
+    {
+      "id": "server",
+      "role": "primary",
+      "image": "ghcr.io/community-valheim-tools/valheim-server@sha256:e8b13da3c44f54a38511c8ac224f2959a437c0b2626cf916683ca7acc8dfb146",
+      "environment": {
+        "BACKUPS": "true",
+        "BACKUPS_IF_IDLE": "true",
+        "BACKUPS_MAX_AGE": "14",
+        "BACKUPS_MAX_COUNT": "24",
+        "BACKUPS_ZIP": "true",
+        "BEPINEX": "false",
+        "VALHEIM_PLUS": "false"
+      },
+      "optionEnvironment": {
+        "crossplay": "CROSSPLAY",
+        "server-public": "SERVER_PUBLIC",
+        "world-name": "WORLD_NAME"
+      },
+      "agreementEnvironment": {},
+      "secretEnvironment": {
+        "server-password": "SERVER_PASS"
+      },
+      "runtimeEnvironment": {
+        "primaryPort": "SERVER_PORT",
+        "serverName": "SERVER_NAME",
+        "timezone": "TZ"
+      },
+      "volumeMounts": [
+        {
+          "volumeId": "config",
+          "target": "/config",
+          "readOnly": false
+        },
+        {
+          "volumeId": "game",
+          "target": "/opt/valheim",
+          "readOnly": false
+        },
+        {
+          "volumeId": "backups",
+          "target": "/backups",
+          "readOnly": false
+        }
+      ],
+      "dependsOn": [],
+      "health": {
+        "source": "running",
+        "startupGraceSeconds": 900
+      }
+    }
+  ],
+  "volumes": [
+    {
+      "id": "config",
+      "role": "config",
+      "retention": "delete-with-server"
+    },
+    {
+      "id": "game",
+      "role": "data",
+      "retention": "delete-with-server"
+    },
+    {
+      "id": "backups",
+      "role": "backup",
+      "retention": "delete-with-server"
+    }
+  ],
+  "ports": [
+    {
+      "id": "game",
+      "componentId": "server",
+      "containerPort": 2456,
+      "protocols": [
+        "udp"
+      ],
+      "exposure": "public",
+      "purpose": "game",
+      "primary": true,
+      "sharedHostPort": true,
+      "environment": "SERVER_PORT"
+    },
+    {
+      "id": "query",
+      "componentId": "server",
+      "containerPort": 2457,
+      "protocols": [
+        "udp"
+      ],
+      "exposure": "public",
+      "purpose": "query",
+      "primary": false,
+      "sharedHostPort": true
+    }
+  ],
+  "resources": {
+    "defaultPresetId": "balanced",
+    "presets": [
+      {
+        "id": "balanced",
+        "title": {
+          "en": "Balanced",
+          "nl": "Gebalanceerd",
+          "de": "Ausgewogen"
+        },
+        "description": {
+          "en": "A safe starting point for a small cooperative world.",
+          "nl": "Een veilig beginpunt voor een kleine coöperatieve wereld.",
+          "de": "Ein sicherer Ausgangspunkt für eine kleine kooperative Welt."
+        },
+        "memoryMb": 4096,
+        "diskMb": 20480,
+        "cpuPercent": 200
+      }
+    ]
+  },
+  "inputs": [
+    {
+      "key": "accept-steam-agreement",
+      "type": "agreement",
+      "label": {
+        "en": "Steam Subscriber Agreement",
+        "nl": "Steam Subscriber Agreement",
+        "de": "Steam-Nutzungsvertrag"
+      },
+      "help": {
+        "en": "I have read and accept the Steam Subscriber Agreement and the applicable Valheim terms.",
+        "nl": "Ik heb de Steam Subscriber Agreement en de toepasselijke Valheim-voorwaarden gelezen en accepteer deze.",
+        "de": "Ich habe den Steam-Nutzungsvertrag und die anwendbaren Valheim-Bedingungen gelesen und akzeptiert."
+      },
+      "required": true,
+      "defaultValue": "false",
+      "url": "https://store.steampowered.com/subscriber_agreement/",
+      "revision": "official-current"
+    },
+    {
+      "key": "world-name",
+      "type": "string",
+      "label": {
+        "en": "World name",
+        "nl": "Wereldnaam",
+        "de": "Weltname"
+      },
+      "help": {
+        "en": "Name of the persistent Valheim world.",
+        "nl": "Naam van de blijvende Valheim-wereld.",
+        "de": "Name der persistenten Valheim-Welt."
+      },
+      "required": true,
+      "defaultValue": "Dauva",
+      "minLength": 3,
+      "maxLength": 64
+    },
+    {
+      "key": "server-public",
+      "type": "boolean",
+      "label": {
+        "en": "Public listing",
+        "nl": "Openbare vermelding",
+        "de": "Öffentliche Auflistung"
+      },
+      "help": {
+        "en": "Show the Server in the public Valheim browser.",
+        "nl": "Toon de Server in de openbare Valheim-browser.",
+        "de": "Den Server im öffentlichen Valheim-Browser anzeigen."
+      },
+      "required": true,
+      "defaultValue": "false"
+    },
+    {
+      "key": "crossplay",
+      "type": "boolean",
+      "label": {
+        "en": "Crossplay",
+        "nl": "Crossplay",
+        "de": "Crossplay"
+      },
+      "help": {
+        "en": "Enable the crossplay backend.",
+        "nl": "Schakel de crossplay-backend in.",
+        "de": "Das Crossplay-Backend aktivieren."
+      },
+      "required": true,
+      "defaultValue": "true"
+    }
+  ],
+  "secrets": [
+    {
+      "key": "server-password",
+      "source": "admin",
+      "label": {
+        "en": "Server password",
+        "nl": "Serverwachtwoord",
+        "de": "Serverpasswort"
+      }
+    }
+  ],
+  "lifecycle": {
+    "startOrder": [
+      "server"
+    ],
+    "stopOrder": [
+      "server"
+    ],
+    "stopTimeoutSeconds": 120
+  },
+  "capabilities": {
+    "backup": true,
+    "restore": false,
+    "update": false,
+    "console": false
+  }
+}
