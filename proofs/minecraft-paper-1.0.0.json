@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "dauva.dev/seed-proof/v1",
+  "seedId": "minecraft-paper",
+  "seedVersion": "1.0.0",
+  "result": "passed",
+  "provedAt": "2026-07-26T00:45:48+02:00",
+  "leaf": "j-hoef-debian",
+  "checks": {
+    "imagesPinned": true,
+    "healthy": true,
+    "ports": true,
+    "backup": true,
+    "gracefulStop": true,
+    "restart": true,
+    "persistence": true,
+    "cleanup": true
+  },
+  "agreements": [
+    {
+      "key": "accept-minecraft-eula",
+      "url": "https://www.minecraft.net/eula",
+      "revision": "official-current",
+      "accepted": true
+    }
+  ],
+  "evidence": {
+    "runtime": "Paper 26.2-71 for Minecraft 26.2 reached healthy and Done.",
+    "primaryImage": "ghcr.io/itzg/minecraft-server@sha256:6ec1110e4d9236d00ae9436a3e4a5929583e5b19cc94b756a7c603f7cf647a77",
+    "companionImage": "ghcr.io/itzg/mc-backup@sha256:db2bca9a54aac96e8db74be038b920cb549c8e3b3384067251aad5e178dd03cc",
+    "agreement": "The disposable data volume contained eula=true.",
+    "backup": "The companion completed RCON save-all flush and wrote a compressed world backup before and after lifecycle testing.",
+    "persistence": "The world data and a proof marker remained present after the ordered stop and restart.",
+    "cleanup": "The disposable containers, volumes, network, and proof-only port allocation were removed."
+  }
+}

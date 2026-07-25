@@ -1,6 +1,6 @@
 {
   "schemaVersion": "dauva.dev/seed/v1",
-  "id": "enshrouded",
+  "id": "enshrouded-wine",
   "version": "1.0.0",
   "status": "stable",
   "podId": "enshrouded",
@@ -11,14 +11,14 @@
   ],
   "metadata": {
     "title": {
-      "en": "Enshrouded Proton",
-      "nl": "Enshrouded Proton",
-      "de": "Enshrouded Proton"
+      "en": "Enshrouded Wine — Recommended",
+      "nl": "Enshrouded Wine — Aanbevolen",
+      "de": "Enshrouded Wine — Empfohlen"
     },
     "description": {
-      "en": "A Windows-through-Proton Enshrouded Server with persistent saves; cold starts revalidate the large game install.",
-      "nl": "Een Enshrouded-Server via Proton met blijvende saves; bij een koude start wordt de grote game-installatie opnieuw gecontroleerd.",
-      "de": "Ein Enshrouded-Server über Proton mit persistenten Spielständen; beim Kaltstart wird die große Spielinstallation erneut geprüft."
+      "en": "An Enshrouded Server on the maintained Wine runtime with scheduled local backups.",
+      "nl": "Een Enshrouded-Server op de onderhouden Wine-runtime met geplande lokale back-ups.",
+      "de": "Ein Enshrouded-Server auf der gepflegten Wine-Laufzeit mit geplanten lokalen Backups."
     },
     "icon": "flame"
   },
@@ -34,27 +34,39 @@
     {
       "id": "server",
       "role": "primary",
-      "image": "docker.io/sknnr/enshrouded-dedicated-server@sha256:45d8b62209fb60889068b3d679dd6d9af0e530516e46752a5f7c82a0bbb5366d",
+      "image": "docker.io/mornedhels/enshrouded-server@sha256:6e7eb94c52a2bbd0aa3c462edf0412dbf8fbf181984d94199cc4adf42085bdda",
       "imageUpdate": {
-        "reference": "docker.io/sknnr/enshrouded-dedicated-server:latest"
+        "reference": "docker.io/mornedhels/enshrouded-server:stable-wine"
       },
       "environment": {
-        "SERVER_IP": "0.0.0.0"
+        "BACKUP_CRON": "0 */6 * * *",
+        "BACKUP_MAX_COUNT": "24",
+        "GAME_BRANCH": "public",
+        "PGID": "4711",
+        "PUID": "4711",
+        "SERVER_IP": "0.0.0.0",
+        "SERVER_ROLE_0_CAN_ACCESS_INVENTORIES": "true",
+        "SERVER_ROLE_0_CAN_EDIT_BASE": "true",
+        "SERVER_ROLE_0_CAN_EDIT_WORLD": "true",
+        "SERVER_ROLE_0_CAN_EXTEND_BASE": "true",
+        "SERVER_ROLE_0_CAN_KICK_BAN": "true",
+        "SERVER_ROLE_0_NAME": "Admins"
       },
       "optionEnvironment": {
-        "server-slots": "SERVER_SLOTS"
+        "server-slots": "SERVER_SLOT_COUNT"
       },
       "agreementEnvironment": {},
       "secretEnvironment": {
-        "admin-password": "SERVER_PASSWORD"
+        "admin-password": "SERVER_ROLE_0_PASSWORD"
       },
       "runtimeEnvironment": {
-        "serverName": "SERVER_NAME"
+        "serverName": "SERVER_NAME",
+        "primaryPort": "SERVER_QUERYPORT"
       },
       "volumeMounts": [
         {
-          "volumeId": "saves",
-          "target": "/home/steam/enshrouded/savegame",
+          "volumeId": "data",
+          "target": "/opt/enshrouded",
           "readOnly": false
         }
       ],
@@ -67,11 +79,11 @@
   ],
   "volumes": [
     {
-      "id": "saves",
-      "role": "save",
+      "id": "data",
+      "role": "data",
       "retention": "delete-with-server",
-      "ownerUid": 10000,
-      "ownerGid": 10000,
+      "ownerUid": 4711,
+      "ownerGid": 4711,
       "directoryMode": "0750"
     }
   ],
@@ -88,7 +100,7 @@
       "purpose": "game",
       "primary": true,
       "sharedHostPort": true,
-      "environment": "PORT"
+      "environment": "SERVER_QUERYPORT"
     }
   ],
   "resources": {
@@ -178,7 +190,7 @@
     "stopTimeoutSeconds": 180
   },
   "capabilities": {
-    "backup": false,
+    "backup": true,
     "restore": false,
     "update": false,
     "console": false

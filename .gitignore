@@ -1,1 +1,3 @@
 node_modules/
+dist/update-report.json
+dist/candidate-proof-plan.json

@@ -140,11 +140,12 @@ native Server. Agreement acceptance is stored in a separate audit record with
 the Server, Seed, agreement, accepting user, URL, revision, and timestamp.
 
 Seed v1 is implemented as JSON Schema plus stricter policy validation. The
-registry contains six game-family Pods and six sanitized Seeds. Minecraft Fabric,
-Factorio, Core Keeper, and Valheim are stable `1.0.0` Seeds after their own
-native lifecycle tests. Satisfactory and Enshrouded remain candidates and are
-not published in the production Seed Library until their larger memory and
-runtime behavior is proven.
+registry contains six game-family Pods and twelve sanitized Seeds: two
+meaningful variants per Pod. Factorio Stable, Valheim BepInEx, both
+Satisfactory branches, and both Enshrouded runtimes passed fresh native
+lifecycle proofs and joined the original stable Seeds. Minecraft Paper then
+passed its EULA-gated Paper 26.2 lifecycle proof with persistent world data,
+ordered restart, and native RCON backups. All twelve current Seeds are stable.
 
 The native Docker Branch and Pterodactyl Branch are registered side by side.
 After the successful Minecraft acceptance test, native Docker became the
@@ -645,32 +646,44 @@ native pool and was removed after the test. Candidate Seeds were enabled only
 for the acceptance window and disabled again after promotion of Minecraft
 Fabric `1.0.0` to stable.
 
-### Phase 2: current Server set — partially complete
+### Phase 2: current Server set — complete
 
-Converted and validated:
+Converted, validated, and lifecycle-proven:
 
 1. Valheim;
 2. Core Keeper;
 3. Factorio;
-
-Remaining candidates:
-
 4. Satisfactory;
 5. Enshrouded.
 
 This phase has added dynamic UDP and contiguous paired-port allocation,
 UID/GID-aware volume ownership, ephemeral secret handoff, graceful shutdown,
-and larger owned storage behavior. Satisfactory and Enshrouded wait for the
-planned RAM upgrade and full disposable lifecycle tests.
+Seed-specific Unix stop signals, crash-only automatic restarts, and larger
+owned storage behavior. Heavy proofs ran serially to stay within the current
+Leaf's memory capacity.
 
 Live acceptance evidence:
 
 - Factorio completed create, running status, stop, start, restart, and delete
   with a dynamic public UDP port and an internal-only RCON port.
 - Core Keeper completed create, running status, stop, start, and delete with
-  data and cache volumes on the dedicated data disk.
+  data and cache volumes on the dedicated data disk. The Hard variant's
+  Seed-specific `SIGINT` shutdown completed in three seconds, persisted
+  `worlds/0.world.gzip`, stayed stopped, and loaded that exact save on restart.
 - Valheim completed create, running status, graceful stop, start, and
   delete-while-running with a contiguous public UDP pair.
+- Satisfactory Stable and Experimental each survived their SteamCMD first-run
+  retry, became healthy, exposed their TCP/UDP ports, stopped intentionally,
+  stayed stopped, and restarted.
+- Enshrouded Proton and Wine each completed a fresh roughly 9 GB install,
+  reached host-online state, exposed the intended UDP port, stopped, and
+  restarted. Wine reused its explicit persistent installation and is the
+  recommended default; Proton deliberately revalidates its container-layer
+  installation on cold starts.
+- Minecraft Paper 26.2 reached healthy and `Done` with `eula=true`, a dynamic
+  TCP allocation, and its pinned backup companion. Its world survived an
+  ordered stop and restart, the companion wrote a fresh RCON backup after
+  recovery, and every disposable resource was removed.
 - Every test used a digest-pinned image and enforced CPU and memory limits.
 - Secret values were absent from ordinary instance options, and each required
   agreement produced exactly one server-side acceptance record.
@@ -687,6 +700,8 @@ Completed on the production-isolated develop stack:
 - extracted Linux Leaf Agent with a labeled Docker executor;
 - portal Leaf inventory, Add Leaf, and Choose Leaf flows;
 - route Sprouting through a selected Leaf;
+- daily OCI tag resolution and reviewable Seed update candidates;
+- proof receipts and guarded candidate promotion;
 
 Live external-Leaf acceptance on 2026-07-26 enrolled an Agent through the
 device-code protocol, observed it online with Docker 27.5.1 capacity, completed
@@ -704,7 +719,7 @@ Next operational slices:
 
 - live log streaming and console;
 - backup and restore UI;
-- update and rollback;
+- installed-Server update and rollback;
 - Factorio-first Mod Profiles, Mod Selection, immutable Mod Locks, and atomic
   mod update rollback;
 - scheduled tasks;
