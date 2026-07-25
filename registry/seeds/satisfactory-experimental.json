@@ -34,6 +34,9 @@
       "id": "server",
       "role": "primary",
       "image": "docker.io/wolveix/satisfactory-server@sha256:e103700ae6ae4c50f19dac80eadb2a805c5b885e179ae2a40850e967bf189efd",
+      "imageUpdate": {
+        "reference": "docker.io/wolveix/satisfactory-server:latest"
+      },
       "environment": {
         "AUTOSAVENUM": "10",
         "DISABLESEASONALEVENTS": "false",

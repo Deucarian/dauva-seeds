@@ -1,8 +1,8 @@
 {
   "schemaVersion": "dauva.dev/seed/v1",
   "id": "minecraft-paper",
-  "version": "1.0.0-rc.1",
-  "status": "candidate",
+  "version": "1.0.0",
+  "status": "stable",
   "podId": "minecraft",
   "genres": [
     "sandbox",
@@ -34,6 +34,9 @@
       "id": "server",
       "role": "primary",
       "image": "ghcr.io/itzg/minecraft-server@sha256:6ec1110e4d9236d00ae9436a3e4a5929583e5b19cc94b756a7c603f7cf647a77",
+      "imageUpdate": {
+        "reference": "ghcr.io/itzg/minecraft-server:stable"
+      },
       "environment": {
         "ALLOW_FLIGHT": "TRUE",
         "ENABLE_RCON": "TRUE",
@@ -82,6 +85,9 @@
       "id": "backups",
       "role": "companion",
       "image": "ghcr.io/itzg/mc-backup@sha256:db2bca9a54aac96e8db74be038b920cb549c8e3b3384067251aad5e178dd03cc",
+      "imageUpdate": {
+        "reference": "ghcr.io/itzg/mc-backup:stable"
+      },
       "environment": {
         "BACKUP_INTERVAL": "2h",
         "BACKUP_ON_STARTUP": "FALSE",
@@ -174,9 +180,9 @@
           "de": "Ausgewogen"
         },
         "description": {
-          "en": "Recommended for a persistent Fabric Server.",
-          "nl": "Aanbevolen voor een blijvende Fabric-Server.",
-          "de": "Für einen persistenten Fabric-Server empfohlen."
+          "en": "Recommended for a persistent Paper Server.",
+          "nl": "Aanbevolen voor een blijvende Paper-Server.",
+          "de": "Für einen persistenten Paper-Server empfohlen."
         },
         "memoryMb": 3072,
         "diskMb": 20480,
@@ -369,4 +375,3 @@
     "console": false
   }
 }
-

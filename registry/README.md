@@ -30,5 +30,12 @@ Core Keeper Hard also passed a fresh Hard-world proof. Its Seed-specific
 `SIGINT` shutdown completed in three seconds, wrote the world save to the
 data-disk volume, stayed stopped, and loaded that same save after restart.
 
-Minecraft Paper remains a candidate until an administrator personally accepts
-the official Minecraft EULA in Dauva and completes its live lifecycle proof.
+Minecraft Paper passed its EULA-gated Paper 26.2 proof with digest-pinned
+primary and backup images, a dynamic port, a persistent world, an ordered
+restart, two RCON backups, and complete cleanup. All twelve current Seeds are
+stable.
+
+Each component also declares one mutable OCI tag under `imageUpdate`. The tag
+is discovery metadata only: Servers always run the digest-pinned `image`.
+Scheduled checks prepare reviewable patch-versioned candidates, never mutate
+existing Servers, never merge automatically, and never pre-accept agreements.

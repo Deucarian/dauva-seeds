@@ -2,7 +2,7 @@
 
 Status: **Phase 2 partially implemented and live**
 
-Last updated: 2026-07-25
+Last updated: 2026-07-26
 
 This document is the canonical product and architecture design for Dauva's
 native game-server platform. Keep it current when the Seed format, registry,
@@ -139,9 +139,9 @@ Seed v1 is implemented as JSON Schema plus stricter policy validation. The
 registry contains six game-family Pods and twelve sanitized Seeds: two
 meaningful variants per Pod. Factorio Stable, Valheim BepInEx, both
 Satisfactory branches, and both Enshrouded runtimes passed fresh native
-lifecycle proofs and joined the original stable Seeds. Minecraft Paper remains
-a candidate until an administrator personally accepts the official Minecraft
-EULA in Dauva and completes its live proof.
+lifecycle proofs and joined the original stable Seeds. Minecraft Paper then
+passed its EULA-gated Paper 26.2 lifecycle proof with persistent world data,
+ordered restart, and native RCON backups. All twelve current Seeds are stable.
 
 The native Docker Branch and Pterodactyl Branch are registered side by side.
 After the successful Minecraft acceptance test, native Docker became the
@@ -520,6 +520,10 @@ Live acceptance evidence:
   restarted. Wine reused its explicit persistent installation and is the
   recommended default; Proton deliberately revalidates its container-layer
   installation on cold starts.
+- Minecraft Paper 26.2 reached healthy and `Done` with `eula=true`, a dynamic
+  TCP allocation, and its pinned backup companion. Its world survived an
+  ordered stop and restart, the companion wrote a fresh RCON backup after
+  recovery, and every disposable resource was removed.
 - Every test used a digest-pinned image and enforced CPU and memory limits.
 - Secret values were absent from ordinary instance options, and each required
   agreement produced exactly one server-side acceptance record.
@@ -529,9 +533,11 @@ Live acceptance evidence:
 
 ### Phase 3: operational completeness
 
+- daily OCI tag resolution and reviewable Seed update candidates (implemented);
+- proof receipts and guarded candidate promotion (implemented);
 - live log streaming and console;
 - backup and restore UI;
-- update and rollback;
+- installed-Server update and rollback;
 - scheduled tasks;
 - registry signing and trusted sources;
 - Leaf capacity reporting;

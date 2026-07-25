@@ -40,8 +40,9 @@ The first vertical slice is live:
   saves, logs, and local backups all live on explicit data-disk storage.
   Enshrouded Proton persists saves but revalidates its large install on cold
   starts.
-- Minecraft Paper remains a candidate until an administrator personally
-  accepts the official Minecraft EULA in Dauva and completes its live proof.
+- Minecraft Paper passed its EULA-gated native lifecycle proof with Paper
+  26.2, a healthy primary container, dynamic port, persistent world, ordered
+  restart, and two real RCON backups. All twelve Seeds are now stable.
 - Dauva rejects mutable images, fixed secrets, saves, arbitrary host paths,
   privileged runtime access, and Docker socket mounts.
 - Disposable Factorio, Core Keeper Normal and Hard, Valheim, Satisfactory, and Enshrouded
@@ -51,3 +52,16 @@ The first vertical slice is live:
   Pterodactyl remains an optional migration fallback.
 
 Compiled registry output is committed at `dist/registry.json`.
+
+## Seed updates
+
+Every component keeps its immutable runtime image and a separate reviewed OCI
+tag used only for update discovery. `npm run updates:check` resolves those tags
+without changing a Seed. The daily GitHub workflow opens a pull request with
+patch-versioned release candidates when digests change.
+
+Existing Servers never move automatically. A candidate must pass health, port,
+backup, stop, restart, persistence, and cleanup checks before
+`npm run seed:promote` accepts its matching proof receipt. Agreements stay
+unchecked: a required EULA or terms revision must have explicit acceptance in
+the proof receipt and in Dauva's server-side audit.

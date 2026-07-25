@@ -35,6 +35,9 @@
       "id": "server",
       "role": "primary",
       "image": "ghcr.io/community-valheim-tools/valheim-server@sha256:e8b13da3c44f54a38511c8ac224f2959a437c0b2626cf916683ca7acc8dfb146",
+      "imageUpdate": {
+        "reference": "ghcr.io/community-valheim-tools/valheim-server:latest"
+      },
       "environment": {
         "BACKUPS": "true",
         "BACKUPS_IF_IDLE": "true",

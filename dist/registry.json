@@ -151,6 +151,9 @@
           "id": "server",
           "role": "primary",
           "image": "docker.io/escaping/core-keeper-dedicated@sha256:6531227708c06db6850731609e2df3e0940e63149395c743f12a0ce5f0c34ead",
+          "imageUpdate": {
+            "reference": "docker.io/escaping/core-keeper-dedicated:latest"
+          },
           "stopSignal": "SIGINT",
           "environment": {
             "MODS_ENABLED": "false",
@@ -341,7 +344,7 @@
         "update": false,
         "console": false
       },
-      "manifestDigest": "sha256:484de41151ff4d90115493183dc925007562a1245b0805855db68f7b6a80b888"
+      "manifestDigest": "sha256:86cddc6e1a2d1f6a24a8c55ea429f0edd05e092fb35d7fec5f3e9b1b47f8fa7e"
     },
     {
       "schemaVersion": "dauva.dev/seed/v1",
@@ -380,6 +383,9 @@
           "id": "server",
           "role": "primary",
           "image": "docker.io/escaping/core-keeper-dedicated@sha256:6531227708c06db6850731609e2df3e0940e63149395c743f12a0ce5f0c34ead",
+          "imageUpdate": {
+            "reference": "docker.io/escaping/core-keeper-dedicated:latest"
+          },
           "stopSignal": "SIGINT",
           "environment": {
             "MODS_ENABLED": "false",
@@ -570,7 +576,7 @@
         "update": false,
         "console": false
       },
-      "manifestDigest": "sha256:b8f446d7ca0a8243ceccbfe0f3da36e22f5458ab38d17ecc6d2d97d4e71e08d5"
+      "manifestDigest": "sha256:d4c0faa98cac1fa7e18879ed8d220027fc22f315f084e2522834d8e14dbbb0cc"
     },
     {
       "schemaVersion": "dauva.dev/seed/v1",
@@ -609,6 +615,9 @@
           "id": "server",
           "role": "primary",
           "image": "docker.io/sknnr/enshrouded-dedicated-server@sha256:45d8b62209fb60889068b3d679dd6d9af0e530516e46752a5f7c82a0bbb5366d",
+          "imageUpdate": {
+            "reference": "docker.io/sknnr/enshrouded-dedicated-server:latest"
+          },
           "environment": {
             "SERVER_IP": "0.0.0.0"
           },
@@ -754,7 +763,7 @@
         "update": false,
         "console": false
       },
-      "manifestDigest": "sha256:5cc8557f272350dab9865ea7b0bbc1bc554526a53df1e433e433914081b3e1e7"
+      "manifestDigest": "sha256:682e465e9ee389a96e0d777fef9f714f85a4b690ec77bb8d61ddcad619974846"
     },
     {
       "schemaVersion": "dauva.dev/seed/v1",
@@ -793,6 +802,9 @@
           "id": "server",
           "role": "primary",
           "image": "docker.io/mornedhels/enshrouded-server@sha256:6e7eb94c52a2bbd0aa3c462edf0412dbf8fbf181984d94199cc4adf42085bdda",
+          "imageUpdate": {
+            "reference": "docker.io/mornedhels/enshrouded-server:stable-wine"
+          },
           "environment": {
             "BACKUP_CRON": "0 */6 * * *",
             "BACKUP_MAX_COUNT": "24",
@@ -950,7 +962,7 @@
         "update": false,
         "console": false
       },
-      "manifestDigest": "sha256:7e6a2db9c1ff007ad4bea61093c407cc28ab7e48734f00819e0a0fc543087580"
+      "manifestDigest": "sha256:4fe56a36331ccaa5f3460854c53aff67b267f5f188c77ff1c03c50c7ecd4e551"
     },
     {
       "schemaVersion": "dauva.dev/seed/v1",
@@ -988,6 +1000,9 @@
           "id": "server",
           "role": "primary",
           "image": "docker.io/factoriotools/factorio@sha256:f7942281d7d3a54fd7e5b1aca57428fce4f035aabdb1cb798473f7b78778fb49",
+          "imageUpdate": {
+            "reference": "docker.io/factoriotools/factorio:latest"
+          },
           "environment": {
             "GENERATE_NEW_SAVE": "true",
             "LOAD_LATEST_SAVE": "true",
@@ -1127,7 +1142,7 @@
         "update": false,
         "console": false
       },
-      "manifestDigest": "sha256:82f5c9ddee6d7a6a6bd0a0d7a783642295bf1a92a3f5f789bcb496b2dd28348a"
+      "manifestDigest": "sha256:dd79b853ca59778cb0fbce1abe9a34f13194a605664abd34c1ab91151f66a4e7"
     },
     {
       "schemaVersion": "dauva.dev/seed/v1",
@@ -1165,6 +1180,9 @@
           "id": "server",
           "role": "primary",
           "image": "docker.io/factoriotools/factorio@sha256:7052b3cca8ca7790f99f4058617d5c8089df544de736b1baa23f2c5f58fb7f48",
+          "imageUpdate": {
+            "reference": "docker.io/factoriotools/factorio:stable"
+          },
           "environment": {
             "GENERATE_NEW_SAVE": "true",
             "LOAD_LATEST_SAVE": "true",
@@ -1304,7 +1322,7 @@
         "update": false,
         "console": false
       },
-      "manifestDigest": "sha256:1d06231b147b4076155aa92753153ea4a48b729eab3be31cd5205f3e0261a00c"
+      "manifestDigest": "sha256:00f2f6a0f564cc95a7a5b6abe7e5990e04ed594a423498b90baa02faeabd1542"
     },
     {
       "schemaVersion": "dauva.dev/seed/v1",
@@ -1342,6 +1360,9 @@
           "id": "server",
           "role": "primary",
           "image": "ghcr.io/itzg/minecraft-server@sha256:6ec1110e4d9236d00ae9436a3e4a5929583e5b19cc94b756a7c603f7cf647a77",
+          "imageUpdate": {
+            "reference": "ghcr.io/itzg/minecraft-server:stable"
+          },
           "environment": {
             "ALLOW_FLIGHT": "TRUE",
             "ENABLE_RCON": "TRUE",
@@ -1390,6 +1411,9 @@
           "id": "backups",
           "role": "companion",
           "image": "ghcr.io/itzg/mc-backup@sha256:db2bca9a54aac96e8db74be038b920cb549c8e3b3384067251aad5e178dd03cc",
+          "imageUpdate": {
+            "reference": "ghcr.io/itzg/mc-backup:stable"
+          },
           "environment": {
             "BACKUP_INTERVAL": "2h",
             "BACKUP_ON_STARTUP": "FALSE",
@@ -1676,13 +1700,13 @@
         "update": false,
         "console": false
       },
-      "manifestDigest": "sha256:5e93ba2e2149b9bd5dfa85524d7eef56d8816c373411e7aeed57dba2a5d1138b"
+      "manifestDigest": "sha256:50d61eb65f55908ef980ce2ea04575c1a875a201d617dcc6e3eab06a3c742dc8"
     },
     {
       "schemaVersion": "dauva.dev/seed/v1",
       "id": "minecraft-paper",
-      "version": "1.0.0-rc.1",
-      "status": "candidate",
+      "version": "1.0.0",
+      "status": "stable",
       "podId": "minecraft",
       "genres": [
         "sandbox",
@@ -1714,6 +1738,9 @@
           "id": "server",
           "role": "primary",
           "image": "ghcr.io/itzg/minecraft-server@sha256:6ec1110e4d9236d00ae9436a3e4a5929583e5b19cc94b756a7c603f7cf647a77",
+          "imageUpdate": {
+            "reference": "ghcr.io/itzg/minecraft-server:stable"
+          },
           "environment": {
             "ALLOW_FLIGHT": "TRUE",
             "ENABLE_RCON": "TRUE",
@@ -1762,6 +1789,9 @@
           "id": "backups",
           "role": "companion",
           "image": "ghcr.io/itzg/mc-backup@sha256:db2bca9a54aac96e8db74be038b920cb549c8e3b3384067251aad5e178dd03cc",
+          "imageUpdate": {
+            "reference": "ghcr.io/itzg/mc-backup:stable"
+          },
           "environment": {
             "BACKUP_INTERVAL": "2h",
             "BACKUP_ON_STARTUP": "FALSE",
@@ -1854,9 +1884,9 @@
               "de": "Ausgewogen"
             },
             "description": {
-              "en": "Recommended for a persistent Fabric Server.",
-              "nl": "Aanbevolen voor een blijvende Fabric-Server.",
-              "de": "Für einen persistenten Fabric-Server empfohlen."
+              "en": "Recommended for a persistent Paper Server.",
+              "nl": "Aanbevolen voor een blijvende Paper-Server.",
+              "de": "Für einen persistenten Paper-Server empfohlen."
             },
             "memoryMb": 3072,
             "diskMb": 20480,
@@ -2048,7 +2078,7 @@
         "update": false,
         "console": false
       },
-      "manifestDigest": "sha256:49410296670164c55a4fc69164ef5afe3ee3fb964dabf6f5b1e73ea8db3e85c6"
+      "manifestDigest": "sha256:186c2d1d5763f6d5cbfd010e35c9ebec3b08fdef8ed68209d7e66c64c55ce17d"
     },
     {
       "schemaVersion": "dauva.dev/seed/v1",
@@ -2086,6 +2116,9 @@
           "id": "server",
           "role": "primary",
           "image": "docker.io/wolveix/satisfactory-server@sha256:e103700ae6ae4c50f19dac80eadb2a805c5b885e179ae2a40850e967bf189efd",
+          "imageUpdate": {
+            "reference": "docker.io/wolveix/satisfactory-server:latest"
+          },
           "environment": {
             "AUTOSAVENUM": "10",
             "DISABLESEASONALEVENTS": "false",
@@ -2248,7 +2281,7 @@
         "update": false,
         "console": false
       },
-      "manifestDigest": "sha256:9758ad49aa623e40f0a1c75f36102755ca6786f34b7b9bce67b42049d18b611f"
+      "manifestDigest": "sha256:7818de5a4ae2bbdd64c683236423bcdd9495949fd76d179db8f4012d4dfae7e5"
     },
     {
       "schemaVersion": "dauva.dev/seed/v1",
@@ -2286,6 +2319,9 @@
           "id": "server",
           "role": "primary",
           "image": "docker.io/wolveix/satisfactory-server@sha256:e103700ae6ae4c50f19dac80eadb2a805c5b885e179ae2a40850e967bf189efd",
+          "imageUpdate": {
+            "reference": "docker.io/wolveix/satisfactory-server:latest"
+          },
           "environment": {
             "AUTOSAVENUM": "10",
             "DISABLESEASONALEVENTS": "false",
@@ -2448,7 +2484,7 @@
         "update": false,
         "console": false
       },
-      "manifestDigest": "sha256:25c181950752815e18b4e47826d27d10f2c4a7d1175f9bd84dd43156e063abd5"
+      "manifestDigest": "sha256:612fb52b9c8662a1467aea1d5ec0cd385f16d37508baaa65a1048132f8252546"
     },
     {
       "schemaVersion": "dauva.dev/seed/v1",
@@ -2487,6 +2523,9 @@
           "id": "server",
           "role": "primary",
           "image": "ghcr.io/community-valheim-tools/valheim-server@sha256:e8b13da3c44f54a38511c8ac224f2959a437c0b2626cf916683ca7acc8dfb146",
+          "imageUpdate": {
+            "reference": "ghcr.io/community-valheim-tools/valheim-server:latest"
+          },
           "environment": {
             "BACKUPS": "true",
             "BACKUPS_IF_IDLE": "true",
@@ -2703,7 +2742,7 @@
         "update": false,
         "console": false
       },
-      "manifestDigest": "sha256:51233d9d4ea1accd3801f49c2a754d30910645e760e80a165553aad1511df1dc"
+      "manifestDigest": "sha256:35c90732bcebb8647fbba0d86b1045fdaaccf5e0d7fc2ae7e98221290c4db46d"
     },
     {
       "schemaVersion": "dauva.dev/seed/v1",
@@ -2742,6 +2781,9 @@
           "id": "server",
           "role": "primary",
           "image": "ghcr.io/community-valheim-tools/valheim-server@sha256:e8b13da3c44f54a38511c8ac224f2959a437c0b2626cf916683ca7acc8dfb146",
+          "imageUpdate": {
+            "reference": "ghcr.io/community-valheim-tools/valheim-server:latest"
+          },
           "environment": {
             "BACKUPS": "true",
             "BACKUPS_IF_IDLE": "true",
@@ -2958,8 +3000,8 @@
         "update": false,
         "console": false
       },
-      "manifestDigest": "sha256:87530d254d1a4bbd4243f6848a4c9abe30c48799974b770dff45ee2b17d4fdd2"
+      "manifestDigest": "sha256:ead33c5c28a0a10a35a15d70dc121eb054e607392c55c21a5d3c28a88b0bb005"
     }
   ],
-  "registryDigest": "sha256:6551939ec9d6c5c0f28d8c31a392158f8c360719e3124658f329798830fd8e4d"
+  "registryDigest": "sha256:c7bc2ffb266afca97c265eaa6a72e9bf4d25f8cda834592e56ebe182245ee43f"
 }

@@ -20,10 +20,15 @@ const podSchema = await readJson(
 const seedSchema = await readJson(
   path.join(repositoryRoot, "schemas", "seed-v1.schema.json"),
 );
+const proofSchema = await readJson(
+  path.join(repositoryRoot, "schemas", "seed-proof-v1.schema.json"),
+);
 const validatePod = ajv.compile(podSchema);
 const validateSeed = ajv.compile(seedSchema);
+const validateProof = ajv.compile(proofSchema);
 const podFiles = await readManifestDirectory("registry/pods");
 const seedFiles = await readManifestDirectory("registry/seeds");
+const proofFiles = await readManifestDirectory("proofs");
 const errors = [];
 
 for (const entry of podFiles) {
@@ -31,6 +36,9 @@ for (const entry of podFiles) {
 }
 for (const entry of seedFiles) {
   validateSchema(entry, validateSeed, "Seed");
+}
+for (const entry of proofFiles) {
+  validateSchema(entry, validateProof, "Seed proof", false);
 }
 
 validateUniqueIds(podFiles, "Pod");
@@ -41,6 +49,7 @@ for (const entry of seedFiles) {
   validateSeedPolicy(entry, podIds);
 }
 validatePodMembership(podFiles, seedFiles);
+validateProofPolicy(proofFiles, seedFiles);
 
 if (errors.length > 0) {
   for (const error of errors) {
@@ -49,11 +58,11 @@ if (errors.length > 0) {
   process.exitCode = 1;
 } else {
   console.log(
-    `Validated ${podFiles.length} Pods and ${seedFiles.length} Seeds without policy violations.`,
+    `Validated ${podFiles.length} Pods, ${seedFiles.length} Seeds, and ${proofFiles.length} proof receipt${proofFiles.length === 1 ? "" : "s"} without policy violations.`,
   );
 }
 
-function validateSchema(entry, validator, kind) {
+function validateSchema(entry, validator, kind, enforceIdFileName = true) {
   if (!validator(entry.value)) {
     for (const error of validator.errors ?? []) {
       errors.push(
@@ -61,7 +70,7 @@ function validateSchema(entry, validator, kind) {
       );
     }
   }
-  if (`${entry.value.id}.json` !== entry.name) {
+  if (enforceIdFileName && `${entry.value.id}.json` !== entry.name) {
     errors.push(
       `${entry.name}: filename must match the manifest id (${entry.value.id}.json).`,
     );
@@ -133,6 +142,16 @@ function validateSeedPolicy(entry, podIds) {
   for (const component of seed.components) {
     if (!component.image.includes("@sha256:")) {
       errors.push(`${entry.name}: ${component.id} image is not pinned by digest.`);
+    }
+    const pinnedRepository = component.image.split("@", 1)[0];
+    const updateRepository = component.imageUpdate.reference.slice(
+      0,
+      component.imageUpdate.reference.lastIndexOf(":"),
+    );
+    if (pinnedRepository !== updateRepository) {
+      errors.push(
+        `${entry.name}: ${component.id} update reference must use repository '${pinnedRepository}'.`,
+      );
     }
     for (const name of Object.keys(component.environment)) {
       if (/(?:PASSWORD|PASSWD|TOKEN|SECRET|API_KEY|PRIVATE_KEY)/i.test(name)) {
@@ -257,6 +276,29 @@ function validateSeedPolicy(entry, podIds) {
   }
 
   void portIds;
+}
+
+function validateProofPolicy(proofs, seeds) {
+  const seedById = new Map(seeds.map((entry) => [entry.value.id, entry.value]));
+  const proofKeys = new Set();
+
+  for (const entry of proofs) {
+    const proof = entry.value;
+    const proofKey = `${proof.seedId}@${proof.seedVersion}`;
+    if (proofKeys.has(proofKey)) {
+      errors.push(`${entry.name}: duplicate proof receipt for '${proofKey}'.`);
+    }
+    proofKeys.add(proofKey);
+
+    if (!seedById.has(proof.seedId)) {
+      errors.push(`${entry.name}: Seed '${proof.seedId}' does not exist.`);
+    }
+    if (`${proof.seedId}-${proof.seedVersion}.json` !== entry.name) {
+      errors.push(
+        `${entry.name}: proof filename must identify '${proof.seedId}-${proof.seedVersion}.json'.`,
+      );
+    }
+  }
 }
 
 function uniqueIds(fileName, kind, items, key = "id") {

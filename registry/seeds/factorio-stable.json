@@ -34,6 +34,9 @@
       "id": "server",
       "role": "primary",
       "image": "docker.io/factoriotools/factorio@sha256:7052b3cca8ca7790f99f4058617d5c8089df544de736b1baa23f2c5f58fb7f48",
+      "imageUpdate": {
+        "reference": "docker.io/factoriotools/factorio:stable"
+      },
       "environment": {
         "GENERATE_NEW_SAVE": "true",
         "LOAD_LATEST_SAVE": "true",

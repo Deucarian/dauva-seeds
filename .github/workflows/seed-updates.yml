@@ -1,0 +1,73 @@
+name: Watch Seed image updates
+
+on:
+  schedule:
+    - cron: "17 4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: seed-image-updates
+  cancel-in-progress: false
+
+jobs:
+  prepare-candidates:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      UPDATE_BRANCH: automation/seed-image-updates
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - name: Check for an existing update pull request
+        id: existing
+        run: |
+          count="$(gh pr list --state open --head "$UPDATE_BRANCH" --json number --jq length)"
+          if [ "$count" -gt 0 ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "An update pull request is already open."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Resolve tracked OCI tags
+        if: steps.existing.outputs.skip == 'false'
+        run: npm run updates:check -- --output "$RUNNER_TEMP/seed-update-report.json"
+      - name: Read update count
+        if: steps.existing.outputs.skip == 'false'
+        id: updates
+        run: |
+          count="$(node -p "JSON.parse(require('fs').readFileSync(process.env.RUNNER_TEMP + '/seed-update-report.json')).updatesAvailable")"
+          echo "count=$count" >> "$GITHUB_OUTPUT"
+      - name: Prepare reviewable candidates
+        if: steps.updates.outputs.count != '0' && steps.updates.outputs.count != ''
+        run: |
+          npm run updates:prepare -- \
+            --report "$RUNNER_TEMP/seed-update-report.json" \
+            --proof-plan "$RUNNER_TEMP/seed-proof-plan.json"
+          npm run compile
+          npm run check
+      - name: Publish candidate pull request
+        if: steps.updates.outputs.count != '0' && steps.updates.outputs.count != ''
+        run: |
+          git config user.name "Dauva Seed Watch"
+          git config user.email "seed-watch@users.noreply.github.com"
+          git fetch origin "$UPDATE_BRANCH:refs/remotes/origin/$UPDATE_BRANCH" || true
+          git checkout -B "$UPDATE_BRANCH"
+          git add registry/seeds dist/registry.json
+          git commit -m "chore: prepare Seed image update candidates"
+          git push --force-with-lease --set-upstream origin "$UPDATE_BRANCH"
+          gh pr create \
+            --base main \
+            --head "$UPDATE_BRANCH" \
+            --title "chore: prove updated Seed images" \
+            --body "Dauva detected ${{ steps.updates.outputs.count }} changed OCI image digest(s) and prepared release-candidate Seeds. Existing Servers remain pinned. Before promotion, every candidate still requires its lifecycle proof; legal agreements remain explicit and are never accepted by this workflow."
+

@@ -35,6 +35,9 @@
       "id": "server",
       "role": "primary",
       "image": "docker.io/escaping/core-keeper-dedicated@sha256:6531227708c06db6850731609e2df3e0940e63149395c743f12a0ce5f0c34ead",
+      "imageUpdate": {
+        "reference": "docker.io/escaping/core-keeper-dedicated:latest"
+      },
       "stopSignal": "SIGINT",
       "environment": {
         "MODS_ENABLED": "false",

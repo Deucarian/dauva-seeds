@@ -35,6 +35,9 @@
       "id": "server",
       "role": "primary",
       "image": "docker.io/sknnr/enshrouded-dedicated-server@sha256:45d8b62209fb60889068b3d679dd6d9af0e530516e46752a5f7c82a0bbb5366d",
+      "imageUpdate": {
+        "reference": "docker.io/sknnr/enshrouded-dedicated-server:latest"
+      },
       "environment": {
         "SERVER_IP": "0.0.0.0"
       },

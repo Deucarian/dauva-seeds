@@ -35,6 +35,9 @@
       "id": "server",
       "role": "primary",
       "image": "docker.io/mornedhels/enshrouded-server@sha256:6e7eb94c52a2bbd0aa3c462edf0412dbf8fbf181984d94199cc4adf42085bdda",
+      "imageUpdate": {
+        "reference": "docker.io/mornedhels/enshrouded-server:stable-wine"
+      },
       "environment": {
         "BACKUP_CRON": "0 */6 * * *",
         "BACKUP_MAX_COUNT": "24",

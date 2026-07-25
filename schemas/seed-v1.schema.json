@@ -200,6 +200,7 @@
         "id",
         "role",
         "image",
+        "imageUpdate",
         "environment",
         "optionEnvironment",
         "agreementEnvironment",
@@ -223,6 +224,20 @@
           "type": "string",
           "pattern": "^[a-z0-9.-]+(?::[0-9]+)?/[a-z0-9._/-]+@sha256:[a-f0-9]{64}$",
           "maxLength": 500
+        },
+        "imageUpdate": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "reference"
+          ],
+          "properties": {
+            "reference": {
+              "type": "string",
+              "pattern": "^[a-z0-9.-]+(?::[0-9]+)?/[a-z0-9._/-]+:[A-Za-z0-9_][A-Za-z0-9._-]{0,127}$",
+              "maxLength": 500
+            }
+          }
         },
         "stopSignal": {
           "enum": [
