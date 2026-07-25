@@ -9,6 +9,9 @@ store live worlds, saves, secrets, backups, or large game installations.
 ## Start here
 
 - [Native server platform design](docs/architecture/dauva-native-server-platform.md)
+- [ADR 0001: outbound device-code Leaf enrollment](docs/adr/0001-outbound-device-code-leaf-enrollment.md)
+- [ADR 0002: Leaf distribution and client surfaces](docs/adr/0002-leaf-distribution-and-client-surfaces.md)
+- [Managed-hosting separation and economics](docs/product/managed-hosting-separation-and-economics.md)
 - [Registry layout](registry/README.md)
 
 ## Layout
@@ -43,5 +46,8 @@ The first vertical slice is live:
   Leaf without using Pterodactyl.
 - New Servers Sprout through Dauva's native Docker Branch by default;
   Pterodactyl remains an optional migration fallback.
+- The Leaf boundary now uses one persistent Linux-first Agent, short
+  device-code approval, unique revocable credentials, and outbound control
+  plane communication.
 
 Compiled registry output is committed at `dist/registry.json`.

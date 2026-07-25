@@ -1,6 +1,6 @@
 # Dauva native server platform
 
-Status: **Phase 2 partially implemented and live**
+Status: **Phase 2 live; isolated Leaf Agent vertical slice in development**
 
 Last updated: 2026-07-25
 
@@ -147,6 +147,12 @@ After the successful Minecraft acceptance test, native Docker became the
 default Branch for new Servers. Existing Servers were not adopted, restarted,
 or otherwise modified.
 
+Development of the extracted Leaf boundary takes place only on the fully
+isolated `develop.jorishoef.nl` control plane. That environment has its own
+API, database, authentication cookies, data-protection keys, Docker-in-Docker
+runtime, networks, volumes, and storage. It does not mount the host Docker
+socket or share production Server state.
+
 ## Target architecture
 
 ```mermaid
@@ -155,7 +161,7 @@ flowchart LR
     Registry["Dauva Seed Registry<br/>Pods and versioned Seeds"] --> API
     API --> Database["Desired state, instances,<br/>agreements and audit"]
     API --> Pterodactyl["Pterodactyl Branch<br/>temporary"]
-    API --> Agent["Dauva Leaf Agent"]
+    API <-->|"outbound authenticated<br/>heartbeat and commands"| Agent["Dauva Leaf Agent"]
     Agent --> Runtime["Docker initially<br/>Podman may follow"]
     Agent --> Data["Active Server storage"]
     Agent --> Images["OCI image registry"]
@@ -208,10 +214,28 @@ The Leaf Agent owns privileged host operations:
 - deleting runtime resources only after an authorized control-plane command;
 - reporting capacity and observed state.
 
+Enrollment and transport follow
+[ADR 0001](../adr/0001-outbound-device-code-leaf-enrollment.md). The Agent
+generates its machine key locally, shows a short device code, waits for portal
+approval, and then maintains outbound authenticated communication. No inbound
+Docker, SSH, or Agent administration port is part of the contract.
+
+Distribution and client ownership follow
+[ADR 0002](../adr/0002-leaf-distribution-and-client-surfaces.md). The Flutter
+web and Windows builds are Portal clients; the separately packaged persistent
+Linux Agent performs privileged runtime work. Sprouting sends the enrolled
+Agent a command rather than producing a different installer for each Server.
+
 The long-term API container must not require the Docker socket. During a
 single-Leaf proof of concept, the existing Docker integration may implement the
 same contract locally, but the privilege boundary must remain explicit so it
 can be extracted into the Agent.
+
+Managed hosting, if it becomes a product, stays behind a scheduler and billing
+gateway and enrolls ordinary fleet Leaves. The core API and Seed model do not
+adopt provider SKUs or payment state. The commercial gates and unit-economics
+model are defined in
+[Managed hosting: separation and economics](../product/managed-hosting-separation-and-economics.md).
 
 ### OCI image registry
 
@@ -520,6 +544,11 @@ Live acceptance evidence:
 
 ### Phase 3: operational completeness
 
+- device-code Leaf enrollment and revocation;
+- outbound heartbeats, capacity, leased commands, and completion results;
+- extracted Linux Leaf Agent with a labeled Docker executor;
+- portal Leaf inventory, Add Leaf, and Choose Leaf flows;
+- route Sprouting through a selected Leaf;
 - live log streaming and console;
 - backup and restore UI;
 - update and rollback;
@@ -554,11 +583,11 @@ These are the current working decisions and should change only deliberately:
 8. Docker is the first runtime because it is already present on the Debian
    Leaf; the contract must not permanently depend on Docker-specific client
    behavior.
+9. Leaves use one persistent Agent and an outbound device-code enrollment
+   protocol; self-hosted and managed Leaves share that boundary.
 
 ## Open design questions
 
-- Should the first Agent use control-plane push over mTLS, or maintain an
-  outbound authenticated connection to the API?
 - Which protected store should hold Server secrets before multi-Leaf support?
 - Should the initial backup target be the existing host backup storage, a NAS,
   or S3-compatible object storage?
