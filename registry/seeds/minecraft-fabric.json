@@ -133,6 +133,7 @@
       "id": "game",
       "componentId": "server",
       "containerPort": 25565,
+      "containerPortMode": "fixed",
       "protocols": [
         "tcp"
       ],

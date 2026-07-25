@@ -1,8 +1,8 @@
 {
   "schemaVersion": "dauva.dev/seed/v1",
   "id": "valheim",
-  "version": "0.1.0",
-  "status": "draft",
+  "version": "1.0.0-rc.1",
+  "status": "candidate",
   "podId": "survival",
   "metadata": {
     "title": {
@@ -49,7 +49,6 @@
         "server-password": "SERVER_PASS"
       },
       "runtimeEnvironment": {
-        "primaryPort": "SERVER_PORT",
         "serverName": "SERVER_NAME",
         "timezone": "TZ"
       },
@@ -99,6 +98,7 @@
       "id": "game",
       "componentId": "server",
       "containerPort": 2456,
+      "containerPortMode": "allocated",
       "protocols": [
         "udp"
       ],
@@ -112,6 +112,7 @@
       "id": "query",
       "componentId": "server",
       "containerPort": 2457,
+      "containerPortMode": "allocated",
       "protocols": [
         "udp"
       ],
@@ -220,7 +221,14 @@
         "en": "Server password",
         "nl": "Serverwachtwoord",
         "de": "Serverpasswort"
-      }
+      },
+      "help": {
+        "en": "At least 5 characters. Dauva uses it only while Sprouting and does not store it in the Server record.",
+        "nl": "Minimaal 5 tekens. Dauva gebruikt dit alleen tijdens het ontkiemen en slaat het niet op in het Server-record.",
+        "de": "Mindestens 5 Zeichen. Dauva verwendet es nur beim Starten und speichert es nicht im Server-Datensatz."
+      },
+      "minLength": 5,
+      "maxLength": 128
     }
   ],
   "lifecycle": {

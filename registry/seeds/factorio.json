@@ -1,8 +1,8 @@
 {
   "schemaVersion": "dauva.dev/seed/v1",
   "id": "factorio",
-  "version": "0.1.0",
-  "status": "draft",
+  "version": "1.0.0-rc.1",
+  "status": "candidate",
   "podId": "factory",
   "metadata": {
     "title": {
@@ -69,6 +69,7 @@
       "id": "game",
       "componentId": "server",
       "containerPort": 34197,
+      "containerPortMode": "allocated",
       "protocols": [
         "udp"
       ],
@@ -82,6 +83,7 @@
       "id": "rcon",
       "componentId": "server",
       "containerPort": 27015,
+      "containerPortMode": "fixed",
       "protocols": [
         "tcp"
       ],

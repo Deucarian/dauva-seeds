@@ -105,6 +105,9 @@ function validateSeedPolicy(entry, podIds) {
   if (primaryPorts.length > 1) {
     errors.push(`${entry.name}: at most one primary public port is allowed.`);
   }
+  if (primaryPorts.some((port) => port.exposure !== "public")) {
+    errors.push(`${entry.name}: the primary port must be public.`);
+  }
 
   for (const component of seed.components) {
     if (!component.image.includes("@sha256:")) {
@@ -162,6 +165,33 @@ function validateSeedPolicy(entry, podIds) {
     if (!componentIds.has(port.componentId)) {
       errors.push(
         `${entry.name}: port '${port.id}' references unknown component '${port.componentId}'.`,
+      );
+    }
+    if (
+      port.containerPortMode === "allocated" &&
+      port.exposure !== "public"
+    ) {
+      errors.push(
+        `${entry.name}: private port '${port.id}' cannot use an allocated container port.`,
+      );
+    }
+  }
+
+  for (const secret of seed.secrets) {
+    const mapped = seed.components.some((component) =>
+      Object.hasOwn(component.secretEnvironment, secret.key),
+    );
+    if (!mapped) {
+      errors.push(`${entry.name}: secret '${secret.key}' is never consumed.`);
+    }
+    if (
+      secret.source === "admin" &&
+      secret.minLength != null &&
+      secret.maxLength != null &&
+      secret.minLength > secret.maxLength
+    ) {
+      errors.push(
+        `${entry.name}: secret '${secret.key}' has minLength greater than maxLength.`,
       );
     }
   }

@@ -1,7 +1,7 @@
 {
   "schemaVersion": "dauva.dev/pod/v1",
   "id": "factory",
-  "status": "draft",
+  "status": "candidate",
   "metadata": {
     "title": {
       "en": "Factory",

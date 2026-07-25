@@ -1,8 +1,8 @@
 {
   "schemaVersion": "dauva.dev/seed/v1",
   "id": "enshrouded",
-  "version": "0.1.0",
-  "status": "draft",
+  "version": "1.0.0-rc.1",
+  "status": "candidate",
   "podId": "survival",
   "metadata": {
     "title": {
@@ -30,20 +30,23 @@
       "id": "server",
       "role": "primary",
       "image": "docker.io/sknnr/enshrouded-dedicated-server@sha256:45d8b62209fb60889068b3d679dd6d9af0e530516e46752a5f7c82a0bbb5366d",
-      "environment": {},
-      "optionEnvironment": {},
+      "environment": {
+        "SERVER_IP": "0.0.0.0"
+      },
+      "optionEnvironment": {
+        "server-slots": "SERVER_SLOTS"
+      },
       "agreementEnvironment": {},
-      "secretEnvironment": {},
-      "runtimeEnvironment": {},
+      "secretEnvironment": {
+        "admin-password": "SERVER_PASSWORD"
+      },
+      "runtimeEnvironment": {
+        "serverName": "SERVER_NAME"
+      },
       "volumeMounts": [
         {
           "volumeId": "saves",
           "target": "/home/steam/enshrouded/savegame",
-          "readOnly": false
-        },
-        {
-          "volumeId": "config",
-          "target": "/home/steam/enshrouded/dauva-config",
           "readOnly": false
         }
       ],
@@ -58,12 +61,10 @@
     {
       "id": "saves",
       "role": "save",
-      "retention": "delete-with-server"
-    },
-    {
-      "id": "config",
-      "role": "config",
-      "retention": "delete-with-server"
+      "retention": "delete-with-server",
+      "ownerUid": 10000,
+      "ownerGid": 10000,
+      "directoryMode": "0750"
     }
   ],
   "ports": [
@@ -71,25 +72,15 @@
       "id": "game",
       "componentId": "server",
       "containerPort": 15637,
+      "containerPortMode": "allocated",
       "protocols": [
         "udp"
       ],
       "exposure": "public",
       "purpose": "game",
       "primary": true,
-      "sharedHostPort": true
-    },
-    {
-      "id": "query",
-      "componentId": "server",
-      "containerPort": 27015,
-      "protocols": [
-        "udp"
-      ],
-      "exposure": "public",
-      "purpose": "query",
-      "primary": false,
-      "sharedHostPort": true
+      "sharedHostPort": true,
+      "environment": "PORT"
     }
   ],
   "resources": {
@@ -131,6 +122,24 @@
       "defaultValue": "false",
       "url": "https://store.steampowered.com/subscriber_agreement/",
       "revision": "official-current"
+    },
+    {
+      "key": "server-slots",
+      "type": "integer",
+      "label": {
+        "en": "Player slots",
+        "nl": "Spelersplaatsen",
+        "de": "Spielerplätze"
+      },
+      "help": {
+        "en": "Maximum simultaneous players, up to 16.",
+        "nl": "Maximaal aantal gelijktijdige spelers, tot 16.",
+        "de": "Maximale Anzahl gleichzeitiger Spieler, bis zu 16."
+      },
+      "required": true,
+      "defaultValue": "16",
+      "minLength": 1,
+      "maxLength": 2
     }
   ],
   "secrets": [
@@ -141,7 +150,14 @@
         "en": "Administrator password",
         "nl": "Beheerderswachtwoord",
         "de": "Administratorpasswort"
-      }
+      },
+      "help": {
+        "en": "Used for the initial administrator group and never stored in the Dauva Server record.",
+        "nl": "Wordt gebruikt voor de eerste beheerdersgroep en nooit opgeslagen in het Dauva Server-record.",
+        "de": "Wird für die erste Administratorgruppe verwendet und nie im Dauva-Server-Datensatz gespeichert."
+      },
+      "minLength": 5,
+      "maxLength": 128
     }
   ],
   "lifecycle": {

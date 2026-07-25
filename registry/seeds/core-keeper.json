@@ -1,8 +1,8 @@
 {
   "schemaVersion": "dauva.dev/seed/v1",
   "id": "core-keeper",
-  "version": "0.1.0",
-  "status": "draft",
+  "version": "1.0.0-rc.1",
+  "status": "candidate",
   "podId": "survival",
   "metadata": {
     "title": {
@@ -44,9 +44,7 @@
       "secretEnvironment": {
         "server-password": "PASSWORD"
       },
-      "runtimeEnvironment": {
-        "primaryPort": "SERVER_PORT"
-      },
+      "runtimeEnvironment": {},
       "volumeMounts": [
         {
           "volumeId": "data",
@@ -83,6 +81,7 @@
       "id": "game",
       "componentId": "server",
       "containerPort": 28080,
+      "containerPortMode": "allocated",
       "protocols": [
         "udp"
       ],
@@ -195,7 +194,14 @@
         "en": "Server password",
         "nl": "Serverwachtwoord",
         "de": "Serverpasswort"
-      }
+      },
+      "help": {
+        "en": "Used for direct connections and never stored in the Dauva Server record.",
+        "nl": "Wordt gebruikt voor directe verbindingen en nooit opgeslagen in het Dauva Server-record.",
+        "de": "Wird für Direktverbindungen verwendet und nie im Dauva-Server-Datensatz gespeichert."
+      },
+      "minLength": 5,
+      "maxLength": 128
     }
   ],
   "lifecycle": {

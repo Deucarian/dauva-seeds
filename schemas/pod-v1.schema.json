@@ -20,6 +20,7 @@
     "status": {
       "enum": [
         "draft",
+        "candidate",
         "stable"
       ]
     },

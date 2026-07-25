@@ -1,7 +1,7 @@
 {
   "schemaVersion": "dauva.dev/pod/v1",
   "id": "survival",
-  "status": "draft",
+  "status": "candidate",
   "metadata": {
     "title": {
       "en": "Survival",

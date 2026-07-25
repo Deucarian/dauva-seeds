@@ -1,8 +1,8 @@
 {
   "schemaVersion": "dauva.dev/seed/v1",
   "id": "satisfactory",
-  "version": "0.1.0",
-  "status": "draft",
+  "version": "1.0.0-rc.1",
+  "status": "candidate",
   "podId": "factory",
   "metadata": {
     "title": {
@@ -72,6 +72,7 @@
       "id": "game",
       "componentId": "server",
       "containerPort": 7777,
+      "containerPortMode": "allocated",
       "protocols": [
         "tcp",
         "udp"
@@ -86,6 +87,7 @@
       "id": "messaging",
       "componentId": "server",
       "containerPort": 8888,
+      "containerPortMode": "allocated",
       "protocols": [
         "tcp"
       ],
@@ -111,7 +113,7 @@
           "nl": "Minimaal praktische resources voor een kleine fabriek.",
           "de": "Praktische Mindestressourcen für eine kleine Fabrik."
         },
-        "memoryMb": 6144,
+        "memoryMb": 8192,
         "diskMb": 30720,
         "cpuPercent": 250
       }

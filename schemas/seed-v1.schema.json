@@ -363,6 +363,20 @@
             "retain-on-delete",
             "disposable"
           ]
+        },
+        "ownerUid": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535
+        },
+        "ownerGid": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535
+        },
+        "directoryMode": {
+          "type": "string",
+          "pattern": "^0[0-7]{3}$"
         }
       }
     },
@@ -373,6 +387,7 @@
         "id",
         "componentId",
         "containerPort",
+        "containerPortMode",
         "protocols",
         "exposure",
         "purpose",
@@ -390,6 +405,12 @@
           "type": "integer",
           "minimum": 1,
           "maximum": 65535
+        },
+        "containerPortMode": {
+          "enum": [
+            "fixed",
+            "allocated"
+          ]
         },
         "protocols": {
           "type": "array",
@@ -602,6 +623,19 @@
         },
         "label": {
           "$ref": "#/$defs/localizedText"
+        },
+        "help": {
+          "$ref": "#/$defs/localizedText"
+        },
+        "minLength": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4096
+        },
+        "maxLength": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4096
         }
       },
       "allOf": [
