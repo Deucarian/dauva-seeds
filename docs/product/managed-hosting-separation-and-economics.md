@@ -29,6 +29,12 @@ Those belong behind the managed-hosting gateway.
 Do not fork the Seed model or invent a hosting-only runtime. A hosted machine
 enrolls as a normal Leaf with extra fleet metadata and policy.
 
+Mod management follows the same rule. Mod Profiles, desired Mod Selections,
+immutable Mod Locks, compatibility resolution, verified application, and
+rollback are core Server capabilities on every Leaf. Managed hosting may sell
+convenience around curated profiles, scheduled maintenance, shared caches, and
+support, but it must not own a different mod format or execution path.
+
 ## Why the boundary matters
 
 - Self-hosting can ship and stay useful if hosting never launches.
@@ -97,6 +103,7 @@ revenue net of VAT
 - compute allocation
 - active storage
 - backup storage
+- mod artifact cache storage and cache-miss egress
 - network egress
 - observability and control-plane allocation
 - support cost
@@ -126,6 +133,11 @@ allocatable CPU = benchmarked sustained CPU × safe oversubscription policy
 RAM-heavy dedicated Servers should not subsidize bursty Servers invisibly.
 Each shape needs an internal cost weight for RAM, sustained CPU, storage,
 backup growth, and public ports.
+
+Modded cohorts must be measured separately when their support time, update
+failure rate, storage growth, or download egress differs materially from
+Vanilla. A high-margin-looking small Server can become unprofitable if frequent
+mod conflicts create manual support and rollback work.
 
 ## First financial experiment
 

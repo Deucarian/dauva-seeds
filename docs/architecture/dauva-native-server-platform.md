@@ -1,8 +1,8 @@
 # Dauva native server platform
 
-Status: **Phase 2 live; isolated Leaf Agent vertical slice deployed to develop**
+Status: **Phase 3 in progress; authenticated external-Leaf Sprouting proven on develop**
 
-Last updated: 2026-07-25
+Last updated: 2026-07-26
 
 This document is the canonical product and architecture design for Dauva's
 native game-server platform. Keep it current when the Seed format, registry,
@@ -64,6 +64,9 @@ backup or object storage.
 | Leaf | A machine that can host Servers. |
 | Leaf Agent | The restricted Dauva service that manages runtime resources on a Leaf. |
 | Withered | A failed Sprouting operation or inactive runtime condition, made explicit by accompanying text. |
+| Mod Profile | An optional reusable, versioned selection such as Vanilla, Quality of life, or a curated modpack. |
+| Mod Selection | The administrator's desired mods and permitted update channels for one Server. |
+| Mod Lock | The immutable resolved mod versions, dependencies, sources, checksums, load order, and compatibility context applied to one Server revision. |
 
 A Pod is catalog metadata, not a running workload or genre. Genres are Seed
 labels used for discovery and filtering. A Seed produces a Server.
@@ -90,14 +93,15 @@ Seed material includes:
 - agreements;
 - health and readiness checks;
 - graceful stop behavior;
-- update and backup capabilities.
+- update and backup capabilities;
+- supported mod ecosystems and the declarative mod-management contract.
 
 Instance data never becomes Seed material:
 
 - worlds and saves;
 - passwords, tokens, and private keys;
 - player lists and administrator assignments;
-- installed user mods;
+- installed user mods and per-Server mod configuration;
 - logs;
 - generated identifiers;
 - actual backups.
@@ -392,12 +396,140 @@ Every managed Server must persist:
 - desired autostart mode;
 - provisioning and runtime state;
 - accepted agreement references;
+- desired Mod Selection or Mod Profile revision, when enabled;
+- applied Mod Lock digest and compatibility context, when enabled;
 - created-by and audit timestamps;
 - last actionable error.
 
 Installed Servers continue using their pinned Seed version until an explicit
 update operation succeeds. Publishing a new Seed version never silently
 changes an existing Server.
+
+## Mod management
+
+Mod management is a hosting-neutral desired-state capability. It must work the
+same way on a user-owned Leaf and a future managed Leaf. It is not a Leaf-side
+plugin store, an arbitrary host file manager, or permission to run installer
+scripts as root.
+
+The product boundary is:
+
+```text
+Portal chooses -> Seed defines capability -> control plane resolves and locks
+-> Sprout carries the lock -> Leaf verifies and applies
+```
+
+### Responsibilities
+
+| Layer | Responsibility |
+| --- | --- |
+| Portal | Show Vanilla and curated profiles first, expose search and deeper choices only when requested, preview compatibility/restart/backup effects, and submit desired selections. |
+| Seed | Declare the game-specific mod adapter, allowed sources, game-version compatibility input, target volume roles, load-order semantics, configuration surface, and lifecycle capabilities. |
+| Control plane and resolver | Read source metadata, enforce source and policy rules, resolve dependencies and conflicts, produce an immutable Mod Lock, persist its digest, and audit the actor and requested change. |
+| Sprout command | Carry the validated Mod Lock digest and exact artifact references as part of the Server revision without embedding source credentials. |
+| Leaf Agent | Download only allowed artifacts, verify checksums or signatures, use a disposable cache, stage the complete revision, switch it atomically, restart when required, health-check, and roll back on failure. |
+
+The Leaf deliberately does not understand Factorio, Fabric, Modrinth, Steam
+Workshop, or another catalog. Game-specific dependency resolution belongs in a
+versioned resolver adapter selected by the Seed. If an ecosystem requires its
+own downloader, such as Steam Workshop, that downloader is a curated
+digest-pinned Seed component or operation; it is never an arbitrary host
+script.
+
+### Data model
+
+A mod-capable Seed declares a `modManagement` capability. The exact v2 schema
+can evolve, but the contract includes:
+
+- adapter identifier and supported adapter contract version;
+- allowed artifact sources and source-specific project identifiers;
+- compatible game, loader, and Seed version inputs;
+- logical installation and configuration volume roles;
+- dependency, conflict, optional-dependency, and load-order semantics;
+- whether a change requires stop, restart, save migration, or full reinstall;
+- backup, health-check, and rollback requirements;
+- whether local/private artifacts are allowed and how they are verified.
+
+A Mod Profile is an optional curated, versioned desired selection. It may live
+in the Seed Registry or another signed trusted registry, but it does not create
+a different Server type and it does not silently mutate installed Servers.
+
+A per-Server Mod Selection records intent: requested projects, permitted
+channels, pinned or floating constraints, disabled entries, and safe
+configuration. The resolver turns that intent into a Mod Lock containing at
+least:
+
+- exact game, loader, Seed, adapter, and profile revisions;
+- every exact mod and transitive dependency version;
+- canonical source and immutable artifact identifier;
+- content size, checksum or signature, and license metadata when available;
+- deterministic load order and resolved conflicts;
+- creation time, resolver version, and complete lock digest.
+
+The Mod Selection can change without rewriting the Seed. The applied Mod Lock
+cannot change in place: every successful resolution creates a new immutable
+Server revision. This preserves reproducibility while still allowing friendly
+one-click updates.
+
+### Apply, update, and rollback
+
+The same transaction is used during initial Sprouting and later mod changes:
+
+1. Validate the desired selection against the pinned game and Seed revision.
+2. Resolve a candidate Mod Lock without changing the running Server.
+3. Show incompatible removals, configuration changes, required restart, and
+   estimated download/storage impact.
+4. Take a verified backup when the Seed or policy requires one.
+5. Download into a staging area and verify every artifact.
+6. Stop the Server only when required, then atomically switch the staged
+   revision into place.
+7. Start the Server and wait for Seed-defined readiness.
+8. Persist the new applied lock only after health succeeds.
+9. Restore the previous files, configuration, lock, and runtime state if any
+   step fails.
+
+Publishing a newer mod or changing a Mod Profile never updates a Server
+silently. Administrators may choose `pinned`, `notify`, or `scheduled` policy;
+the first implementation defaults to `pinned`. Scheduled updates still create
+a candidate lock, backup, audit event, and rollback point.
+
+### Creator experience
+
+Mods become their own character-creator page only for Seeds that declare the
+capability. The first view contains large, self-explanatory choices:
+
+- **Vanilla** — no mods;
+- **Curated** — a small set of compatible Mod Profiles;
+- **Custom** — search, dependency details, conflicts, and load order.
+
+The Review page shows one human-readable modpack summary and lock state rather
+than a wall of artifact versions. Exact versions and checksums remain available
+as progressive disclosure. Existing Servers use the same surface for a
+previewable revision change, not an unrelated file-management screen.
+
+### Security, licensing, and operations
+
+- Mod sources are deny-by-default and scoped per Seed adapter.
+- Every artifact is immutable or content-hashed before the Leaf can apply it.
+- Registry credentials are protected control-plane secrets and never appear in
+  a Seed, Mod Lock, label, log, or ordinary command result.
+- Arbitrary host hooks, privileged containers, mutable download URLs, and
+  unverified native installers are rejected.
+- Mod code runs only inside the Server's existing runtime sandbox and resource
+  limits; a trusted source is not treated as trusted code.
+- Source terms, redistribution limits, author licenses, and deletion requests
+  are part of adapter policy. A lock may reference an artifact Dauva is allowed
+  to download without granting Dauva redistribution rights.
+- Download caches are disposable and quota-controlled. Active mod files,
+  configuration, locks, and rollback state are owned Server data.
+- Managed hosting uses the identical resolver and Leaf protocol. Its gateway
+  may add cache, bandwidth, storage, and support cost weights, but cannot fork
+  the mod model.
+
+The first vertical slice should use Factorio because its portal exposes clear
+game-version metadata and dependency information. It should prove Vanilla,
+one curated profile, one custom selection, dependency resolution, backup,
+restart, health, and rollback before additional adapters are added.
 
 ## Lifecycle and reconciliation
 
@@ -433,7 +565,11 @@ behind after a confirmed deletion.
 - Registry inputs are untrusted until schema, policy, signature, and digest
   validation succeeds.
 - Images are pinned by digest and come from allowed registries.
+- Mod artifacts come from Seed-allowed sources and match their locked checksum
+  or signature before they become active.
 - Seeds cannot request privileged mode or arbitrary host mounts.
+- Mod adapters cannot request arbitrary host scripts or bypass the Server
+  sandbox.
 - The Agent accepts only authenticated, authorized, idempotent commands.
 - Agent credentials are unique per Leaf and revocable.
 - Secrets are not written to logs, manifests, labels, or command responses.
@@ -544,14 +680,33 @@ Live acceptance evidence:
 
 ### Phase 3: operational completeness
 
+Completed on the production-isolated develop stack:
+
 - device-code Leaf enrollment and revocation;
 - outbound heartbeats, capacity, leased commands, and completion results;
 - extracted Linux Leaf Agent with a labeled Docker executor;
 - portal Leaf inventory, Add Leaf, and Choose Leaf flows;
 - route Sprouting through a selected Leaf;
+
+Live external-Leaf acceptance on 2026-07-26 enrolled an Agent through the
+device-code protocol, observed it online with Docker 27.5.1 capacity, completed
+a leased probe, and completed a real Sprout in the isolated Docker-in-Docker
+runtime. The disposable proof used Alpine pinned to
+`sha256:48b0309ca019d89d40f670aa1bc06e426dc0931948452e8491e3d65087abc07d`.
+The running component and private network carried the expected Dauva ownership
+labels; the component enforced a 64 MiB memory limit, 0.10 CPU limit, dropped
+all Linux capabilities, enabled `no-new-privileges`, used owned persistent
+storage, and persisted the successful command result in the develop database.
+The develop API had no host Docker socket and no production runtime was
+addressed.
+
+Next operational slices:
+
 - live log streaming and console;
 - backup and restore UI;
 - update and rollback;
+- Factorio-first Mod Profiles, Mod Selection, immutable Mod Locks, and atomic
+  mod update rollback;
 - scheduled tasks;
 - registry signing and trusted sources;
 - Leaf capacity reporting;
@@ -585,6 +740,11 @@ These are the current working decisions and should change only deliberately:
    behavior.
 9. Leaves use one persistent Agent and an outbound device-code enrollment
    protocol; self-hosted and managed Leaves share that boundary.
+10. Mod choices are instance desired state; compatibility capability belongs to
+    the Seed, exact resolution belongs to an immutable Mod Lock, and execution
+    remains a generic verified Leaf operation.
+11. Mod management uses the same protocol on self-hosted and managed Leaves and
+    does not become a hosting-only feature.
 
 ## Open design questions
 
@@ -595,3 +755,7 @@ These are the current working decisions and should change only deliberately:
   artifacts?
 - Which file-management capability is actually required after logs, backups,
   and configuration editing exist in Dauva?
+- Which trusted catalog sources and license policies should follow the initial
+  Factorio Mod Portal adapter?
+- Should signed Mod Profiles live beside Seeds or in a separately delegated
+  trusted registry once community curators are supported?
