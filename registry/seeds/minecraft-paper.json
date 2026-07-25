@@ -1,0 +1,372 @@
+{
+  "schemaVersion": "dauva.dev/seed/v1",
+  "id": "minecraft-paper",
+  "version": "1.0.0-rc.1",
+  "status": "candidate",
+  "podId": "minecraft",
+  "genres": [
+    "sandbox",
+    "survival"
+  ],
+  "metadata": {
+    "title": {
+      "en": "Minecraft Paper",
+      "nl": "Minecraft Paper",
+      "de": "Minecraft Paper"
+    },
+    "description": {
+      "en": "A performance-focused Minecraft Paper Server with automatic backups.",
+      "nl": "Een prestatiegerichte Minecraft Paper-Server met automatische back-ups.",
+      "de": "Ein leistungsorientierter Minecraft-Paper-Server mit automatischen Backups."
+    },
+    "icon": "shield"
+  },
+  "compatibility": {
+    "operatingSystems": [
+      "linux"
+    ],
+    "architectures": [
+      "amd64"
+    ]
+  },
+  "components": [
+    {
+      "id": "server",
+      "role": "primary",
+      "image": "ghcr.io/itzg/minecraft-server@sha256:6ec1110e4d9236d00ae9436a3e4a5929583e5b19cc94b756a7c603f7cf647a77",
+      "environment": {
+        "ALLOW_FLIGHT": "TRUE",
+        "ENABLE_RCON": "TRUE",
+        "ENABLE_WHITELIST": "FALSE",
+        "ENFORCE_WHITELIST": "FALSE",
+        "MODE": "survival",
+        "TYPE": "PAPER"
+      },
+      "optionEnvironment": {
+        "difficulty": "DIFFICULTY",
+        "max-players": "MAX_PLAYERS",
+        "minecraft-version": "VERSION",
+        "motd": "MOTD",
+        "online-mode": "ONLINE_MODE",
+        "simulation-distance": "SIMULATION_DISTANCE",
+        "view-distance": "VIEW_DISTANCE"
+      },
+      "agreementEnvironment": {
+        "accept-minecraft-eula": {
+          "name": "EULA",
+          "acceptedValue": "TRUE"
+        }
+      },
+      "secretEnvironment": {
+        "rcon-password": "RCON_PASSWORD"
+      },
+      "runtimeEnvironment": {
+        "memoryMb": "MEMORY",
+        "serverName": "SERVER_NAME",
+        "timezone": "TZ"
+      },
+      "volumeMounts": [
+        {
+          "volumeId": "data",
+          "target": "/data",
+          "readOnly": false
+        }
+      ],
+      "dependsOn": [],
+      "health": {
+        "source": "container",
+        "startupGraceSeconds": 600
+      }
+    },
+    {
+      "id": "backups",
+      "role": "companion",
+      "image": "ghcr.io/itzg/mc-backup@sha256:db2bca9a54aac96e8db74be038b920cb549c8e3b3384067251aad5e178dd03cc",
+      "environment": {
+        "BACKUP_INTERVAL": "2h",
+        "BACKUP_ON_STARTUP": "FALSE",
+        "INITIAL_DELAY": "5m",
+        "PRUNE_BACKUPS_COUNT": "24",
+        "PRUNE_BACKUPS_DAYS": "14",
+        "RCON_HOST": "server"
+      },
+      "optionEnvironment": {},
+      "agreementEnvironment": {},
+      "secretEnvironment": {
+        "rcon-password": "RCON_PASSWORD"
+      },
+      "runtimeEnvironment": {
+        "serverName": "BACKUP_NAME",
+        "timezone": "TZ"
+      },
+      "volumeMounts": [
+        {
+          "volumeId": "data",
+          "target": "/data",
+          "readOnly": true
+        },
+        {
+          "volumeId": "backups",
+          "target": "/backups",
+          "readOnly": false
+        }
+      ],
+      "dependsOn": [
+        "server"
+      ],
+      "health": {
+        "source": "running",
+        "startupGraceSeconds": 60
+      }
+    }
+  ],
+  "volumes": [
+    {
+      "id": "data",
+      "role": "data",
+      "retention": "delete-with-server"
+    },
+    {
+      "id": "backups",
+      "role": "backup",
+      "retention": "delete-with-server"
+    }
+  ],
+  "ports": [
+    {
+      "id": "game",
+      "componentId": "server",
+      "containerPort": 25565,
+      "containerPortMode": "fixed",
+      "protocols": [
+        "tcp"
+      ],
+      "exposure": "public",
+      "purpose": "game",
+      "primary": true,
+      "sharedHostPort": true
+    }
+  ],
+  "resources": {
+    "defaultPresetId": "balanced",
+    "presets": [
+      {
+        "id": "small",
+        "title": {
+          "en": "Small",
+          "nl": "Klein",
+          "de": "Klein"
+        },
+        "description": {
+          "en": "For a disposable test or a few players with light mods.",
+          "nl": "Voor een tijdelijke test of enkele spelers met lichte mods.",
+          "de": "Für einen temporären Test oder wenige Spieler mit leichten Mods."
+        },
+        "memoryMb": 2048,
+        "diskMb": 12288,
+        "cpuPercent": 100
+      },
+      {
+        "id": "balanced",
+        "title": {
+          "en": "Balanced",
+          "nl": "Gebalanceerd",
+          "de": "Ausgewogen"
+        },
+        "description": {
+          "en": "Recommended for a persistent Fabric Server.",
+          "nl": "Aanbevolen voor een blijvende Fabric-Server.",
+          "de": "Für einen persistenten Fabric-Server empfohlen."
+        },
+        "memoryMb": 3072,
+        "diskMb": 20480,
+        "cpuPercent": 150
+      },
+      {
+        "id": "large",
+        "title": {
+          "en": "Large",
+          "nl": "Groot",
+          "de": "Groß"
+        },
+        "description": {
+          "en": "For larger modpacks after Leaf capacity has been checked.",
+          "nl": "Voor grotere modpacks nadat de Leaf-capaciteit is gecontroleerd.",
+          "de": "Für größere Modpacks nach Prüfung der Leaf-Kapazität."
+        },
+        "memoryMb": 6144,
+        "diskMb": 40960,
+        "cpuPercent": 200
+      }
+    ]
+  },
+  "inputs": [
+    {
+      "key": "accept-minecraft-eula",
+      "type": "agreement",
+      "label": {
+        "en": "Minecraft End User License Agreement",
+        "nl": "Minecraft-gebruikersovereenkomst",
+        "de": "Minecraft-Endbenutzerlizenzvertrag"
+      },
+      "help": {
+        "en": "I have read and accept the official Minecraft EULA and authorize Dauva to record EULA=TRUE for this Server.",
+        "nl": "Ik heb de officiële Minecraft-EULA gelezen en accepteer deze. Ik geef Dauva toestemming om EULA=TRUE voor deze Server vast te leggen.",
+        "de": "Ich habe die offizielle Minecraft-EULA gelesen und akzeptiere sie. Ich erlaube Dauva, EULA=TRUE für diesen Server festzulegen."
+      },
+      "required": true,
+      "defaultValue": "false",
+      "url": "https://www.minecraft.net/eula",
+      "revision": "official-current"
+    },
+    {
+      "key": "minecraft-version",
+      "type": "string",
+      "label": {
+        "en": "Minecraft version",
+        "nl": "Minecraft-versie",
+        "de": "Minecraft-Version"
+      },
+      "help": {
+        "en": "A Paper-supported Minecraft version, or LATEST.",
+        "nl": "Een door Paper ondersteunde Minecraft-versie, of LATEST.",
+        "de": "Eine von Paper unterstützte Minecraft-Version oder LATEST."
+      },
+      "required": true,
+      "defaultValue": "26.2",
+      "minLength": 3,
+      "maxLength": 24
+    },
+    {
+      "key": "motd",
+      "type": "string",
+      "label": {
+        "en": "Message of the day",
+        "nl": "Welkomstbericht",
+        "de": "Servernachricht"
+      },
+      "help": {
+        "en": "The text shown in the multiplayer Server list.",
+        "nl": "De tekst die in de multiplayer-Serverlijst wordt getoond.",
+        "de": "Der Text, der in der Multiplayer-Serverliste angezeigt wird."
+      },
+      "required": true,
+      "defaultValue": "A Dauva Server",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    {
+      "key": "max-players",
+      "type": "integer",
+      "label": {
+        "en": "Maximum players",
+        "nl": "Maximumaantal spelers",
+        "de": "Maximale Spielerzahl"
+      },
+      "help": {
+        "en": "Maximum simultaneous players.",
+        "nl": "Maximaal aantal gelijktijdige spelers.",
+        "de": "Maximale Anzahl gleichzeitiger Spieler."
+      },
+      "required": true,
+      "defaultValue": "10",
+      "minLength": 1,
+      "maxLength": 3
+    },
+    {
+      "key": "difficulty",
+      "type": "string",
+      "label": {
+        "en": "Difficulty",
+        "nl": "Moeilijkheid",
+        "de": "Schwierigkeit"
+      },
+      "help": {
+        "en": "Minecraft difficulty: peaceful, easy, normal, or hard.",
+        "nl": "Minecraft-moeilijkheid: peaceful, easy, normal of hard.",
+        "de": "Minecraft-Schwierigkeit: peaceful, easy, normal oder hard."
+      },
+      "required": true,
+      "defaultValue": "normal",
+      "minLength": 4,
+      "maxLength": 8
+    },
+    {
+      "key": "online-mode",
+      "type": "boolean",
+      "label": {
+        "en": "Online authentication",
+        "nl": "Online authenticatie",
+        "de": "Online-Authentifizierung"
+      },
+      "help": {
+        "en": "Verify player accounts with Mojang.",
+        "nl": "Controleer spelersaccounts via Mojang.",
+        "de": "Spielerkonten über Mojang überprüfen."
+      },
+      "required": true,
+      "defaultValue": "true"
+    },
+    {
+      "key": "view-distance",
+      "type": "integer",
+      "label": {
+        "en": "View distance",
+        "nl": "Kijkafstand",
+        "de": "Sichtweite"
+      },
+      "help": {
+        "en": "Maximum chunk view distance.",
+        "nl": "Maximale kijkafstand in chunks.",
+        "de": "Maximale Sichtweite in Chunks."
+      },
+      "required": true,
+      "defaultValue": "10",
+      "minLength": 1,
+      "maxLength": 2
+    },
+    {
+      "key": "simulation-distance",
+      "type": "integer",
+      "label": {
+        "en": "Simulation distance",
+        "nl": "Simulatieafstand",
+        "de": "Simulationsdistanz"
+      },
+      "help": {
+        "en": "Maximum ticking distance in chunks.",
+        "nl": "Maximale actieve simulatieafstand in chunks.",
+        "de": "Maximale aktive Simulationsdistanz in Chunks."
+      },
+      "required": true,
+      "defaultValue": "8",
+      "minLength": 1,
+      "maxLength": 2
+    }
+  ],
+  "secrets": [
+    {
+      "key": "rcon-password",
+      "source": "generated",
+      "generatedBytes": 32
+    }
+  ],
+  "lifecycle": {
+    "startOrder": [
+      "server",
+      "backups"
+    ],
+    "stopOrder": [
+      "backups",
+      "server"
+    ],
+    "stopTimeoutSeconds": 60
+  },
+  "capabilities": {
+    "backup": true,
+    "restore": false,
+    "update": false,
+    "console": false
+  }
+}
+

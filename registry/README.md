@@ -5,9 +5,9 @@ This directory contains the reviewed Pod and Seed manifests compiled into
 
 Rules already fixed by the canonical design:
 
-- A Pod represents one game family and groups one or more related Seed
-  variants. Seeds join a Pod through `podId`; there is no one-Seed limit or
-  duplicated Seed list in the Pod manifest.
+- A Pod represents one game family and groups at least two related Seed
+  variants. Seeds join a Pod through `podId`; there is no upper one-Seed limit
+  or duplicated Seed list in the Pod manifest.
 - Genres are Seed labels for discovery and filtering; they never define Pod
   ownership.
 - Seeds are versioned, curated, and reproducible.
@@ -19,6 +19,16 @@ Rules already fixed by the canonical design:
 
 The six current Compose-managed Servers were used as reference implementations
 for Minecraft, Valheim, Core Keeper, Satisfactory, Factorio, and Enshrouded.
-Minecraft Fabric, Factorio, Core Keeper, and Valheim are stable after
-successful disposable native lifecycle tests. Satisfactory and Enshrouded
-remain candidates until their heavier runtime and memory behavior is proven.
+Each Pod now contains two meaningful variants. Factorio Stable, Valheim
+BepInEx, both Satisfactory branches, and both Enshrouded runtimes passed fresh
+install, port, stop, restart, persistence, and deletion proofs on the native
+Docker Branch. Enshrouded Wine keeps its roughly 9 GB game install in explicit
+persistent storage and is the recommended Enshrouded Seed. Enshrouded Proton
+persists saves but revalidates the large install on cold starts.
+
+Core Keeper Hard also passed a fresh Hard-world proof. Its Seed-specific
+`SIGINT` shutdown completed in three seconds, wrote the world save to the
+data-disk volume, stayed stopped, and loaded that same save after restart.
+
+Minecraft Paper remains a candidate until an administrator personally accepts
+the official Minecraft EULA in Dauva and completes its live lifecycle proof.

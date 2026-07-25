@@ -90,8 +90,10 @@ function validatePodMembership(pods, seeds) {
   }
 
   for (const [podId, seedCount] of seedCountByPod) {
-    if (seedCount === 0) {
-      errors.push(`${podId}.json: every Pod must contain at least one Seed.`);
+    if (seedCount < 2) {
+      errors.push(
+        `${podId}.json: every Pod must contain at least two related Seeds.`,
+      );
     }
   }
 }

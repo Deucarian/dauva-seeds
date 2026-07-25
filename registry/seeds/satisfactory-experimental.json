@@ -1,6 +1,6 @@
 {
   "schemaVersion": "dauva.dev/seed/v1",
-  "id": "satisfactory",
+  "id": "satisfactory-experimental",
   "version": "1.0.0",
   "status": "stable",
   "podId": "satisfactory",
@@ -10,14 +10,14 @@
   ],
   "metadata": {
     "title": {
-      "en": "Satisfactory Stable",
-      "nl": "Satisfactory Stable",
-      "de": "Satisfactory Stable"
+      "en": "Satisfactory Experimental",
+      "nl": "Satisfactory Experimental",
+      "de": "Satisfactory Experimental"
     },
     "description": {
-      "en": "A persistent Satisfactory Server that follows the stable Steam branch.",
-      "nl": "Een blijvende Satisfactory-Server die de stabiele Steam-tak volgt.",
-      "de": "Ein persistenter Satisfactory-Server auf dem stabilen Steam-Zweig."
+      "en": "A Satisfactory Server that follows the Experimental Steam branch.",
+      "nl": "Een Satisfactory-Server die de Experimental-tak van Steam volgt.",
+      "de": "Ein Satisfactory-Server auf dem Experimental-Zweig von Steam."
     },
     "icon": "settings"
   },
@@ -39,7 +39,7 @@
         "DISABLESEASONALEVENTS": "false",
         "ROOTLESS": "false",
         "SKIPUPDATE": "false",
-        "STEAMBETA": "false"
+        "STEAMBETA": "true"
       },
       "optionEnvironment": {
         "max-players": "MAXPLAYERS",
