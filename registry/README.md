@@ -5,7 +5,9 @@ This directory contains the reviewed Pod and Seed manifests compiled into
 
 Rules already fixed by the canonical design:
 
-- A Pod represents one game family and groups its related Server variants.
+- A Pod represents one game family and groups one or more related Seed
+  variants. Seeds join a Pod through `podId`; there is no one-Seed limit or
+  duplicated Seed list in the Pod manifest.
 - Genres are Seed labels for discovery and filtering; they never define Pod
   ownership.
 - Seeds are versioned, curated, and reproducible.

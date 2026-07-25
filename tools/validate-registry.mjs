@@ -40,6 +40,7 @@ const podIds = new Set(podFiles.map((entry) => entry.value.id));
 for (const entry of seedFiles) {
   validateSeedPolicy(entry, podIds);
 }
+validatePodMembership(podFiles, seedFiles);
 
 if (errors.length > 0) {
   for (const error of errors) {
@@ -74,6 +75,24 @@ function validateUniqueIds(entries, kind) {
       errors.push(`${entry.name}: duplicate ${kind} id '${entry.value.id}'.`);
     }
     seen.add(entry.value.id);
+  }
+}
+
+function validatePodMembership(pods, seeds) {
+  const seedCountByPod = new Map(pods.map((entry) => [entry.value.id, 0]));
+  for (const entry of seeds) {
+    if (seedCountByPod.has(entry.value.podId)) {
+      seedCountByPod.set(
+        entry.value.podId,
+        seedCountByPod.get(entry.value.podId) + 1,
+      );
+    }
+  }
+
+  for (const [podId, seedCount] of seedCountByPod) {
+    if (seedCount === 0) {
+      errors.push(`${podId}.json: every Pod must contain at least one Seed.`);
+    }
   }
 }
 

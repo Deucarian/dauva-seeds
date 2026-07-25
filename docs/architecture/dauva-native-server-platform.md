@@ -248,6 +248,11 @@ A Seed v1 manifest must be declarative and contain at least:
 - update, backup, and restore capabilities;
 - required restricted runtime capabilities.
 
+Each Seed declares exactly one `podId`. A Pod groups one or more related
+Server variants for the same game family, and has no arbitrary per-Pod Seed
+limit. The compiled catalog derives membership from the Seeds so Pod and Seed
+manifests cannot maintain conflicting lists.
+
 Executable installation behavior belongs in reviewed, signed images. The
 registry must not permit arbitrary host shell scripts, privileged containers,
 host PID or network namespaces, Docker socket mounts, or unrestricted host
