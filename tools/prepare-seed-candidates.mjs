@@ -2,7 +2,10 @@ import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { readJson, repositoryRoot } from "./registry-lib.mjs";
-import { prepareCandidate } from "./update-lib.mjs";
+import {
+  nextPatchVersion,
+  prepareCandidate,
+} from "./update-lib.mjs";
 
 const reportPath = path.resolve(
   optionValue("--report") ??
@@ -63,6 +66,27 @@ for (const update of report.seeds) {
 
 if (onlySeed && plans.length === 0) {
   throw new Error(`No available update found for Seed '${onlySeed}'.`);
+}
+
+if (plans.length > 0) {
+  const packagePath = path.join(repositoryRoot, "package.json");
+  const lockPath = path.join(repositoryRoot, "package-lock.json");
+  const packageDocument = await readJson(packagePath);
+  const lockDocument = await readJson(lockPath);
+  const releaseVersion = nextPatchVersion(packageDocument.version);
+  packageDocument.version = releaseVersion;
+  lockDocument.version = releaseVersion;
+  lockDocument.packages[""].version = releaseVersion;
+  await writeFile(
+    packagePath,
+    `${JSON.stringify(packageDocument, null, 2)}\n`,
+    "utf8",
+  );
+  await writeFile(
+    lockPath,
+    `${JSON.stringify(lockDocument, null, 2)}\n`,
+    "utf8",
+  );
 }
 
 await mkdir(path.dirname(proofPlanPath), { recursive: true });

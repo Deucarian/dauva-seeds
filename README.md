@@ -59,6 +59,8 @@ Every component keeps its immutable runtime image and a separate reviewed OCI
 tag used only for update discovery. `npm run updates:check` resolves those tags
 without changing a Seed. The daily GitHub workflow opens a pull request with
 patch-versioned release candidates when digests change.
+The same candidate batch increments the actual Seed Library package version;
+build metadata is never used as a substitute for that release number.
 
 Existing Servers never move automatically. A candidate must pass health, port,
 backup, stop, restart, persistence, and cleanup checks before

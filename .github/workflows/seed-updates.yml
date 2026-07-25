@@ -70,7 +70,7 @@ jobs:
           git config user.email "seed-watch@users.noreply.github.com"
           git fetch origin "$UPDATE_BRANCH:refs/remotes/origin/$UPDATE_BRANCH" || true
           git checkout -B "$UPDATE_BRANCH"
-          git add registry/seeds dist/registry.json
+          git add registry/seeds dist/registry.json package.json package-lock.json
           git commit -m "chore: prepare Seed image update candidates"
           git push --force-with-lease --set-upstream origin "$UPDATE_BRANCH"
           gh pr create \

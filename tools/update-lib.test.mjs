@@ -4,6 +4,7 @@ import {
   createUpdateReport,
   fixtureDigestResolver,
   nextCandidateVersion,
+  nextPatchVersion,
   parsePinnedImage,
   parseUpdateReference,
   prepareCandidate,
@@ -27,6 +28,7 @@ test("parses pinned images and mutable update references", () => {
 test("increments candidates without replacing a stable Seed in place", () => {
   assert.equal(nextCandidateVersion("1.2.3"), "1.2.4-rc.1");
   assert.equal(nextCandidateVersion("1.2.4-rc.1"), "1.2.4-rc.2");
+  assert.equal(nextPatchVersion("0.2.1"), "0.2.2");
   assert.equal(stableVersion("1.2.4-rc.2"), "1.2.4");
 });
 

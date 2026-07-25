@@ -46,6 +46,16 @@ export function nextCandidateVersion(version) {
   return `${major}.${minor}.${Number(patch) + 1}-rc.1`;
 }
 
+export function nextPatchVersion(version) {
+  const match = version.match(
+    /^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$/,
+  );
+  if (!match) {
+    throw new Error(`Package version '${version}' must be a plain semantic version.`);
+  }
+  return `${match[1]}.${match[2]}.${Number(match[3]) + 1}`;
+}
+
 export function stableVersion(version) {
   const match = version.match(
     /^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)-rc\.\d+$/,
