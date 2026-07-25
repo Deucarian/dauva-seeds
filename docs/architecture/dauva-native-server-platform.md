@@ -1,6 +1,6 @@
 # Dauva native server platform
 
-Status: **Phase 2 live; isolated Leaf Agent vertical slice in development**
+Status: **Phase 2 live; isolated Leaf Agent vertical slice deployed to develop**
 
 Last updated: 2026-07-25
 

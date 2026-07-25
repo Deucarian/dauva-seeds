@@ -1,6 +1,7 @@
 # ADR 0002: Leaf distribution and client surfaces
 
-Status: accepted  
+Status: accepted
+
 Date: 2026-07-25
 
 ## Context

@@ -1,6 +1,7 @@
 # ADR 0001: outbound device-code Leaf enrollment
 
-Status: accepted  
+Status: accepted
+
 Date: 2026-07-25
 
 ## Context

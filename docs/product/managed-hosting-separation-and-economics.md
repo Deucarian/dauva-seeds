@@ -1,6 +1,7 @@
 # Managed hosting: separation and economics
 
-Status: planning boundary  
+Status: planning boundary
+
 Date: 2026-07-25
 
 ## Product decision
