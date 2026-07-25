@@ -1,8 +1,8 @@
 # Dauva native server platform
 
-Status: **Phase 1 implemented and live**
+Status: **Phase 2 partially implemented and live**
 
-Last updated: 2026-07-24
+Last updated: 2026-07-25
 
 This document is the canonical product and architecture design for Dauva's
 native game-server platform. Keep it current when the Seed format, registry,
@@ -135,9 +135,11 @@ native Server. Agreement acceptance is stored in a separate audit record with
 the Server, Seed, agreement, accepting user, URL, revision, and timestamp.
 
 Seed v1 is implemented as JSON Schema plus stricter policy validation. The
-registry contains three Pods and six sanitized Seeds. Minecraft Fabric is
-stable; Valheim, Core Keeper, Satisfactory, Factorio, and Enshrouded remain
-draft until their own native lifecycle tests are complete.
+registry contains three Pods and six sanitized Seeds. Minecraft Fabric,
+Factorio, Core Keeper, and Valheim are stable `1.0.0` Seeds after their own
+native lifecycle tests. Satisfactory and Enshrouded remain candidates and are
+not published in the production Seed Library until their larger memory and
+runtime behavior is proven.
 
 The native Docker Branch and Pterodactyl Branch are registered side by side.
 After the successful Minecraft acceptance test, native Docker became the
@@ -291,7 +293,9 @@ Storage rules:
 - active saves use persistent Leaf storage;
 - disposable download caches are separately identifiable and garbage
   collectable;
-- secrets are stored separately from ordinary configuration;
+- secret inputs are excluded from Seed manifests and ordinary Server records;
+- the current single-Leaf implementation supplies secrets ephemerally while
+  Sprouting and only to the runtime component that requires them;
 - deletion distinguishes runtime cleanup from backup retention;
 - updates can require a successful pre-update backup;
 - backup retention and quotas are control-plane policy, not arbitrary Seed
@@ -317,6 +321,10 @@ The Leaf Agent allocates ports atomically from configured pools and persists
 the complete allocation before starting components. Partial allocation failure
 must leave no leaked reservations.
 
+The native Docker Branch now supports single dynamic ports and contiguous
+paired allocations. Valheim proved a two-port public UDP pair, while Factorio
+proved that a private administration port is not published to the host.
+
 ## Agreements and secrets
 
 Required agreements remain unchecked in the portal and are independently
@@ -331,9 +339,12 @@ For every accepted agreement, Dauva stores:
 - timestamp;
 - the explicit accepted value.
 
-Passwords and tokens are never stored in the registry or returned in ordinary
-Server responses. The API stores them using the platform's protected secret
-mechanism and supplies them to the Agent only for the intended Server.
+Passwords and tokens are never stored in the registry, ordinary instance
+options, or Server responses. In the current single-Leaf implementation they
+exist only during the Sprouting request and are supplied to the intended
+runtime container as required by the game. Durable protected secret storage is
+still required before updates, migration, or multi-Leaf reconciliation can
+recreate a Server without asking the administrator again.
 
 ## Instance identity and persistence
 
@@ -380,6 +391,11 @@ Deletion remains name-confirmed in the API. Runtime resources are removed
 before the database record. Backup deletion or retention is an explicit policy
 and must not be an accidental side effect.
 
+Once the exact deletion name has been confirmed, provider cleanup and record
+cleanup continue independently of the browser request lifetime. A disconnected
+portal must not leave a stopped container, Server record, or owned storage
+behind after a confirmed deletion.
+
 ## Security invariants
 
 - The portal never talks directly to a Leaf runtime.
@@ -415,9 +431,11 @@ The native platform must progressively replace the useful Wings capabilities:
 Dauva already owns the product-facing catalog, agreements, authentication,
 managed instance records, high-level status, autostart, and safe deletion.
 
-Native Sprouting, Leaf isolation, allocation, storage, logs, backups, and
-updates are the major remaining capabilities. File management, scheduling, and
-multi-Leaf placement follow after the first reliable native Server.
+Native Sprouting, resource enforcement, dynamic and paired allocation, owned
+storage, status, power, and safe deletion are now live on one Docker Leaf.
+Leaf-agent isolation, logs, restore, general backup control, updates, and
+protected durable secrets are the major remaining capabilities. File
+management, scheduling, and multi-Leaf placement follow.
 
 ## Delivery plan
 
@@ -460,18 +478,38 @@ native pool and was removed after the test. Candidate Seeds were enabled only
 for the acceptance window and disabled again after promotion of Minecraft
 Fabric `1.0.0` to stable.
 
-### Phase 2: current Server set
+### Phase 2: current Server set — partially complete
 
-Convert and validate:
+Converted and validated:
 
 1. Valheim;
 2. Core Keeper;
 3. Factorio;
+
+Remaining candidates:
+
 4. Satisfactory;
 5. Enshrouded.
 
-This phase adds UDP and paired-port allocation, SteamCMD installation,
-game-specific readiness, graceful shutdown, and larger storage behavior.
+This phase has added dynamic UDP and contiguous paired-port allocation,
+UID/GID-aware volume ownership, ephemeral secret handoff, graceful shutdown,
+and larger owned storage behavior. Satisfactory and Enshrouded wait for the
+planned RAM upgrade and full disposable lifecycle tests.
+
+Live acceptance evidence:
+
+- Factorio completed create, running status, stop, start, restart, and delete
+  with a dynamic public UDP port and an internal-only RCON port.
+- Core Keeper completed create, running status, stop, start, and delete with
+  data and cache volumes on the dedicated data disk.
+- Valheim completed create, running status, graceful stop, start, and
+  delete-while-running with a contiguous public UDP pair.
+- Every test used a digest-pinned image and enforced CPU and memory limits.
+- Secret values were absent from ordinary instance options, and each required
+  agreement produced exactly one server-side acceptance record.
+- Confirmed running deletion completed container, record, and owned-storage
+  cleanup even when the original portal request no longer needed to remain
+  connected.
 
 ### Phase 3: operational completeness
 
@@ -503,8 +541,8 @@ These are the current working decisions and should change only deliberately:
 4. A running Server is source material for a Seed, never copied into the
    registry with its private data.
 5. Seeds support multiple components.
-6. Existing Servers remain untouched while a disposable Minecraft Fabric
-   Server proves the native path.
+6. Existing Servers remain untouched while disposable native Servers prove
+   each Seed before it becomes stable.
 7. Pterodactyl remains a temporary optional Branch, not the Dauva domain model.
 8. Docker is the first runtime because it is already present on the Debian
    Leaf; the contract must not permanently depend on Docker-specific client

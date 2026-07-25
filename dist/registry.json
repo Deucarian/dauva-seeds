@@ -7,7 +7,7 @@
     {
       "schemaVersion": "dauva.dev/pod/v1",
       "id": "factory",
-      "status": "candidate",
+      "status": "stable",
       "metadata": {
         "title": {
           "en": "Factory",
@@ -43,7 +43,7 @@
     {
       "schemaVersion": "dauva.dev/pod/v1",
       "id": "survival",
-      "status": "candidate",
+      "status": "stable",
       "metadata": {
         "title": {
           "en": "Survival",
@@ -63,8 +63,8 @@
     {
       "schemaVersion": "dauva.dev/seed/v1",
       "id": "core-keeper",
-      "version": "1.0.0-rc.1",
-      "status": "candidate",
+      "version": "1.0.0",
+      "status": "stable",
       "podId": "survival",
       "metadata": {
         "title": {
@@ -281,7 +281,7 @@
         "update": false,
         "console": false
       },
-      "manifestDigest": "sha256:0aec114c2422221dd0383a1fbaa78ca7586010e57f5cf1a8eb2218d8d0376c9c"
+      "manifestDigest": "sha256:a88397325bc497dbcb9f3ed62de50bff0a9a5f26c1ddffca80a23886c1aa17fe"
     },
     {
       "schemaVersion": "dauva.dev/seed/v1",
@@ -465,8 +465,8 @@
     {
       "schemaVersion": "dauva.dev/seed/v1",
       "id": "factorio",
-      "version": "1.0.0-rc.1",
-      "status": "candidate",
+      "version": "1.0.0",
+      "status": "stable",
       "podId": "factory",
       "metadata": {
         "title": {
@@ -633,7 +633,7 @@
         "update": false,
         "console": false
       },
-      "manifestDigest": "sha256:17608bd41ea3ee908c8c15e2791464b59d6b487fbf8217cf787a6ff816cdad85"
+      "manifestDigest": "sha256:7f4d9d357c88487255deff549a6431af482f8545d6bc33efcb50953c0bb5bddf"
     },
     {
       "schemaVersion": "dauva.dev/seed/v1",
@@ -1201,8 +1201,8 @@
     {
       "schemaVersion": "dauva.dev/seed/v1",
       "id": "valheim",
-      "version": "1.0.0-rc.1",
-      "status": "candidate",
+      "version": "1.0.0",
+      "status": "stable",
       "podId": "survival",
       "metadata": {
         "title": {
@@ -1446,8 +1446,8 @@
         "update": false,
         "console": false
       },
-      "manifestDigest": "sha256:adce76d2617bb91312c7f0b18aeb196e3f8f3d71c16539798495b1b854052ace"
+      "manifestDigest": "sha256:61400ca12f9d88dc3084abbb5601f4789a8e688d0eeaabe292337772cef6df51"
     }
   ],
-  "registryDigest": "sha256:edc7381d28f5fdf6c344924b52e19305ba7396eca195d4f97050ea620023432c"
+  "registryDigest": "sha256:f010ca302e385891787e6236ccb5a367a6e776a55bc52ad2903afdc06252baf2"
 }

@@ -30,14 +30,15 @@ The first vertical slice is live:
 - Seed v1 schemas, policy validation, and deterministic compilation are in
   place.
 - All six existing Compose Server types have sanitized Seed manifests.
-- Minecraft Fabric `1.0.0` is stable and contains a primary Server plus a
-  backup companion.
-- The other five Seeds remain draft until their native lifecycle and
-  multi-port behavior have been tested.
+- Minecraft Fabric, Factorio, Core Keeper, and Valheim are stable `1.0.0`
+  Seeds after disposable native lifecycle tests.
+- Satisfactory and Enshrouded remain candidate Seeds until the Leaf receives
+  its RAM upgrade and their heavier runtime behavior is tested end to end.
 - Dauva rejects mutable images, fixed secrets, saves, arbitrary host paths,
   privileged runtime access, and Docker socket mounts.
-- A disposable Fabric Server completed create, health, stop, start, restart,
-  and name-confirmed delete on the Debian Leaf without using Pterodactyl.
+- Disposable Fabric, Factorio, Core Keeper, and Valheim Servers completed
+  native create, status, power, and name-confirmed delete flows on the Debian
+  Leaf without using Pterodactyl.
 - New Servers Sprout through Dauva's native Docker Branch by default;
   Pterodactyl remains an optional migration fallback.
 

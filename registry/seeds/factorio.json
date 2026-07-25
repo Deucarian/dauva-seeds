@@ -1,8 +1,8 @@
 {
   "schemaVersion": "dauva.dev/seed/v1",
   "id": "factorio",
-  "version": "1.0.0-rc.1",
-  "status": "candidate",
+  "version": "1.0.0",
+  "status": "stable",
   "podId": "factory",
   "metadata": {
     "title": {

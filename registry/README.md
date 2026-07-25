@@ -15,5 +15,6 @@ Rules already fixed by the canonical design:
 
 The six current Compose-managed Servers were used as reference implementations
 for Minecraft, Valheim, Core Keeper, Satisfactory, Factorio, and Enshrouded.
-Minecraft Fabric is stable after a successful native lifecycle test; the other
-five Seeds remain draft.
+Minecraft Fabric, Factorio, Core Keeper, and Valheim are stable after
+successful disposable native lifecycle tests. Satisfactory and Enshrouded
+remain candidates until their heavier runtime and memory behavior is proven.
