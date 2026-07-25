@@ -3,7 +3,11 @@
   "id": "satisfactory",
   "version": "1.0.0-rc.1",
   "status": "candidate",
-  "podId": "factory",
+  "podId": "satisfactory",
+  "genres": [
+    "automation",
+    "simulation"
+  ],
   "metadata": {
     "title": {
       "en": "Satisfactory",

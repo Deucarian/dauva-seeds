@@ -3,7 +3,12 @@
   "id": "core-keeper",
   "version": "1.0.0",
   "status": "stable",
-  "podId": "survival",
+  "podId": "core-keeper",
+  "genres": [
+    "adventure",
+    "sandbox",
+    "survival"
+  ],
   "metadata": {
     "title": {
       "en": "Core Keeper",

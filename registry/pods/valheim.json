@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "dauva.dev/pod/v1",
+  "id": "valheim",
+  "status": "stable",
+  "metadata": {
+    "title": {
+      "en": "Valheim",
+      "nl": "Valheim",
+      "de": "Valheim"
+    },
+    "description": {
+      "en": "Valheim Server variants with persistent worlds, saves, and native backups.",
+      "nl": "Valheim-Servervarianten met blijvende werelden, saves en native back-ups.",
+      "de": "Valheim-Servervarianten mit persistenten Welten, Spielständen und nativen Backups."
+    },
+    "icon": "shield"
+  }
+}

@@ -3,7 +3,12 @@
   "id": "enshrouded",
   "version": "1.0.0-rc.1",
   "status": "candidate",
-  "podId": "survival",
+  "podId": "enshrouded",
+  "genres": [
+    "adventure",
+    "cooperative",
+    "survival"
+  ],
   "metadata": {
     "title": {
       "en": "Enshrouded",

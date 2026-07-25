@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "dauva.dev/pod/v1",
+  "id": "factorio",
+  "status": "stable",
+  "metadata": {
+    "title": {
+      "en": "Factorio",
+      "nl": "Factorio",
+      "de": "Factorio"
+    },
+    "description": {
+      "en": "Factorio Server variants with persistent factories and native administration.",
+      "nl": "Factorio-Servervarianten met blijvende fabrieken en native beheer.",
+      "de": "Factorio-Servervarianten mit persistenten Fabriken und nativer Verwaltung."
+    },
+    "icon": "settings"
+  }
+}

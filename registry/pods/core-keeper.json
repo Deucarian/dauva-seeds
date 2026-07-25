@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "dauva.dev/pod/v1",
+  "id": "core-keeper",
+  "status": "stable",
+  "metadata": {
+    "title": {
+      "en": "Core Keeper",
+      "nl": "Core Keeper",
+      "de": "Core Keeper"
+    },
+    "description": {
+      "en": "Core Keeper Server variants with persistent worlds and saves.",
+      "nl": "Core Keeper-Servervarianten met blijvende werelden en saves.",
+      "de": "Core-Keeper-Servervarianten mit persistenten Welten und Spielständen."
+    },
+    "icon": "gem"
+  }
+}

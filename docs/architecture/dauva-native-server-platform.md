@@ -56,7 +56,7 @@ backup or object storage.
 | --- | --- |
 | Seed Library | The catalog administrators see in Dauva. |
 | Seed Registry | The versioned technical source behind the Seed Library. |
-| Pod | A recognizable collection of related Seeds, such as Minecraft. |
+| Pod | One game family containing related Server variants, such as Minecraft. |
 | Seed | A complete, approved, reproducible recipe for one Server type. |
 | Server | One installed runtime instance with its own data and settings. |
 | Sprouting | Provisioning a Server from a Seed. |
@@ -65,7 +65,8 @@ backup or object storage.
 | Leaf Agent | The restricted Dauva service that manages runtime resources on a Leaf. |
 | Withered | A failed Sprouting operation or inactive runtime condition, made explicit by accompanying text. |
 
-A Pod is catalog metadata, not a running workload. A Seed produces a Server.
+A Pod is catalog metadata, not a running workload or genre. Genres are Seed
+labels used for discovery and filtering. A Seed produces a Server.
 A Server can contain multiple runtime components, such as a primary game
 container and a backup sidecar.
 
@@ -135,7 +136,7 @@ native Server. Agreement acceptance is stored in a separate audit record with
 the Server, Seed, agreement, accepting user, URL, revision, and timestamp.
 
 Seed v1 is implemented as JSON Schema plus stricter policy validation. The
-registry contains three Pods and six sanitized Seeds. Minecraft Fabric,
+registry contains six game-family Pods and six sanitized Seeds. Minecraft Fabric,
 Factorio, Core Keeper, and Valheim are stable `1.0.0` Seeds after their own
 native lifecycle tests. Satisfactory and Enshrouded remain candidates and are
 not published in the production Seed Library until their larger memory and
@@ -230,6 +231,7 @@ A Seed v1 manifest must be declarative and contain at least:
 - immutable Seed `id`;
 - semantic `version`;
 - `podId`;
+- one or more discovery `genres`;
 - localized title and description;
 - supported operating systems and CPU architectures;
 - one or more runtime components;

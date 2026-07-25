@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "dauva.dev/pod/v1",
+  "id": "satisfactory",
+  "status": "candidate",
+  "metadata": {
+    "title": {
+      "en": "Satisfactory",
+      "nl": "Satisfactory",
+      "de": "Satisfactory"
+    },
+    "description": {
+      "en": "Satisfactory Server variants with persistent factories and administration ports.",
+      "nl": "Satisfactory-Servervarianten met blijvende fabrieken en beheerpoorten.",
+      "de": "Satisfactory-Servervarianten mit persistenten Fabriken und Verwaltungsports."
+    },
+    "icon": "settings"
+  }
+}

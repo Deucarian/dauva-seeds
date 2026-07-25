@@ -6,18 +6,54 @@
   "pods": [
     {
       "schemaVersion": "dauva.dev/pod/v1",
-      "id": "factory",
+      "id": "core-keeper",
       "status": "stable",
       "metadata": {
         "title": {
-          "en": "Factory",
-          "nl": "Factory",
-          "de": "Fabrik"
+          "en": "Core Keeper",
+          "nl": "Core Keeper",
+          "de": "Core Keeper"
         },
         "description": {
-          "en": "Persistent automation and factory Servers with durable saves and administration ports.",
-          "nl": "Blijvende automatiserings- en factory-Servers met duurzame saves en beheerpoorten.",
-          "de": "Persistente Automatisierungs- und Fabrik-Server mit dauerhaften Spielständen und Verwaltungsports."
+          "en": "Core Keeper Server variants with persistent worlds and saves.",
+          "nl": "Core Keeper-Servervarianten met blijvende werelden en saves.",
+          "de": "Core-Keeper-Servervarianten mit persistenten Welten und Spielständen."
+        },
+        "icon": "gem"
+      }
+    },
+    {
+      "schemaVersion": "dauva.dev/pod/v1",
+      "id": "enshrouded",
+      "status": "candidate",
+      "metadata": {
+        "title": {
+          "en": "Enshrouded",
+          "nl": "Enshrouded",
+          "de": "Enshrouded"
+        },
+        "description": {
+          "en": "Enshrouded Server variants with persistent worlds and saves.",
+          "nl": "Enshrouded-Servervarianten met blijvende werelden en saves.",
+          "de": "Enshrouded-Servervarianten mit persistenten Welten und Spielständen."
+        },
+        "icon": "flame"
+      }
+    },
+    {
+      "schemaVersion": "dauva.dev/pod/v1",
+      "id": "factorio",
+      "status": "stable",
+      "metadata": {
+        "title": {
+          "en": "Factorio",
+          "nl": "Factorio",
+          "de": "Factorio"
+        },
+        "description": {
+          "en": "Factorio Server variants with persistent factories and native administration.",
+          "nl": "Factorio-Servervarianten met blijvende fabrieken en native beheer.",
+          "de": "Factorio-Servervarianten mit persistenten Fabriken und nativer Verwaltung."
         },
         "icon": "settings"
       }
@@ -42,20 +78,38 @@
     },
     {
       "schemaVersion": "dauva.dev/pod/v1",
-      "id": "survival",
+      "id": "satisfactory",
+      "status": "candidate",
+      "metadata": {
+        "title": {
+          "en": "Satisfactory",
+          "nl": "Satisfactory",
+          "de": "Satisfactory"
+        },
+        "description": {
+          "en": "Satisfactory Server variants with persistent factories and administration ports.",
+          "nl": "Satisfactory-Servervarianten met blijvende fabrieken en beheerpoorten.",
+          "de": "Satisfactory-Servervarianten mit persistenten Fabriken und Verwaltungsports."
+        },
+        "icon": "settings"
+      }
+    },
+    {
+      "schemaVersion": "dauva.dev/pod/v1",
+      "id": "valheim",
       "status": "stable",
       "metadata": {
         "title": {
-          "en": "Survival",
-          "nl": "Survival",
-          "de": "Survival"
+          "en": "Valheim",
+          "nl": "Valheim",
+          "de": "Valheim"
         },
         "description": {
-          "en": "Persistent cooperative survival Servers with larger downloads and multiple UDP ports.",
-          "nl": "Blijvende coöperatieve survival-Servers met grotere downloads en meerdere UDP-poorten.",
-          "de": "Persistente kooperative Survival-Server mit größeren Downloads und mehreren UDP-Ports."
+          "en": "Valheim Server variants with persistent worlds, saves, and native backups.",
+          "nl": "Valheim-Servervarianten met blijvende werelden, saves en native back-ups.",
+          "de": "Valheim-Servervarianten mit persistenten Welten, Spielständen und nativen Backups."
         },
-        "icon": "leaf"
+        "icon": "shield"
       }
     }
   ],
@@ -65,7 +119,12 @@
       "id": "core-keeper",
       "version": "1.0.0",
       "status": "stable",
-      "podId": "survival",
+      "podId": "core-keeper",
+      "genres": [
+        "adventure",
+        "sandbox",
+        "survival"
+      ],
       "metadata": {
         "title": {
           "en": "Core Keeper",
@@ -281,14 +340,19 @@
         "update": false,
         "console": false
       },
-      "manifestDigest": "sha256:a88397325bc497dbcb9f3ed62de50bff0a9a5f26c1ddffca80a23886c1aa17fe"
+      "manifestDigest": "sha256:ac722195e2202db52cbe21e7e70cb07022404009066da6667ff072a9e73fd86c"
     },
     {
       "schemaVersion": "dauva.dev/seed/v1",
       "id": "enshrouded",
       "version": "1.0.0-rc.1",
       "status": "candidate",
-      "podId": "survival",
+      "podId": "enshrouded",
+      "genres": [
+        "adventure",
+        "cooperative",
+        "survival"
+      ],
       "metadata": {
         "title": {
           "en": "Enshrouded",
@@ -460,14 +524,18 @@
         "update": false,
         "console": false
       },
-      "manifestDigest": "sha256:79ba0a23593ba090ec2d4642163d073fe7d89879eb1dc9f7d0faacd1fe551e67"
+      "manifestDigest": "sha256:565a12cba1ad4a48b79aec2e6e2f4cfb85c9e8fe0c5754833ce20d256f4c7981"
     },
     {
       "schemaVersion": "dauva.dev/seed/v1",
       "id": "factorio",
       "version": "1.0.0",
       "status": "stable",
-      "podId": "factory",
+      "podId": "factorio",
+      "genres": [
+        "automation",
+        "simulation"
+      ],
       "metadata": {
         "title": {
           "en": "Factorio",
@@ -633,7 +701,7 @@
         "update": false,
         "console": false
       },
-      "manifestDigest": "sha256:7f4d9d357c88487255deff549a6431af482f8545d6bc33efcb50953c0bb5bddf"
+      "manifestDigest": "sha256:043864247992ba0885db6763264b47184847ca79777a98f98aae5e41d826bbbc"
     },
     {
       "schemaVersion": "dauva.dev/seed/v1",
@@ -641,6 +709,10 @@
       "version": "1.0.0",
       "status": "stable",
       "podId": "minecraft",
+      "genres": [
+        "sandbox",
+        "survival"
+      ],
       "metadata": {
         "title": {
           "en": "Minecraft Fabric",
@@ -1001,14 +1073,18 @@
         "update": false,
         "console": false
       },
-      "manifestDigest": "sha256:6b9a9acc5c70bdfa872760f49105457156494eec6c57a069772a2cda81a8c96b"
+      "manifestDigest": "sha256:5e93ba2e2149b9bd5dfa85524d7eef56d8816c373411e7aeed57dba2a5d1138b"
     },
     {
       "schemaVersion": "dauva.dev/seed/v1",
       "id": "satisfactory",
       "version": "1.0.0-rc.1",
       "status": "candidate",
-      "podId": "factory",
+      "podId": "satisfactory",
+      "genres": [
+        "automation",
+        "simulation"
+      ],
       "metadata": {
         "title": {
           "en": "Satisfactory",
@@ -1196,14 +1272,19 @@
         "update": false,
         "console": false
       },
-      "manifestDigest": "sha256:deea63a19a66bbebd1c228eb973fac37d346c3e09fc71f982cc382915a68b5e3"
+      "manifestDigest": "sha256:8c5927f02b0823027fc84e86c29ed48ef9cdeea8f7e12fb2a192755e403155ba"
     },
     {
       "schemaVersion": "dauva.dev/seed/v1",
       "id": "valheim",
       "version": "1.0.0",
       "status": "stable",
-      "podId": "survival",
+      "podId": "valheim",
+      "genres": [
+        "adventure",
+        "cooperative",
+        "survival"
+      ],
       "metadata": {
         "title": {
           "en": "Valheim",
@@ -1446,8 +1527,8 @@
         "update": false,
         "console": false
       },
-      "manifestDigest": "sha256:61400ca12f9d88dc3084abbb5601f4789a8e688d0eeaabe292337772cef6df51"
+      "manifestDigest": "sha256:30d535b72c803b00a934c839d9bbf419619c3b86fe2560e43438bd331f5745f7"
     }
   ],
-  "registryDigest": "sha256:f010ca302e385891787e6236ccb5a367a6e776a55bc52ad2903afdc06252baf2"
+  "registryDigest": "sha256:258e8e138b2c75426a9efdd1bb9b645b71d923d14530f41e51dfba3aa05bdddd"
 }

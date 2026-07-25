@@ -5,7 +5,9 @@ This directory contains the reviewed Pod and Seed manifests compiled into
 
 Rules already fixed by the canonical design:
 
-- Pods group related Seeds but are not runtime workloads.
+- A Pod represents one game family and groups its related Server variants.
+- Genres are Seed labels for discovery and filtering; they never define Pod
+  ownership.
 - Seeds are versioned, curated, and reproducible.
 - Container images are pinned by immutable digest.
 - Secrets, live data, saves, and backups never enter the registry.

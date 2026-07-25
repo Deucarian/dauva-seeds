@@ -3,7 +3,11 @@
   "id": "factorio",
   "version": "1.0.0",
   "status": "stable",
-  "podId": "factory",
+  "podId": "factorio",
+  "genres": [
+    "automation",
+    "simulation"
+  ],
   "metadata": {
     "title": {
       "en": "Factorio",

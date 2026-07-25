@@ -4,6 +4,10 @@
   "version": "1.0.0",
   "status": "stable",
   "podId": "minecraft",
+  "genres": [
+    "sandbox",
+    "survival"
+  ],
   "metadata": {
     "title": {
       "en": "Minecraft Fabric",

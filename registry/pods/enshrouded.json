@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "dauva.dev/pod/v1",
+  "id": "enshrouded",
+  "status": "candidate",
+  "metadata": {
+    "title": {
+      "en": "Enshrouded",
+      "nl": "Enshrouded",
+      "de": "Enshrouded"
+    },
+    "description": {
+      "en": "Enshrouded Server variants with persistent worlds and saves.",
+      "nl": "Enshrouded-Servervarianten met blijvende werelden en saves.",
+      "de": "Enshrouded-Servervarianten mit persistenten Welten und Spielständen."
+    },
+    "icon": "flame"
+  }
+}

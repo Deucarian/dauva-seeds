@@ -3,7 +3,12 @@
   "id": "valheim",
   "version": "1.0.0",
   "status": "stable",
-  "podId": "survival",
+  "podId": "valheim",
+  "genres": [
+    "adventure",
+    "cooperative",
+    "survival"
+  ],
   "metadata": {
     "title": {
       "en": "Valheim",
