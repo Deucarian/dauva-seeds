@@ -1,6 +1,14 @@
 name: Watch Seed image updates
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/seed-updates.yml"
+      - "registry/seeds/**"
+      - "schemas/**"
+      - "tools/**"
   schedule:
     - cron: "17 4 * * *"
   workflow_dispatch:
@@ -70,4 +78,3 @@ jobs:
             --head "$UPDATE_BRANCH" \
             --title "chore: prove updated Seed images" \
             --body "Dauva detected ${{ steps.updates.outputs.count }} changed OCI image digest(s) and prepared release-candidate Seeds. Existing Servers remain pinned. Before promotion, every candidate still requires its lifecycle proof; legal agreements remain explicit and are never accepted by this workflow."
-
