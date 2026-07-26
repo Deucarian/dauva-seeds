@@ -1,6 +1,6 @@
 # Dauva native server platform
 
-Status: **Phase 3 foundation complete; native Leaf rollout included in this release**
+Status: **Phase 4 control plane complete; Leaf fleet rollout included in this release**
 
 Last updated: 2026-07-26
 
@@ -14,10 +14,10 @@ to the new canonical location instead of maintaining two copies.
 
 ## Summary
 
-Dauva will own the full product model and control plane for creating and
-managing Servers. Pterodactyl may remain available as a temporary Branch during
-migration, but it must not define Dauva's catalog, terminology, or long-term
-runtime contract.
+Dauva owns the full product model and control plane for creating and managing
+Servers. Pterodactyl is no longer a runtime dependency. Existing trusted
+Compose Servers remain controllable through the Leaf while they are adopted or
+recreated from native Seeds.
 
 The platform has two separate distribution concerns:
 
@@ -147,13 +147,11 @@ fresh disposable lifecycle proofs on the Debian Leaf; their exact
 release-candidate versions, manifest digests, agreement revisions, checks, and
 proof expiry are retained in committed receipts.
 
-The in-process native Docker Branch and Pterodactyl Branch are registered side
-by side. After the successful Minecraft acceptance test, native Docker became
-the default Branch for new Servers. A separately deployable Leaf Agent now
-implements the same lifecycle behind an authenticated HTTP contract. This
-release introduces it beside both existing Branches and makes it the default
-for newly Sprouted Servers. Existing Servers are not adopted, restarted, or
-otherwise modified by that switch.
+The separately deployable Leaf Agent now owns every privileged host operation.
+The API has no Docker socket and Pterodactyl is removed. Newly Sprouted Servers
+always use a compatible healthy Leaf. Existing trusted Compose Servers remain
+discoverable and controllable through a restricted legacy Leaf contract; they
+are never adopted, restarted, moved, or deleted automatically.
 
 ## Target architecture
 
@@ -162,12 +160,13 @@ flowchart LR
     Portal["Dauva Portal<br/>Seed Library"] --> API["Dauva API<br/>Control plane"]
     Registry["Dauva Seed Registry<br/>Pods and versioned Seeds"] --> API
     API --> Database["Desired state, instances,<br/>agreements and audit"]
-    API --> Pterodactyl["Pterodactyl Branch<br/>temporary"]
-    API --> Agent["Dauva Leaf Agent"]
-    Agent --> Runtime["Docker initially<br/>Podman may follow"]
-    Agent --> Data["Active Server storage"]
-    Agent --> Images["OCI image registry"]
-    Agent --> Backups["Backup or object storage"]
+    API --> AgentA["Dauva Leaf Agent A"]
+    API --> AgentB["Dauva Leaf Agent B"]
+    AgentA --> RuntimeA["Container runtime"]
+    AgentB --> RuntimeB["Container runtime"]
+    AgentA --> Data["Active Server storage"]
+    AgentA --> Images["OCI image registry"]
+    AgentA --> Backups["Backup filesystem or object storage"]
 ```
 
 ### Dauva Portal
@@ -182,7 +181,7 @@ The API is the authoritative control plane. It:
 
 - resolves an exact Seed version and digest;
 - validates options and agreements;
-- chooses a Branch and later a Leaf;
+- selects a compatible Leaf by capabilities, memory, storage, and free ports;
 - persists desired state before provisioning;
 - sends idempotent commands to the Branch;
 - reconciles desired and observed state;
@@ -236,10 +235,9 @@ The Leaf Agent owns privileged host operations:
 - deleting runtime resources only after an authorized control-plane command;
 - reporting capacity and observed state.
 
-The long-term API container must not require the Docker socket. During a
-single-Leaf proof of concept, the existing Docker integration may implement the
-same contract locally, but the privilege boundary must remain explicit so it
-can be extracted into the Agent.
+The API container does not receive the Docker socket or active Server storage.
+All runtime discovery and mutation, including control of trusted legacy
+Compose Servers, crosses the authenticated Leaf contract.
 
 The first extracted Agent uses a control-plane-initiated private HTTP
 connection with a unique 256-bit-or-stronger bearer credential. The Agent:
@@ -252,6 +250,49 @@ connection with a unique 256-bit-or-stronger bearer credential. The Agent:
   new direct runtime privileges;
 - returns provider-neutral lifecycle results;
 - can run a disposable proof without adding a permanent Server record.
+
+### Lifecycle operations
+
+The control plane provides one Server lifecycle model:
+
+- component-aware logs with bounded tail sizes;
+- console commands only through a Seed-declared protocol, private RCON port,
+  and generated or administrator-owned secret—never a host shell;
+- consistent persistent-volume backups, retention, restore, and exact-target
+  deletion;
+- transactional restore staging so a failed restore keeps the previous data;
+- Seed updates and trusted-history rollback, each preceded by a safety backup;
+- daily or weekly schedules evaluated in `Europe/Amsterdam`;
+- Leaf capacity and health reporting;
+- read-only migration discovery for native workloads and trusted legacy
+  candidates.
+
+Backups are stored outside the active Server tree. A Leaf reports whether the
+backup root resolves to a separate filesystem. Local backups are useful for
+operator mistakes but are explicitly shown as not disaster-safe. Large or
+important Servers should use a roomy separate disk, mounted backup target, or
+future object-storage adapter. The first production Leaf defaults to three
+retained archives per Server because its data SSD currently has about 223 GB
+free and the media disks are already heavily occupied.
+
+### Multi-Leaf placement
+
+`PORTAL_LEAVES_JSON` configures a fleet without changing the Portal contract.
+Each entry has an immutable ID, display name, private URL, bearer token, and
+enabled flag. The API rejects unexpected Leaf identities and Registry digests.
+Sprouting selects only a healthy Leaf that advertises every required
+capability and has sufficient memory, disk headroom, and port capacity.
+Existing Server IDs retain their Leaf identity, so later fleet changes cannot
+silently move a Server.
+
+### Seed releases
+
+The Registry keeps the current stable Seed plus immutable historical releases.
+Preparing a new candidate archives the previous stable manifest before it can
+be replaced. Rollback accepts only a historical manifest whose ID, version, and
+digest match the recorded deployment. The optional `console` contract is
+validated against an existing component, private TCP RCON port, and declared
+secret.
 
 TLS termination is not required on the private Compose network. Connections
 that leave a private host or overlay network must use HTTPS or mTLS. Bearer
@@ -509,9 +550,9 @@ behind after a confirmed deletion.
 - Ownership labels prevent Dauva from mutating unrelated containers.
 - Destructive operations are auditable.
 
-## What Pterodactyl currently supplies
+## Runtime capabilities now owned by Dauva
 
-The native platform must progressively replace the useful Wings capabilities:
+The Leaf fleet and control plane now provide:
 
 - container and image lifecycle;
 - installation behavior;
@@ -520,26 +561,17 @@ The native platform must progressively replace the useful Wings capabilities:
 - CPU and memory enforcement;
 - runtime state and power actions;
 - live console and logs;
-- file access;
 - backups and restore;
 - scheduled tasks;
 - reinstall and update flows;
 - node capacity and placement;
 - multi-node communication.
 
-Dauva already owns the product-facing catalog, agreements, authentication,
-managed instance records, high-level status, autostart, and safe deletion.
-
-Native Sprouting, resource enforcement, dynamic and paired allocation, owned
-storage, status, power, and safe deletion are now live on one Docker Leaf.
-The extracted Leaf Agent, read-only Registry API, source adapters, proof
-runner, proof receipts, and portal trust/storage/proof metadata are implemented
-in this release. The six-Seed catalog batch passed its live proof gate, and the
-deployment migrates only the default for new Servers to the Leaf Agent. Logs,
-restore, general
-backup control, installed-Server updates, and protected durable secrets remain
-the next operational capabilities. File management, scheduling, and multi-Leaf
-placement follow.
+Dauva also owns the product-facing catalog, agreements, authentication,
+protected instance options, deployment history, high-level status, autostart,
+and safe deletion. Browser file management, signed Registry distribution, and
+an object-storage backup adapter remain later additions; none is required for
+the lifecycle in this release.
 
 ## Delivery plan
 
@@ -627,7 +659,7 @@ Live acceptance evidence:
   cleanup even when the original portal request no longer needed to remain
   connected.
 
-### Phase 3: operational completeness
+### Phase 3: operational completeness — complete
 
 - daily OCI tag resolution and reviewable Seed update candidates (implemented);
 - proof receipts and guarded candidate promotion (implemented);
@@ -638,22 +670,25 @@ Live acceptance evidence:
 - extracted authenticated Leaf Agent and Registry read API (implemented);
 - Terraria, Project Zomboid, and Garry's Mod Pods and six proven Seeds
   (implemented);
-- live log streaming and console;
-- backup and restore UI;
-- installed-Server update and rollback;
-- scheduled tasks;
+- continuously refreshed logs and Seed-gated console (implemented);
+- backup, restore, retention, and UI (implemented);
+- installed-Server update and trusted-history rollback (implemented);
+- scheduled tasks (implemented);
 - registry signing and trusted sources;
-- Leaf capacity reporting;
-- stronger secret storage;
-- remove direct Docker access from the API.
+- Leaf capacity reporting and placement (implemented);
+- protected API-side option storage (implemented);
+- remove direct Docker access from the API (implemented).
 
-### Phase 4: migration and retirement
+### Phase 4: migration and retirement — in progress
 
 - Adopt or recreate existing Compose Servers one at a time.
 - Back up and validate before changing ownership.
-- Keep the legacy and Pterodactyl Branches available during migration.
-- Remove Pterodactyl only after no managed Server depends on it.
-- Add additional Leaves and scheduling after the single-Leaf path is stable.
+- Keep restricted legacy discovery and control through the Leaf during
+  migration.
+- Pterodactyl is removed after verification that no managed Server depended on
+  it.
+- Multi-Leaf configuration, health, and placement are implemented; enrolling a
+  second physical Leaf remains an operator action.
 
 ## Initial decisions
 
@@ -668,7 +703,7 @@ These are the current working decisions and should change only deliberately:
 5. Seeds support multiple components.
 6. Existing Servers remain untouched while disposable native Servers prove
    each Seed before it becomes stable.
-7. Pterodactyl remains a temporary optional Branch, not the Dauva domain model.
+7. Pterodactyl is not a Dauva Branch or runtime dependency.
 8. Docker is the first runtime because it is already present on the Debian
    Leaf; the contract must not permanently depend on Docker-specific client
    behavior.
@@ -678,15 +713,14 @@ These are the current working decisions and should change only deliberately:
     non-production candidate setting.
 11. A source image with known cleartext secret logging is ineligible for the
     curated Registry.
-12. The first host keeps active data on the dedicated data SSD and reserves the
-    media disks for their existing workload until a separate backup target is
-    approved.
+12. The first host keeps active data on the dedicated data SSD. Backups use a
+    separately mounted configurable root and are labeled local until the host
+    confirms that root is a distinct filesystem.
 
 ## Open design questions
 
-- Which protected store should hold Server secrets before multi-Leaf support?
-- Should the initial backup target be the existing host backup storage, a NAS,
-  or S3-compatible object storage?
+- Which remote backup target should follow the local backup root: NAS or
+  S3-compatible object storage?
 - When should Git-compiled Seed bundles also be published as signed OCI
   artifacts?
 - Which file-management capability is actually required after logs, backups,

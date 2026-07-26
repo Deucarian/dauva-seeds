@@ -36,3 +36,26 @@ test("compiled proof summaries retain the exact proved version", () => {
   assert.equal(registry.seeds[0].proof.expiresAt, "2026-10-24T00:00:00.000Z");
   assert.match(registry.seeds[0].proof.receiptDigest, /^sha256:[a-f0-9]{64}$/);
 });
+
+test("historical Seed releases remain digest-pinned in the Registry", () => {
+  const current = {
+    id: "example",
+    version: "1.1.0",
+    status: "stable",
+    source: { kind: "oci", repository: "https://example.com/source" },
+  };
+  const historical = {
+    ...current,
+    version: "1.0.0",
+  };
+
+  const registry = compiledRegistry([], [current], [], [historical]);
+
+  assert.equal(registry.releases.length, 1);
+  assert.equal(registry.releases[0].version, "1.0.0");
+  assert.match(
+    registry.releases[0].manifestDigest,
+    /^sha256:[a-f0-9]{64}$/,
+  );
+  assert.equal(registry.releases[0].proof.state, "unproven");
+});

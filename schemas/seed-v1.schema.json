@@ -156,6 +156,9 @@
     "capabilities": {
       "$ref": "#/$defs/capabilities"
     },
+    "console": {
+      "$ref": "#/$defs/console"
+    },
     "updatePolicy": {
       "$ref": "#/$defs/updatePolicy"
     },
@@ -923,6 +926,36 @@
         },
         "console": {
           "type": "boolean"
+        }
+      }
+    },
+    "console": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protocol",
+        "componentId",
+        "portId",
+        "secretKey",
+        "maxCommandLength"
+      ],
+      "properties": {
+        "protocol": {
+          "const": "source-rcon"
+        },
+        "componentId": {
+          "$ref": "#/$defs/id"
+        },
+        "portId": {
+          "$ref": "#/$defs/id"
+        },
+        "secretKey": {
+          "$ref": "#/$defs/id"
+        },
+        "maxCommandLength": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 512
         }
       }
     },

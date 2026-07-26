@@ -5487,6 +5487,7 @@
       }
     }
   ],
+  "releases": [],
   "proofs": [
     {
       "schemaVersion": "dauva.dev/seed-proof/v1",
@@ -5837,5 +5838,5 @@
       ]
     }
   ],
-  "registryDigest": "sha256:80095da38a5b442a9a42b5c6b073b22b4d70737de66bce1c4b19a131b9d41009"
+  "registryDigest": "sha256:8805b23a64a0bf5046052b1923624ef63b76a8a2a88ee232cee847f8ec7f305f"
 }

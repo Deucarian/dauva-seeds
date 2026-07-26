@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { readJson, repositoryRoot } from "./registry-lib.mjs";
@@ -37,6 +37,27 @@ for (const update of report.seeds) {
   const { seed, updatedComponents } = prepareCandidate(currentSeed, update);
   if (updatedComponents.length === 0) {
     continue;
+  }
+  const historyDirectory = path.join(repositoryRoot, "registry", "history");
+  const historyPath = path.join(
+    historyDirectory,
+    `${currentSeed.id}@${currentSeed.version}.json`,
+  );
+  await mkdir(historyDirectory, { recursive: true });
+  let existingHistory;
+  try {
+    existingHistory = await readFile(historyPath, "utf8");
+  } catch (error) {
+    if (error?.code !== "ENOENT") throw error;
+  }
+  const renderedHistory = `${JSON.stringify(currentSeed, null, 2)}\n`;
+  if (existingHistory != null && existingHistory !== renderedHistory) {
+    throw new Error(
+      `Historical release '${currentSeed.id}@${currentSeed.version}' is immutable.`,
+    );
+  }
+  if (existingHistory == null) {
+    await writeFile(historyPath, renderedHistory, "utf8");
   }
   await writeFile(manifestPath, `${JSON.stringify(seed, null, 2)}\n`, "utf8");
   plans.push({

@@ -10,9 +10,21 @@ export async function readJson(filePath) {
   return JSON.parse(await readFile(filePath, "utf8"));
 }
 
-export async function readManifestDirectory(relativeDirectory) {
+export async function readManifestDirectory(
+  relativeDirectory,
+  { allowMissing = false } = {},
+) {
   const directory = path.join(repositoryRoot, relativeDirectory);
-  const names = (await readdir(directory))
+  let directoryEntries;
+  try {
+    directoryEntries = await readdir(directory);
+  } catch (error) {
+    if (allowMissing && error?.code === "ENOENT") {
+      return [];
+    }
+    throw error;
+  }
+  const names = directoryEntries
     .filter((name) => name.endsWith(".json"))
     .sort((left, right) => left.localeCompare(right));
   return Promise.all(
@@ -43,7 +55,7 @@ export function sha256(value) {
   return `sha256:${createHash("sha256").update(value).digest("hex")}`;
 }
 
-export function compiledRegistry(pods, seeds, proofs = []) {
+export function compiledRegistry(pods, seeds, proofs = [], releases = []) {
   const compiledProofs = proofs
     .map((proof) => ({
       ...proof,
@@ -54,11 +66,11 @@ export function compiledRegistry(pods, seeds, proofs = []) {
         `${right.seedId}@${right.seedVersion}`,
       ),
     );
-  const compiledSeeds = seeds
-    .map((seed) => {
+  const compileSeed = (seed, includeProof) => {
       const matchingProofs = compiledProofs
         .filter(
           (proof) =>
+            includeProof &&
             proof.seedId === seed.id &&
             proofReleasesVersion(proof.seedVersion, seed.version) &&
             proof.result === "passed",
@@ -86,10 +98,19 @@ export function compiledRegistry(pods, seeds, proofs = []) {
             }
           : {
               state: seed.status === "withered" ? "withered" : "unproven",
-            },
+          },
       };
-    })
+    };
+  const compiledSeeds = seeds
+    .map((seed) => compileSeed(seed, true))
     .sort((left, right) => left.id.localeCompare(right.id));
+  const compiledReleases = releases
+    .map((seed) => compileSeed(seed, false))
+    .sort((left, right) =>
+      `${left.id}@${left.version}`.localeCompare(
+        `${right.id}@${right.version}`,
+      ),
+    );
   const compiledPods = [...pods].sort((left, right) =>
     left.id.localeCompare(right.id),
   );
@@ -100,6 +121,7 @@ export function compiledRegistry(pods, seeds, proofs = []) {
     },
     pods: compiledPods,
     seeds: compiledSeeds,
+    releases: compiledReleases,
     proofs: compiledProofs,
     sources: [
       ...new Map(

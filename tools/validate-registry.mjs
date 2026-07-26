@@ -28,6 +28,9 @@ const validateSeed = ajv.compile(seedSchema);
 const validateProof = ajv.compile(proofSchema);
 const podFiles = await readManifestDirectory("registry/pods");
 const seedFiles = await readManifestDirectory("registry/seeds");
+const releaseFiles = await readManifestDirectory("registry/history", {
+  allowMissing: true,
+});
 const proofFiles = await readManifestDirectory("proofs");
 const errors = [];
 
@@ -37,15 +40,30 @@ for (const entry of podFiles) {
 for (const entry of seedFiles) {
   validateSchema(entry, validateSeed, "Seed");
 }
+for (const entry of releaseFiles) {
+  validateSchema(entry, validateSeed, "historical Seed", false);
+  if (`${entry.value.id}@${entry.value.version}.json` !== entry.name) {
+    errors.push(
+      `${entry.name}: historical filename must match ${entry.value.id}@${entry.value.version}.json.`,
+    );
+  }
+  if (entry.value.status !== "stable") {
+    errors.push(`${entry.name}: only stable Seeds may enter release history.`);
+  }
+}
 for (const entry of proofFiles) {
   validateSchema(entry, validateProof, "Seed proof", false);
 }
 
 validateUniqueIds(podFiles, "Pod");
 validateUniqueIds(seedFiles, "Seed");
+validateUniqueReleaseIds(releaseFiles);
 
 const podIds = new Set(podFiles.map((entry) => entry.value.id));
 for (const entry of seedFiles) {
+  validateSeedPolicy(entry, podIds);
+}
+for (const entry of releaseFiles) {
   validateSeedPolicy(entry, podIds);
 }
 validatePodMembership(podFiles, seedFiles);
@@ -58,7 +76,7 @@ if (errors.length > 0) {
   process.exitCode = 1;
 } else {
   console.log(
-    `Validated ${podFiles.length} Pods, ${seedFiles.length} Seeds, and ${proofFiles.length} proof receipt${proofFiles.length === 1 ? "" : "s"} without policy violations.`,
+    `Validated ${podFiles.length} Pods, ${seedFiles.length} Seeds, ${releaseFiles.length} historical releases, and ${proofFiles.length} proof receipt${proofFiles.length === 1 ? "" : "s"} without policy violations.`,
   );
 }
 
@@ -84,6 +102,17 @@ function validateUniqueIds(entries, kind) {
       errors.push(`${entry.name}: duplicate ${kind} id '${entry.value.id}'.`);
     }
     seen.add(entry.value.id);
+  }
+}
+
+function validateUniqueReleaseIds(entries) {
+  const seen = new Set();
+  for (const entry of entries) {
+    const key = `${entry.value.id}@${entry.value.version}`;
+    if (seen.has(key)) {
+      errors.push(`${entry.name}: duplicate historical Seed '${key}'.`);
+    }
+    seen.add(key);
   }
 }
 
@@ -292,6 +321,37 @@ function validateSeedPolicy(entry, podIds) {
     errors.push(
       `${entry.name}: update requires a backup but the Seed has no backup capability.`,
     );
+  }
+  if (seed.capabilities.console !== Boolean(seed.console)) {
+    errors.push(
+      `${entry.name}: console capability and console contract must be enabled together.`,
+    );
+  }
+  if (seed.console) {
+    const consolePort = seed.ports.find(
+      (port) => port.id === seed.console.portId,
+    );
+    if (!componentIds.has(seed.console.componentId)) {
+      errors.push(
+        `${entry.name}: console references unknown component '${seed.console.componentId}'.`,
+      );
+    }
+    if (
+      !consolePort ||
+      consolePort.componentId !== seed.console.componentId ||
+      consolePort.purpose !== "rcon" ||
+      consolePort.exposure !== "private" ||
+      !consolePort.protocols.includes("tcp")
+    ) {
+      errors.push(
+        `${entry.name}: console must reference a private TCP RCON port on its component.`,
+      );
+    }
+    if (!secretIds.has(seed.console.secretKey)) {
+      errors.push(
+        `${entry.name}: console references unknown secret '${seed.console.secretKey}'.`,
+      );
+    }
   }
 
   const forbiddenKeys = findForbiddenKeys(seed);
