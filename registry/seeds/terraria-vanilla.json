@@ -1,9 +1,9 @@
 {
   "schemaVersion": "dauva.dev/seed/v1",
-  "id": "core-keeper-hard",
+  "id": "terraria-vanilla",
   "version": "1.0.0",
   "status": "stable",
-  "podId": "core-keeper",
+  "podId": "terraria",
   "genres": [
     "adventure",
     "sandbox",
@@ -11,14 +11,14 @@
   ],
   "metadata": {
     "title": {
-      "en": "Core Keeper Hard",
-      "nl": "Core Keeper Hard",
-      "de": "Core Keeper Schwer"
+      "en": "Terraria Vanilla",
+      "nl": "Terraria Vanilla",
+      "de": "Terraria Vanilla"
     },
     "description": {
-      "en": "A Core Keeper Server that sprouts new worlds in Hard mode.",
-      "nl": "Een Core Keeper-Server die nieuwe werelden in de modus Hard ontkiemt.",
-      "de": "Ein Core-Keeper-Server, der neue Welten im schweren Modus startet."
+      "en": "The official vanilla dedicated Server with graceful world saves.",
+      "nl": "De officiële vanilla dedicated Server met nette wereldopslag bij stoppen.",
+      "de": "Der offizielle Vanilla-Dedicated-Server mit sauberem Speichern beim Stoppen."
     },
     "icon": "gem"
   },
@@ -40,76 +40,90 @@
     {
       "id": "server",
       "role": "primary",
-      "image": "docker.io/escaping/core-keeper-dedicated@sha256:6531227708c06db6850731609e2df3e0940e63149395c743f12a0ce5f0c34ead",
+      "image": "docker.io/brammys/terraria@sha256:5b33a335dd6b250caa4858b00388102bcf87a02b311e6635fd013d3a564a430a",
       "imageUpdate": {
-        "reference": "docker.io/escaping/core-keeper-dedicated:latest"
+        "reference": "docker.io/brammys/terraria:latest"
       },
-      "stopSignal": "SIGINT",
       "environment": {
-        "MODS_ENABLED": "false",
-        "WORLD_INDEX": "0",
-        "WORLD_MODE": "1"
+        "TERRARIA_NOUPNP": "1",
+        "TERRARIA_SECURE": "1"
       },
       "optionEnvironment": {
-        "max-players": "MAX_PLAYERS",
-        "world-name": "WORLD_NAME",
-        "world-seed": "WORLD_SEED"
+        "max-players": "TERRARIA_MAXPLAYERS",
+        "world-name": "TERRARIA_WORLD",
+        "world-size": "TERRARIA_AUTOCREATE"
       },
       "agreementEnvironment": {},
       "secretEnvironment": {
-        "server-password": "PASSWORD"
+        "server-password": "TERRARIA_PASSWORD"
       },
       "runtimeEnvironment": {},
       "volumeMounts": [
         {
-          "volumeId": "data",
-          "target": "/home/steam/core-keeper-data",
+          "volumeId": "worlds",
+          "target": "/worlds",
           "readOnly": false
         },
         {
-          "volumeId": "game",
-          "target": "/home/steam/core-keeper-dedicated",
+          "volumeId": "config",
+          "target": "/configs",
           "readOnly": false
         }
       ],
       "dependsOn": [],
       "health": {
         "source": "running",
-        "startupGraceSeconds": 900
+        "startupGraceSeconds": 600
       }
     }
   ],
   "volumes": [
     {
-      "id": "data",
-      "role": "data",
+      "id": "worlds",
+      "role": "save",
       "retention": "delete-with-server"
     },
     {
-      "id": "game",
-      "role": "cache",
-      "retention": "disposable"
+      "id": "config",
+      "role": "config",
+      "retention": "delete-with-server"
     }
   ],
   "ports": [
     {
       "id": "game",
       "componentId": "server",
-      "containerPort": 28080,
-      "containerPortMode": "allocated",
+      "containerPort": 7777,
+      "containerPortMode": "fixed",
       "protocols": [
+        "tcp",
         "udp"
       ],
       "exposure": "public",
       "purpose": "game",
       "primary": true,
-      "sharedHostPort": true,
-      "environment": "SERVER_PORT"
+      "sharedHostPort": true
     }
   ],
   "resources": {
     "defaultPresetId": "balanced",
     "presets": [
+      {
+        "id": "small",
+        "title": {
+          "en": "Small",
+          "nl": "Klein",
+          "de": "Klein"
+        },
+        "description": {
+          "en": "For a small world with a few players.",
+          "nl": "Voor een kleine wereld met enkele spelers.",
+          "de": "Für eine kleine Welt mit wenigen Spielern."
+        },
+        "memoryMb": 1024,
+        "diskMb": 4096,
+        "cpuPercent": 100
+      },
       {
         "id": "balanced",
         "title": {
@@ -118,12 +132,12 @@
           "de": "Ausgewogen"
         },
         "description": {
-          "en": "Recommended starting resources for a small group.",
-          "nl": "Aanbevolen startresources voor een kleine groep.",
-          "de": "Empfohlene Startressourcen für eine kleine Gruppe."
+          "en": "Recommended for a persistent cooperative world.",
+          "nl": "Aanbevolen voor een blijvende coöperatieve wereld.",
+          "de": "Für eine persistente kooperative Welt empfohlen."
         },
-        "memoryMb": 3072,
-        "diskMb": 12288,
+        "memoryMb": 2048,
+        "diskMb": 8192,
         "cpuPercent": 150
       }
     ]
@@ -138,9 +152,9 @@
         "de": "Steam-Nutzungsvertrag"
       },
       "help": {
-        "en": "I have read and accept the Steam Subscriber Agreement and the applicable Core Keeper terms.",
-        "nl": "Ik heb de Steam Subscriber Agreement en de toepasselijke Core Keeper-voorwaarden gelezen en accepteer deze.",
-        "de": "Ich habe den Steam-Nutzungsvertrag und die anwendbaren Core-Keeper-Bedingungen gelesen und akzeptiert."
+        "en": "I have read and accept the Steam Subscriber Agreement and the applicable game terms.",
+        "nl": "Ik heb de Steam Subscriber Agreement en de toepasselijke gamevoorwaarden gelezen en accepteer deze.",
+        "de": "Ich habe den Steam-Nutzungsvertrag und die anwendbaren Spielbedingungen gelesen und akzeptiert."
       },
       "required": true,
       "defaultValue": "false",
@@ -156,31 +170,32 @@
         "de": "Weltname"
       },
       "help": {
-        "en": "Name of the persistent world.",
-        "nl": "Naam van de blijvende wereld.",
-        "de": "Name der persistenten Welt."
+        "en": "Name of the persistent Terraria world.",
+        "nl": "Naam van de blijvende Terraria-wereld.",
+        "de": "Name der persistenten Terraria-Welt."
       },
       "required": true,
       "defaultValue": "Dauva",
-      "minLength": 3,
+      "minLength": 1,
       "maxLength": 64
     },
     {
-      "key": "world-seed",
-      "type": "string",
+      "key": "world-size",
+      "type": "integer",
       "label": {
-        "en": "World seed",
-        "nl": "World seed",
-        "de": "Welt-Seed"
+        "en": "World size",
+        "nl": "Wereldgrootte",
+        "de": "Weltgröße"
       },
       "help": {
-        "en": "Optional deterministic world seed.",
-        "nl": "Optionele vaste seed voor de wereldgeneratie.",
-        "de": "Optionaler deterministischer Seed für die Weltgenerierung."
+        "en": "World size: 1 small, 2 medium, or 3 large.",
+        "nl": "Wereldgrootte: 1 klein, 2 middelgroot of 3 groot.",
+        "de": "Weltgröße: 1 klein, 2 mittel oder 3 groß."
       },
-      "required": false,
-      "defaultValue": "",
-      "maxLength": 64
+      "required": true,
+      "defaultValue": "2",
+      "minLength": 1,
+      "maxLength": 1
     },
     {
       "key": "max-players",
@@ -198,7 +213,7 @@
       "required": true,
       "defaultValue": "8",
       "minLength": 1,
-      "maxLength": 2
+      "maxLength": 3
     }
   ],
   "secrets": [
@@ -211,11 +226,11 @@
         "de": "Serverpasswort"
       },
       "help": {
-        "en": "Used for direct connections and never stored in the Dauva Server record.",
-        "nl": "Wordt gebruikt voor directe verbindingen en nooit opgeslagen in het Dauva Server-record.",
-        "de": "Wird für Direktverbindungen verwendet und nie im Dauva-Server-Datensatz gespeichert."
+        "en": "Used only while Sprouting; the clear value is not stored in the Dauva Server record.",
+        "nl": "Alleen gebruikt tijdens het ontkiemen; Dauva bewaart de leesbare waarde niet in het Server-record.",
+        "de": "Wird nur beim Starten verwendet; der Klartextwert wird nicht im Dauva-Serverdatensatz gespeichert."
       },
-      "minLength": 5,
+      "minLength": 6,
       "maxLength": 128
     }
   ],
@@ -236,8 +251,8 @@
   },
   "source": {
     "kind": "oci",
-    "homepage": "https://corekeepergame.com/",
-    "repository": "https://hub.docker.com/r/escaping/core-keeper-dedicated",
+    "homepage": "https://terraria.org/",
+    "repository": "https://github.com/BrammyS/Terraria",
     "imageRegistries": [
       "docker.io"
     ]
@@ -248,12 +263,12 @@
     "mutableRuntimeImagesAllowed": false
   },
   "storage": {
-    "class": "bulk",
+    "class": "fast",
     "backupClass": "backup",
-    "estimatedDownloadMb": 1200,
-    "estimatedInstallMb": 5000,
-    "estimatedMutableMb": 8192,
-    "backupPolicy": "optional"
+    "estimatedDownloadMb": 100,
+    "estimatedInstallMb": 512,
+    "estimatedMutableMb": 4096,
+    "backupPolicy": "recommended"
   },
   "updatePolicy": {
     "discovery": "oci-tag",

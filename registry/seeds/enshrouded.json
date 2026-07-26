@@ -28,6 +28,12 @@
     ],
     "architectures": [
       "amd64"
+    ],
+    "leafCapabilities": [
+      "dynamic-ports",
+      "oci",
+      "persistent-storage",
+      "resource-limits"
     ]
   },
   "components": [
@@ -182,5 +188,46 @@
     "restore": false,
     "update": false,
     "console": false
+  },
+  "source": {
+    "kind": "oci",
+    "homepage": "https://enshrouded.com/",
+    "repository": "https://hub.docker.com/r/mornedhels/enshrouded-server",
+    "imageRegistries": [
+      "docker.io"
+    ]
+  },
+  "trust": {
+    "level": "curated",
+    "reviewedAt": "2026-07-26",
+    "mutableRuntimeImagesAllowed": false
+  },
+  "storage": {
+    "class": "bulk",
+    "backupClass": "backup",
+    "estimatedDownloadMb": 9000,
+    "estimatedInstallMb": 18000,
+    "estimatedMutableMb": 12288,
+    "backupPolicy": "optional"
+  },
+  "updatePolicy": {
+    "discovery": "oci-tag",
+    "automaticCheck": true,
+    "automaticInstall": false,
+    "requiresBackup": false,
+    "rollback": true
+  },
+  "proofPolicy": {
+    "requiredChecks": [
+      "images-pinned",
+      "healthy",
+      "ports",
+      "backup-if-supported",
+      "graceful-stop",
+      "restart",
+      "persistence",
+      "cleanup"
+    ],
+    "expiresAfterDays": 90
   }
 }

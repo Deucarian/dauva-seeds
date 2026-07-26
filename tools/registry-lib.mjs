@@ -43,12 +43,52 @@ export function sha256(value) {
   return `sha256:${createHash("sha256").update(value).digest("hex")}`;
 }
 
-export function compiledRegistry(pods, seeds) {
-  const compiledSeeds = seeds
-    .map((seed) => ({
-      ...seed,
-      manifestDigest: sha256(canonicalJson(seed)),
+export function compiledRegistry(pods, seeds, proofs = []) {
+  const compiledProofs = proofs
+    .map((proof) => ({
+      ...proof,
+      receiptDigest: sha256(canonicalJson(proof)),
     }))
+    .sort((left, right) =>
+      `${left.seedId}@${left.seedVersion}`.localeCompare(
+        `${right.seedId}@${right.seedVersion}`,
+      ),
+    );
+  const compiledSeeds = seeds
+    .map((seed) => {
+      const matchingProofs = compiledProofs
+        .filter(
+          (proof) =>
+            proof.seedId === seed.id &&
+            proofReleasesVersion(proof.seedVersion, seed.version) &&
+            proof.result === "passed",
+        )
+        .sort((left, right) => right.provedAt.localeCompare(left.provedAt));
+      const currentProof = matchingProofs[0];
+      const expiresAt =
+        currentProof && seed.proofPolicy?.expiresAfterDays
+          ? new Date(
+              Date.parse(currentProof.provedAt) +
+                seed.proofPolicy.expiresAfterDays * 24 * 60 * 60 * 1000,
+            ).toISOString()
+          : undefined;
+      return {
+        ...seed,
+        manifestDigest: sha256(canonicalJson(seed)),
+        proof: currentProof
+          ? {
+              state: "proven",
+              provedAt: currentProof.provedAt,
+              expiresAt,
+              leaf: currentProof.leaf,
+              provedVersion: currentProof.seedVersion,
+              receiptDigest: currentProof.receiptDigest,
+            }
+          : {
+              state: seed.status === "withered" ? "withered" : "unproven",
+            },
+      };
+    })
     .sort((left, right) => left.id.localeCompare(right.id));
   const compiledPods = [...pods].sort((left, right) =>
     left.id.localeCompare(right.id),
@@ -60,9 +100,33 @@ export function compiledRegistry(pods, seeds) {
     },
     pods: compiledPods,
     seeds: compiledSeeds,
+    proofs: compiledProofs,
+    sources: [
+      ...new Map(
+        compiledSeeds.map((seed) => [
+          `${seed.source.kind}:${seed.source.repository}`,
+          seed.source,
+        ]),
+      ).values(),
+    ].sort((left, right) =>
+      `${left.kind}:${left.repository}`.localeCompare(
+        `${right.kind}:${right.repository}`,
+      ),
+    ),
   };
   return {
     ...content,
     registryDigest: sha256(canonicalJson(content)),
   };
+}
+
+export function proofReleasesVersion(proofVersion, seedVersion) {
+  if (proofVersion === seedVersion) {
+    return true;
+  }
+  const releaseCandidate = /^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)-rc\.[1-9][0-9]*$/;
+  if (!releaseCandidate.test(proofVersion)) {
+    return false;
+  }
+  return proofVersion.replace(/-rc\.[1-9][0-9]*$/, "") === seedVersion;
 }

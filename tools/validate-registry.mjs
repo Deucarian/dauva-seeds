@@ -144,6 +144,15 @@ function validateSeedPolicy(entry, podIds) {
       errors.push(`${entry.name}: ${component.id} image is not pinned by digest.`);
     }
     const pinnedRepository = component.image.split("@", 1)[0];
+    const imageRegistry = pinnedRepository.slice(
+      0,
+      pinnedRepository.indexOf("/"),
+    );
+    if (!seed.source.imageRegistries.includes(imageRegistry)) {
+      errors.push(
+        `${entry.name}: ${component.id} uses registry '${imageRegistry}' outside source.imageRegistries.`,
+      );
+    }
     const updateRepository = component.imageUpdate.reference.slice(
       0,
       component.imageUpdate.reference.lastIndexOf(":"),
@@ -270,6 +279,21 @@ function validateSeedPolicy(entry, podIds) {
     }
   }
 
+  if (seed.trust.mutableRuntimeImagesAllowed !== false) {
+    errors.push(`${entry.name}: mutable runtime images are forbidden.`);
+  }
+  if (seed.updatePolicy.automaticInstall !== false) {
+    errors.push(`${entry.name}: unattended Seed installation is forbidden.`);
+  }
+  if (
+    seed.updatePolicy.requiresBackup &&
+    !seed.capabilities.backup
+  ) {
+    errors.push(
+      `${entry.name}: update requires a backup but the Seed has no backup capability.`,
+    );
+  }
+
   const forbiddenKeys = findForbiddenKeys(seed);
   for (const keyPath of forbiddenKeys) {
     errors.push(`${entry.name}: forbidden host/runtime property '${keyPath}'.`);
@@ -299,6 +323,7 @@ function validateProofPolicy(proofs, seeds) {
       );
     }
   }
+
 }
 
 function uniqueIds(fileName, kind, items, key = "id") {

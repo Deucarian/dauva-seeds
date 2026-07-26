@@ -28,6 +28,13 @@
     ],
     "architectures": [
       "amd64"
+    ],
+    "leafCapabilities": [
+      "dynamic-ports",
+      "multi-port",
+      "oci",
+      "persistent-storage",
+      "resource-limits"
     ]
   },
   "components": [
@@ -253,5 +260,46 @@
     "restore": false,
     "update": false,
     "console": false
+  },
+  "source": {
+    "kind": "oci",
+    "homepage": "https://www.valheimgame.com/",
+    "repository": "https://github.com/lloesche/valheim-server-docker",
+    "imageRegistries": [
+      "ghcr.io"
+    ]
+  },
+  "trust": {
+    "level": "curated",
+    "reviewedAt": "2026-07-26",
+    "mutableRuntimeImagesAllowed": false
+  },
+  "storage": {
+    "class": "bulk",
+    "backupClass": "backup",
+    "estimatedDownloadMb": 2200,
+    "estimatedInstallMb": 5000,
+    "estimatedMutableMb": 10240,
+    "backupPolicy": "recommended"
+  },
+  "updatePolicy": {
+    "discovery": "oci-tag",
+    "automaticCheck": true,
+    "automaticInstall": false,
+    "requiresBackup": true,
+    "rollback": true
+  },
+  "proofPolicy": {
+    "requiredChecks": [
+      "images-pinned",
+      "healthy",
+      "ports",
+      "backup-if-supported",
+      "graceful-stop",
+      "restart",
+      "persistence",
+      "cleanup"
+    ],
+    "expiresAfterDays": 90
   }
 }

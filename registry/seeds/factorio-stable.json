@@ -27,6 +27,12 @@
     ],
     "architectures": [
       "amd64"
+    ],
+    "leafCapabilities": [
+      "dynamic-ports",
+      "oci",
+      "persistent-storage",
+      "resource-limits"
     ]
   },
   "components": [
@@ -175,5 +181,46 @@
     "restore": false,
     "update": false,
     "console": false
+  },
+  "source": {
+    "kind": "oci",
+    "homepage": "https://www.factorio.com/",
+    "repository": "https://github.com/factoriotools/factorio-docker",
+    "imageRegistries": [
+      "docker.io"
+    ]
+  },
+  "trust": {
+    "level": "curated",
+    "reviewedAt": "2026-07-26",
+    "mutableRuntimeImagesAllowed": false
+  },
+  "storage": {
+    "class": "bulk",
+    "backupClass": "backup",
+    "estimatedDownloadMb": 500,
+    "estimatedInstallMb": 2048,
+    "estimatedMutableMb": 10240,
+    "backupPolicy": "optional"
+  },
+  "updatePolicy": {
+    "discovery": "oci-tag",
+    "automaticCheck": true,
+    "automaticInstall": false,
+    "requiresBackup": false,
+    "rollback": true
+  },
+  "proofPolicy": {
+    "requiredChecks": [
+      "images-pinned",
+      "healthy",
+      "ports",
+      "backup-if-supported",
+      "graceful-stop",
+      "restart",
+      "persistence",
+      "cleanup"
+    ],
+    "expiresAfterDays": 90
   }
 }

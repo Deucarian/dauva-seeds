@@ -21,7 +21,8 @@
       "enum": [
         "draft",
         "candidate",
-        "stable"
+        "stable",
+        "withered"
       ]
     },
     "metadata": {

@@ -1,6 +1,6 @@
 # Dauva native server platform
 
-Status: **Phase 2 partially implemented and live**
+Status: **Phase 3 foundation complete; native Leaf rollout included in this release**
 
 Last updated: 2026-07-26
 
@@ -136,17 +136,24 @@ native Server. Agreement acceptance is stored in a separate audit record with
 the Server, Seed, agreement, accepting user, URL, revision, and timestamp.
 
 Seed v1 is implemented as JSON Schema plus stricter policy validation. The
-registry contains six game-family Pods and twelve sanitized Seeds: two
+registry contains nine game-family Pods and eighteen sanitized Seeds: two
 meaningful variants per Pod. Factorio Stable, Valheim BepInEx, both
 Satisfactory branches, and both Enshrouded runtimes passed fresh native
 lifecycle proofs and joined the original stable Seeds. Minecraft Paper then
 passed its EULA-gated Paper 26.2 lifecycle proof with persistent world data,
-ordered restart, and native RCON backups. All twelve current Seeds are stable.
+ordered restart, and native RCON backups. All twelve original Seeds are stable.
+Terraria, Project Zomboid, and Garry's Mod add six stable Seeds. All six passed
+fresh disposable lifecycle proofs on the Debian Leaf; their exact
+release-candidate versions, manifest digests, agreement revisions, checks, and
+proof expiry are retained in committed receipts.
 
-The native Docker Branch and Pterodactyl Branch are registered side by side.
-After the successful Minecraft acceptance test, native Docker became the
-default Branch for new Servers. Existing Servers were not adopted, restarted,
-or otherwise modified.
+The in-process native Docker Branch and Pterodactyl Branch are registered side
+by side. After the successful Minecraft acceptance test, native Docker became
+the default Branch for new Servers. A separately deployable Leaf Agent now
+implements the same lifecycle behind an authenticated HTTP contract. This
+release introduces it beside both existing Branches and makes it the default
+for newly Sprouted Servers. Existing Servers are not adopted, restarted, or
+otherwise modified by that switch.
 
 ## Target architecture
 
@@ -195,6 +202,26 @@ Servers from being managed.
 The registry can later be distributed as signed OCI artifacts and support
 multiple trusted sources. The Seed Library remains the user-facing name.
 
+The control plane exposes read-only administrator routes for the compiled
+Registry, individual Pods, and individual Seeds. Registry mutation remains a
+reviewed Git workflow: a portal request cannot silently rewrite trusted Seed
+material.
+
+Every Seed records:
+
+- its upstream delivery kind (`oci`, `steamcmd`, `linuxgsm`, or `dauva`);
+- official homepage and reviewed source repository;
+- permitted image registries and upstream application identifier;
+- trust level and review date;
+- storage estimates and backup expectation;
+- update discovery policy;
+- required Leaf capabilities;
+- proof policy and current compiled proof summary.
+
+OCI, SteamCMD, and LinuxGSM source adapters normalize upstream metadata into a
+draft Seed. They do not bypass curation, digest pinning, agreement review, or
+proof promotion.
+
 ### Dauva Leaf Agent
 
 The Leaf Agent owns privileged host operations:
@@ -213,6 +240,23 @@ The long-term API container must not require the Docker socket. During a
 single-Leaf proof of concept, the existing Docker integration may implement the
 same contract locally, but the privilege boundary must remain explicit so it
 can be extracted into the Agent.
+
+The first extracted Agent uses a control-plane-initiated private HTTP
+connection with a unique 256-bit-or-stronger bearer credential. The Agent:
+
+- exposes no unauthenticated management route;
+- verifies its Leaf ID, Registry digest, Seed version, and Seed manifest digest;
+- advertises the restricted capabilities it implements;
+- accepts only declarative commands compiled from a trusted Seed;
+- owns the Docker socket and approved storage roots so the API no longer needs
+  new direct runtime privileges;
+- returns provider-neutral lifecycle results;
+- can run a disposable proof without adding a permanent Server record.
+
+TLS termination is not required on the private Compose network. Connections
+that leave a private host or overlay network must use HTTPS or mTLS. Bearer
+authentication is the first single-Leaf transport, not the final multi-Leaf
+enrollment design.
 
 ### OCI image registry
 
@@ -291,10 +335,27 @@ The exact host paths are Agent implementation details and do not appear in
 public Seed manifests. Seeds declare logical volume roles; the Agent resolves
 those roles to approved storage roots.
 
-On the first Debian Leaf this root lives on the dedicated 1 TB Docker/data
-filesystem, not on the smaller operating-system filesystem. Local companion
-backups initially share that data disk; off-host backup storage remains a
-separate operational milestone.
+On the first Debian Leaf this root lives on `/mnt/data`, the dedicated 1 TB
+SSD-backed Docker/data filesystem, not on the 120 GB operating-system SSD or
+the nearly full media disks. At the 2026-07-26 capacity review it had about
+241 GB available. Container layers already live on the same filesystem through
+`/var/lib/docker`, which avoids duplicating multi-gigabyte installations onto
+the OS disk.
+
+The initial placement is deliberately conservative:
+
+| Data | Initial location | Reason |
+| --- | --- | --- |
+| OCI layers and runtime cache | `/var/lib/docker` on the data SSD | large, reusable, and already managed by Docker |
+| active saves/config/install volumes | `/mnt/data/dauva/servers` | low-latency persistent storage with the most suitable free capacity |
+| disposable proof data | `/mnt/data/dauva-proof/servers` | isolated ownership and easy verified cleanup |
+| local companion backups | approved backup volumes under the Server root | first-line recovery only; not disaster recovery |
+| future durable backups | separate physical disk or object storage | survives loss of the runtime SSD |
+
+The media merger pool is not used for active game data: it was above 80%
+utilization and is optimized for media capacity rather than game-server
+latency. A local backup stored on the data SSD is explicitly not called an
+off-host or disaster-recovery backup.
 
 Storage rules:
 
@@ -310,6 +371,10 @@ Storage rules:
   values;
 - a future Leaf can advertise storage classes such as `fast`, `bulk`, and
   `backup`.
+- the portal shows expected download, installed, and mutable size before
+  Sprouting a large Seed;
+- the Agent rejects a new Sprout when the approved storage root cannot retain
+  the configured free-space reserve after the selected disk allocation.
 
 ## Port allocation
 
@@ -376,6 +441,32 @@ Installed Servers continue using their pinned Seed version until an explicit
 update operation succeeds. Publishing a new Seed version never silently
 changes an existing Server.
 
+## Seed sources, updates, and proof promotion
+
+Source discovery and runtime identity are separate:
+
+1. A mutable upstream tag or release feed is checked on schedule.
+2. A changed digest creates a reviewable patch release candidate.
+3. The previous stable manifest remains untouched.
+4. License links, changelog, image source, and policy changes are reviewed.
+5. The candidate is Sprouted on a disposable Leaf allocation.
+6. Proof verifies pinned images, health stability, all declared public ports,
+   backup evidence when claimed, graceful stop, restart, persistent storage,
+   and complete cleanup.
+7. A passed receipt is stored with Leaf ID, time, agreement revisions, Seed
+   digest, Registry digest, non-secret evidence, and receipt digest.
+8. Guarded promotion changes that exact candidate to stable.
+
+Automatic checks are allowed. Automatic installation into an existing Server
+is not. Existing Servers receive an update offer and remain pinned until an
+administrator explicitly requests an update. A new image digest is never
+silently substituted at container start.
+
+Proof credentials and required administrator secrets are supplied only for the
+disposable request. They are neither written to the Seed nor copied into the
+receipt. An upstream image with a known cleartext secret logging path is
+rejected during source review even if it otherwise starts successfully.
+
 ## Lifecycle and reconciliation
 
 Sprouting is an idempotent, observable workflow:
@@ -441,9 +532,14 @@ managed instance records, high-level status, autostart, and safe deletion.
 
 Native Sprouting, resource enforcement, dynamic and paired allocation, owned
 storage, status, power, and safe deletion are now live on one Docker Leaf.
-Leaf-agent isolation, logs, restore, general backup control, updates, and
-protected durable secrets are the major remaining capabilities. File
-management, scheduling, and multi-Leaf placement follow.
+The extracted Leaf Agent, read-only Registry API, source adapters, proof
+runner, proof receipts, and portal trust/storage/proof metadata are implemented
+in this release. The six-Seed catalog batch passed its live proof gate, and the
+deployment migrates only the default for new Servers to the Leaf Agent. Logs,
+restore, general
+backup control, installed-Server updates, and protected durable secrets remain
+the next operational capabilities. File management, scheduling, and multi-Leaf
+placement follow.
 
 ## Delivery plan
 
@@ -535,6 +631,13 @@ Live acceptance evidence:
 
 - daily OCI tag resolution and reviewable Seed update candidates (implemented);
 - proof receipts and guarded candidate promotion (implemented);
+- source, trust, storage, update, proof, and Leaf capability metadata
+  (implemented);
+- deterministic proof expiry in the compiled Registry and portal
+  (implemented);
+- extracted authenticated Leaf Agent and Registry read API (implemented);
+- Terraria, Project Zomboid, and Garry's Mod Pods and six proven Seeds
+  (implemented);
 - live log streaming and console;
 - backup and restore UI;
 - installed-Server update and rollback;
@@ -569,11 +672,18 @@ These are the current working decisions and should change only deliberately:
 8. Docker is the first runtime because it is already present on the Debian
    Leaf; the contract must not permanently depend on Docker-specific client
    behavior.
+9. The control plane pushes authenticated commands over a private HTTP network
+   for the first Leaf; remote Leaves require a protected transport.
+10. Candidate Seeds may be run only by the proof flow or an explicit
+    non-production candidate setting.
+11. A source image with known cleartext secret logging is ineligible for the
+    curated Registry.
+12. The first host keeps active data on the dedicated data SSD and reserves the
+    media disks for their existing workload until a separate backup target is
+    approved.
 
 ## Open design questions
 
-- Should the first Agent use control-plane push over mTLS, or maintain an
-  outbound authenticated connection to the API?
 - Which protected store should hold Server secrets before multi-Leaf support?
 - Should the initial backup target be the existing host backup storage, a NAS,
   or S3-compatible object storage?

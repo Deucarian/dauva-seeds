@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "dauva.dev/pod/v1",
+  "id": "garrys-mod",
+  "status": "stable",
+  "metadata": {
+    "title": {
+      "en": "Garry's Mod",
+      "nl": "Garry's Mod",
+      "de": "Garry's Mod"
+    },
+    "description": {
+      "en": "Garry's Mod Sandbox Servers with persistent data and automatic port allocation.",
+      "nl": "Garry's Mod Sandbox-Servers met blijvende data en automatische poorttoewijzing.",
+      "de": "Garry's-Mod-Sandbox-Server mit persistenten Daten und automatischer Portzuweisung."
+    },
+    "icon": "toolbox"
+  }
+}
