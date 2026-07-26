@@ -39,6 +39,47 @@ backup or object storage.
 - Record required license and EULA acceptance server-side.
 - Preserve existing Servers while the native Branch is introduced.
 - Keep provider-specific credentials and runtime details outside the client.
+- Let a non-technical administrator add a supported Server without needing to
+  understand Docker, ports, images, storage paths, Seeds, Branches, or Leaves.
+
+## Non-technical product contract
+
+Adding a Server is a guided product flow, not an infrastructure form. The
+default path is:
+
+**Choose game → choose recommended variant → name Server → choose simple
+gameplay options → accept linked agreements → Sprout**
+
+The Seed provides safe defaults for placement, ports, storage, CPU, memory,
+images, protocols, health checks, updates, and backups. Dauva selects a
+compatible Leaf automatically. Technical configuration may exist behind an
+explicit advanced section, but it must never be required for a supported,
+proofed Seed.
+
+Every Server-creation and lifecycle feature must meet these rules:
+
+- use player-facing language and explain unfamiliar Dauva terms in context;
+- recommend one Seed and one resource preset instead of requiring comparison;
+- ask only questions whose answers cannot be derived safely;
+- show required disk space, memory, agreements, and likely installation time
+  in ordinary language before Sprouting;
+- link each license, terms document, or EULA next to its required checkbox and
+  record acceptance server-side;
+- show visible installation progress and a useful next action when a step
+  fails;
+- clean up or safely resume partial work after a failed Sprouting operation;
+- hide ports, container images, mount paths, environment variables, protocols,
+  and Leaf placement from the default flow;
+- reserve typed confirmation for destructive actions such as permanent Server
+  deletion, not ordinary creation;
+- provide a human-readable summary before confirmation and a clear success
+  screen with connection details afterward.
+
+A supported Seed is not product-complete if an administrator must consult
+external setup instructions, edit a file, select a port, or understand the
+underlying container runtime to create its Server. Acceptance testing for every
+new Pod or Seed must therefore include the complete default flow from the
+perspective of a first-time, non-technical administrator.
 
 ## Initial non-goals
 
