@@ -15,9 +15,9 @@ to the new canonical location instead of maintaining two copies.
 ## Summary
 
 Dauva will own the full product model and control plane for creating and
-managing Servers. Pterodactyl may remain available as a temporary Branch during
-migration, but it must not define Dauva's catalog, terminology, or long-term
-runtime contract.
+managing Branches (game servers). Pterodactyl may remain available as a
+temporary runtime provider during migration, but it must not define Dauva's
+catalog, terminology, or long-term runtime contract.
 
 The platform has two separate distribution concerns:
 
@@ -25,19 +25,20 @@ The platform has two separate distribution concerns:
 2. An **OCI image registry** stores the container images referenced by Seeds.
 
 Large game installations, saves, mods, and backups do not belong in the Seed
-Registry. Active data lives on the selected Leaf; backups live on separate
+Registry. Active data lives on the selected Tree; backups live on separate
 backup or object storage.
 
 ## Goals
 
 - Create, start, stop, restart, inspect, update, back up, restore, and safely
-  delete Servers without depending on Pterodactyl.
-- Make every installable Server type a curated, versioned, reproducible Seed.
+  delete Branches without depending on Pterodactyl.
+- Make every installable game-server type a curated, versioned, reproducible
+  Seed.
 - Keep the portal and public API provider-neutral.
-- Support one Debian Leaf first and multiple Leaves later.
+- Support one Debian Tree first and multiple Trees later.
 - Allocate ports, storage, CPU, and memory safely and predictably.
 - Record required license and EULA acceptance server-side.
-- Preserve existing Servers while the native Branch is introduced.
+- Preserve existing game servers while the native provider is introduced.
 - Keep provider-specific credentials and runtime details outside the client.
 
 ## Initial non-goals
@@ -53,34 +54,45 @@ backup or object storage.
 ## Product language
 
 The metaphor must shorten explanations, not require a glossary before someone
-can create a Game Server. Every first-use surface pairs the thematic noun with
+can create a game server. Every first-use surface pairs the thematic noun with
 its literal job. The repeated creation path is:
 
 ```text
-Pod · game family → Seed · setup recipe → Leaf · your computer → Game Server · the result
+Pod · game family → Seed · setup recipe → Tree · your computer or server → Branch · game server
 ```
 
 | Term | Literal label | Meaning |
 | --- | --- | --- |
-| Garden | Your Dauva workspace | The optional collective name for a person's Servers and Leaves. It is never required to complete a task. |
+| Garden | Your Dauva workspace | The optional collective name for a person's Trees and Branches. It is never required to complete a task. |
 | Seed Library | Browse games | The catalog administrators see in Dauva. |
 | Seed Registry | Technical recipe source | The versioned technical source behind the Seed Library. |
-| Pod | Game family | One recognizable game containing related Server variants, such as Minecraft. |
-| Seed | Setup recipe | A complete, approved, reproducible recipe for one Server type. |
-| Game Server | Running result | One installed runtime instance with its own data and settings. Use `Game Server`, not bare `Server`, when the surrounding page could mean a physical machine. |
-| Sprouting | Installing | Creating a Game Server from a Seed. Progress text may be thematic, but errors must be literal and actionable. |
-| Branch | Runtime provider | A replaceable provider used by the Dauva control plane. This is normally hidden from self-hosters. |
-| Leaf | Your computer | A user-owned Windows computer or Linux server where Game Servers run. A Leaf is the machine, never the Agent. |
-| Leaf Agent | Background helper | The restricted Dauva service installed once on a Leaf. It performs approved work and calls Dauva outbound. |
+| Pod | Game family | One recognizable game containing related Seed variants, such as Minecraft. |
+| Seed | Setup recipe | A complete, approved, reproducible recipe for one game-server type. |
+| Tree | Your computer or server | A user-owned Windows computer or Linux server where Branches run. |
+| Branch | Game server | One installed runtime instance with its own data and settings. |
+| Leaf Agent | Helper on your Tree | The restricted Dauva service installed once on a Tree. It performs approved work and calls Dauva outbound. `Leaf Agent` remains the product name. |
+| Runtime provider | Technical execution adapter | A replaceable control-plane adapter such as the Leaf Agent provider, native Docker, or temporary Pterodactyl. It is not a thematic user-facing noun. |
+| Sprouting | Installing | Growing a Branch from a Seed. Progress text may be thematic, but errors must be literal and actionable. |
 | Withered | Failed or offline | A failed Sprouting operation or inactive runtime condition, always followed by literal text. |
 | Mod Profile | An optional reusable, versioned selection such as Vanilla, Quality of life, or a curated modpack. |
-| Mod Selection | The administrator's desired mods and permitted update channels for one Server. |
-| Mod Lock | The immutable resolved mod versions, dependencies, sources, checksums, load order, and compatibility context applied to one Server revision. |
+| Mod Selection | The administrator's desired mods and permitted update channels for one Branch. |
+| Mod Lock | The immutable resolved mod versions, dependencies, sources, checksums, load order, and compatibility context applied to one Branch revision. |
 
 A Pod is catalog metadata, not a running workload or genre. Genres are Seed
-labels used for discovery and filtering. A Seed produces a Game Server.
-A Game Server can contain multiple runtime components, such as a primary game
+labels used for discovery and filtering. A Seed produces a Branch.
+A Branch can contain multiple runtime components, such as a primary game
 container and a backup sidecar.
+
+The previous vocabulary remains a deliberate rollback profile:
+
+| Profile | Machine | Installed game server | Status |
+| --- | --- | --- | --- |
+| `growth` | Tree | Branch | Active |
+| `legacy` | Leaf | Game Server | Retained in the Portal's centralized terminology source for a one-line UI rollback |
+
+API routes, database entities, command payloads, and repository names may keep
+`Leaf` and `GameServer` for compatibility. Those are implementation terms, not
+a reason to show the legacy nouns to users.
 
 Operational states stay literal: **Running**, **Stopped**, **Starting**,
 **Stopping**, **Restarting**, **Installing**, **Failed**, and **Offline**.
@@ -161,9 +173,9 @@ lifecycle proofs and joined the original stable Seeds. Minecraft Paper then
 passed its EULA-gated Paper 26.2 lifecycle proof with persistent world data,
 ordered restart, and native RCON backups. All twelve current Seeds are stable.
 
-The native Docker Branch and Pterodactyl Branch are registered side by side.
+The native Docker and Pterodactyl providers are registered side by side.
 After the successful Minecraft acceptance test, native Docker became the
-default Branch for new Servers. Existing Servers were not adopted, restarted,
+default provider for new Branches. Existing Servers were not adopted, restarted,
 or otherwise modified.
 
 Development of the extracted Leaf boundary takes place only on the fully
@@ -172,6 +184,16 @@ API, database, authentication cookies, data-protection keys, Docker-in-Docker
 runtime, networks, volumes, and storage. It does not mount the host Docker
 socket or share production Server state.
 
+Deployment isolation is an invariant:
+
+- a `develop` push may deploy only public develop;
+- a `main` push builds and verifies in a hidden commit-addressed directory;
+- only a verified main artifact may be promoted to production;
+- a main workflow must never deploy, compare against, restart, or use public
+  develop as a staging environment;
+- feature branches may be deployed to develop explicitly, but never to
+  production.
+
 ## Target architecture
 
 ```mermaid
@@ -179,7 +201,7 @@ flowchart LR
     Portal["Dauva Portal<br/>Seed Library"] --> API["Dauva API<br/>Control plane"]
     Registry["Dauva Seed Registry<br/>Pods and versioned Seeds"] --> API
     API --> Database["Desired state, instances,<br/>agreements and audit"]
-    API --> Pterodactyl["Pterodactyl Branch<br/>temporary"]
+    API --> Pterodactyl["Pterodactyl provider<br/>temporary"]
     API <-->|"outbound authenticated<br/>heartbeat and commands"| Agent["Dauva Leaf Agent"]
     Agent --> Runtime["Docker initially<br/>Podman may follow"]
     Agent --> Data["Active Server storage"]
@@ -199,9 +221,9 @@ The API is the authoritative control plane. It:
 
 - resolves an exact Seed version and digest;
 - validates options and agreements;
-- chooses a Branch and later a Leaf;
+- chooses a runtime provider and Tree;
 - persists desired state before provisioning;
-- sends idempotent commands to the Branch;
+- sends idempotent commands to the provider;
 - reconciles desired and observed state;
 - stores audit and failure details;
 - serves a provider-neutral response to clients.
@@ -221,7 +243,8 @@ multiple trusted sources. The Seed Library remains the user-facing name.
 
 ### Dauva Leaf Agent
 
-The Leaf Agent owns privileged host operations:
+The Leaf Agent is the helper installed on a Tree and owns privileged host
+operations:
 
 - pulling approved images;
 - creating networks, containers, and volumes;
@@ -245,13 +268,16 @@ web and Windows builds are Portal clients; the separately packaged persistent
 Linux Agent performs privileged runtime work. Sprouting sends the enrolled
 Agent a command rather than producing a different installer for each Server.
 
+For compatibility, the control-plane device entity and Agent protocol remain
+named `Leaf`. The Portal translates that entity to the user-facing Tree model.
+
 The long-term API container must not require the Docker socket. During a
 single-Leaf proof of concept, the existing Docker integration may implement the
 same contract locally, but the privilege boundary must remain explicit so it
 can be extracted into the Agent.
 
 Managed hosting, if it becomes a product, stays behind a scheduler and billing
-gateway and enrolls ordinary fleet Leaves. The core API and Seed model do not
+gateway and enrolls ordinary fleet Trees through their Leaf Agents. The core API and Seed model do not
 adopt provider SKUs or payment state. The commercial gates and unit-economics
 model are defined in
 [Managed hosting: separation and economics](../product/managed-hosting-separation-and-economics.md).
@@ -390,11 +416,17 @@ For every accepted agreement, Dauva stores:
 - the explicit accepted value.
 
 Passwords and tokens are never stored in the registry, ordinary instance
-options, or Server responses. In the current single-Leaf implementation they
-exist only during the Sprouting request and are supplied to the intended
-runtime container as required by the game. Durable protected secret storage is
-still required before updates, migration, or multi-Leaf reconciliation can
-recreate a Server without asking the administrator again.
+options, or Branch responses. Every Tree has a Leaf Agent-generated RSA key
+pair. The control plane stores only the public key and wraps each generated or
+administrator-supplied secret with RSA-OAEP-SHA256 for that Tree before adding
+it to a command. The command database therefore contains ciphertext. The Leaf
+Agent opens it only in memory while creating the intended runtime component.
+Existing Agents generate the encryption key on their next start and publish
+the new public key by heartbeat without re-enrollment.
+
+Durable protected secret storage is still required before updates, migration,
+or multi-Tree reconciliation can recreate a Branch without asking the
+administrator again.
 
 ## Instance identity and persistence
 
@@ -552,18 +584,18 @@ Sprouting is an idempotent, observable workflow:
 
 1. Resolve and validate the exact Seed.
 2. Validate options, secrets, resources, and agreements.
-3. Persist the desired Server in a pending state.
-4. Select the Branch and Leaf.
+3. Persist the desired Branch in a pending state.
+4. Select the runtime provider and Tree.
 5. Reserve ports and storage.
 6. Pull and verify images.
 7. Create all components.
 8. Start components in dependency order when requested.
 9. Wait for readiness.
-10. Mark the Server ready or Withered with an actionable failure.
+10. Mark the Branch ready or Withered with an actionable failure.
 
-Retries reuse the same Server ID and reservations. A failure after partial
+Retries reuse the same Branch ID and reservations. A failure after partial
 creation must either reconcile forward or clean up only resources owned by that
-Server.
+Branch.
 
 Deletion remains name-confirmed in the API. Runtime resources are removed
 before the database record. Backup deletion or retention is an explicit policy
@@ -576,7 +608,7 @@ behind after a confirmed deletion.
 
 ## Security invariants
 
-- The portal never talks directly to a Leaf runtime.
+- The portal never talks directly to a Tree runtime.
 - Registry inputs are untrusted until schema, policy, signature, and digest
   validation succeeds.
 - Images are pinned by digest and come from allowed registries.
@@ -586,9 +618,9 @@ behind after a confirmed deletion.
 - Mod adapters cannot request arbitrary host scripts or bypass the Server
   sandbox.
 - The Agent accepts only authenticated, authorized, idempotent commands.
-- Agent credentials are unique per Leaf and revocable.
+- Agent credentials and encryption keys are unique per Tree and revocable.
 - Secrets are not written to logs, manifests, labels, or command responses.
-- Resource limits and storage quotas are enforced on the Leaf.
+- Resource limits and storage quotas are enforced on the Tree.
 - Ownership labels prevent Dauva from mutating unrelated containers.
 - Destructive operations are auditable.
 
@@ -614,10 +646,10 @@ Dauva already owns the product-facing catalog, agreements, authentication,
 managed instance records, high-level status, autostart, and safe deletion.
 
 Native Sprouting, resource enforcement, dynamic and paired allocation, owned
-storage, status, power, and safe deletion are now live on one Docker Leaf.
-Leaf-agent isolation, logs, restore, general backup control, updates, and
-protected durable secrets are the major remaining capabilities. File
-management, scheduling, and multi-Leaf placement follow.
+storage, live observed status, power, safe deletion, and read-only logs are now
+live on one Docker Tree through its Leaf Agent. Restore, general backup
+control, updates, and protected durable secrets are the major remaining
+capabilities. File management, scheduling, and multi-Tree placement follow.
 
 ## Delivery plan
 
@@ -716,6 +748,14 @@ Completed on the production-isolated develop stack:
 - portal Leaf inventory, Add Leaf, and Choose Leaf flows;
 - route Sprouting through a selected Leaf;
 - bounded read-only live-log snapshots through the outbound Leaf channel;
+- Tree-specific RSA-OAEP secret envelopes for generated and administrator
+  secrets, including Minecraft Paper RCON;
+- observed Branch status plus bounded start, stop, and restart commands that
+  can touch only Dauva-owned containers;
+- a centralized Portal terminology profile using
+  `Pod → Seed → Tree → Branch`, with the previous
+  `Pod → Seed → Leaf → Game Server` profile retained for rollback;
+- isolated release promotion where main never deploys public develop;
 - daily OCI tag resolution and reviewable Seed update candidates;
 - proof receipts and guarded candidate promotion;
 
@@ -740,15 +780,15 @@ Next operational slices:
   mod update rollback;
 - scheduled tasks;
 - registry signing and trusted sources;
-- Leaf capacity reporting;
-- stronger secret storage;
+- richer Tree capacity and storage-class reporting;
+- durable protected secret storage for update and reconciliation;
 - remove direct Docker access from the API.
 
 ### Phase 4: migration and retirement
 
 - Adopt or recreate existing Compose Servers one at a time.
 - Back up and validate before changing ownership.
-- Keep the legacy and Pterodactyl Branches available during migration.
+- Keep the legacy and Pterodactyl providers available during migration.
 - Remove Pterodactyl only after no managed Server depends on it.
 - Add additional Leaves and scheduling after the single-Leaf path is stable.
 
@@ -765,7 +805,8 @@ These are the current working decisions and should change only deliberately:
 5. Seeds support multiple components.
 6. Existing Servers remain untouched while disposable native Servers prove
    each Seed before it becomes stable.
-7. Pterodactyl remains a temporary optional Branch, not the Dauva domain model.
+7. Pterodactyl remains a temporary optional provider, not the Dauva domain
+   model.
 8. Docker is the first runtime because it is already present on the Debian
    Leaf; the contract must not permanently depend on Docker-specific client
    behavior.

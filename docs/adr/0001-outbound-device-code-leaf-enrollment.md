@@ -17,7 +17,8 @@ easy to understand from the existing Flutter portal.
 
 ## Decision
 
-One persistent **Dauva Leaf Agent** runs on each Leaf.
+One persistent **Dauva Leaf Agent** runs on each user-facing Tree. The protocol
+and stored device entity retain the internal name `Leaf` for compatibility.
 
 Enrollment follows an OAuth-style device-code flow:
 
@@ -57,9 +58,9 @@ ordinary Leaves rather than introduce a second provisioning model.
 - Agent commands are leased, idempotent, and completed with explicit results.
 - The Agent validates command type, Seed image digests, resource boundaries,
   paths, ports, and Dauva ownership labels before touching the runtime.
-- Server secrets require application-level encryption to the enrolled machine
-  key before they are added to commands; that capability is a milestone, not
-  a reason to weaken enrollment.
+- Server secrets use application-level RSA-OAEP-SHA256 encryption to the
+  enrolled Tree's machine key before they are added to commands. The private
+  key never leaves the Leaf Agent state directory.
 
 ## Consequences
 
@@ -70,6 +71,6 @@ online.
 The control plane needs Leaf, enrollment, capacity, command, and observed-state
 records. It also needs clear offline and command-expiry behavior.
 
-Linux x64 is the first distribution target. Linux ARM64 follows from the same
-Go source. A Windows service can be built later, but the Leaf Agent has no web
-build; the web and Windows Flutter builds remain Portal clients.
+Linux x64 and ARM64 plus a Windows AMD64 development package are built from the
+same Go source. The Leaf Agent has no web build; the web and Windows Flutter
+builds remain Portal clients.
