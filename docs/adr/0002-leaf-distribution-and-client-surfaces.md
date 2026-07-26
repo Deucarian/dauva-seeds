@@ -27,8 +27,9 @@ lifecycle controls. The same Flutter source continues to produce web and
 Windows Portal clients.
 
 The separate private `Deucarian/dauva-leaf` repository owns one persistent
-host Agent. The initial artifacts are Linux `amd64` and `arm64` binaries plus
-a systemd unit. It has no web build.
+host Agent. Its artifacts are Linux `amd64` and `arm64` binaries plus a
+systemd unit, and a Windows `amd64` binary plus a background-task installer.
+It has no web build.
 
 A self-hoster installs the Agent once, enrolls the machine once, and leaves it
 running. Sprouting does not download another administrator script. The control
@@ -40,9 +41,11 @@ bootstrap package. A public installer must verify a signed release before
 installing it. The private GitHub releases used during development are not the
 long-term public distribution channel.
 
-A future Windows Leaf is a dedicated Windows service built from the Agent
-repository. It is not the Flutter Portal executable and is not required for the
-Linux-first release.
+A Windows Leaf uses the same Agent protocol and Docker-backed executor as
+Linux. The development package registers the Agent as a highest-privilege
+startup task under `SYSTEM`; a signed Windows Service wrapper can replace that
+packaging detail before public distribution. It is not the Flutter Portal
+executable. The Portal remains an unprivileged visual client.
 
 ## Repository ownership
 
@@ -60,4 +63,5 @@ Linux-first release.
 - The self-hosted and future managed-hosting paths use the same Leaf protocol.
 - Public Agent signing, update policy, rollback, and compatibility windows are
   explicit product work.
-- Linux is complete before a Windows Agent is promised.
+- Linux and Windows use one command contract while keeping platform-specific
+  capacity probes, shutdown behavior, and installers explicit.

@@ -52,26 +52,40 @@ backup or object storage.
 
 ## Product language
 
-| Term | Meaning |
-| --- | --- |
-| Seed Library | The catalog administrators see in Dauva. |
-| Seed Registry | The versioned technical source behind the Seed Library. |
-| Pod | One game family containing related Server variants, such as Minecraft. |
-| Seed | A complete, approved, reproducible recipe for one Server type. |
-| Server | One installed runtime instance with its own data and settings. |
-| Sprouting | Provisioning a Server from a Seed. |
-| Branch | A replaceable runtime provider used by the Dauva control plane. |
-| Leaf | A machine that can host Servers. |
-| Leaf Agent | The restricted Dauva service that manages runtime resources on a Leaf. |
-| Withered | A failed Sprouting operation or inactive runtime condition, made explicit by accompanying text. |
+The metaphor must shorten explanations, not require a glossary before someone
+can create a Game Server. Every first-use surface pairs the thematic noun with
+its literal job. The repeated creation path is:
+
+```text
+Pod · game family → Seed · setup recipe → Leaf · your computer → Game Server · the result
+```
+
+| Term | Literal label | Meaning |
+| --- | --- | --- |
+| Garden | Your Dauva workspace | The optional collective name for a person's Servers and Leaves. It is never required to complete a task. |
+| Seed Library | Browse games | The catalog administrators see in Dauva. |
+| Seed Registry | Technical recipe source | The versioned technical source behind the Seed Library. |
+| Pod | Game family | One recognizable game containing related Server variants, such as Minecraft. |
+| Seed | Setup recipe | A complete, approved, reproducible recipe for one Server type. |
+| Game Server | Running result | One installed runtime instance with its own data and settings. Use `Game Server`, not bare `Server`, when the surrounding page could mean a physical machine. |
+| Sprouting | Installing | Creating a Game Server from a Seed. Progress text may be thematic, but errors must be literal and actionable. |
+| Branch | Runtime provider | A replaceable provider used by the Dauva control plane. This is normally hidden from self-hosters. |
+| Leaf | Your computer | A user-owned Windows computer or Linux server where Game Servers run. A Leaf is the machine, never the Agent. |
+| Leaf Agent | Background helper | The restricted Dauva service installed once on a Leaf. It performs approved work and calls Dauva outbound. |
+| Withered | Failed or offline | A failed Sprouting operation or inactive runtime condition, always followed by literal text. |
 | Mod Profile | An optional reusable, versioned selection such as Vanilla, Quality of life, or a curated modpack. |
 | Mod Selection | The administrator's desired mods and permitted update channels for one Server. |
 | Mod Lock | The immutable resolved mod versions, dependencies, sources, checksums, load order, and compatibility context applied to one Server revision. |
 
 A Pod is catalog metadata, not a running workload or genre. Genres are Seed
-labels used for discovery and filtering. A Seed produces a Server.
-A Server can contain multiple runtime components, such as a primary game
+labels used for discovery and filtering. A Seed produces a Game Server.
+A Game Server can contain multiple runtime components, such as a primary game
 container and a backup sidecar.
+
+Operational states stay literal: **Running**, **Stopped**, **Starting**,
+**Stopping**, **Restarting**, **Installing**, **Failed**, and **Offline**.
+Avoid using `world` as a general visible synonym because not every game has a
+world. Existing API fields and routes may retain it for compatibility.
 
 ## What is and is not a Seed
 
@@ -698,8 +712,10 @@ Completed on the production-isolated develop stack:
 - device-code Leaf enrollment and revocation;
 - outbound heartbeats, capacity, leased commands, and completion results;
 - extracted Linux Leaf Agent with a labeled Docker executor;
+- Windows `amd64` Leaf Agent, private-state installer, and startup task;
 - portal Leaf inventory, Add Leaf, and Choose Leaf flows;
 - route Sprouting through a selected Leaf;
+- bounded read-only live-log snapshots through the outbound Leaf channel;
 - daily OCI tag resolution and reviewable Seed update candidates;
 - proof receipts and guarded candidate promotion;
 
@@ -717,7 +733,7 @@ addressed.
 
 Next operational slices:
 
-- live log streaming and console;
+- audited game-console input on top of the read-only live-log view;
 - backup and restore UI;
 - installed-Server update and rollback;
 - Factorio-first Mod Profiles, Mod Selection, immutable Mod Locks, and atomic
