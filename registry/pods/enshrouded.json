@@ -1,7 +1,7 @@
 {
   "schemaVersion": "dauva.dev/pod/v1",
   "id": "enshrouded",
-  "status": "candidate",
+  "status": "stable",
   "metadata": {
     "title": {
       "en": "Enshrouded",

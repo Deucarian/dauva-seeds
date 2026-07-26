@@ -1,7 +1,7 @@
 {
   "schemaVersion": "dauva.dev/seed/v1",
-  "id": "core-keeper",
-  "version": "1.0.1",
+  "id": "core-keeper-hard",
+  "version": "1.0.0",
   "status": "stable",
   "podId": "core-keeper",
   "genres": [
@@ -11,14 +11,14 @@
   ],
   "metadata": {
     "title": {
-      "en": "Core Keeper Normal",
-      "nl": "Core Keeper Normal",
-      "de": "Core Keeper Normal"
+      "en": "Core Keeper Hard",
+      "nl": "Core Keeper Hard",
+      "de": "Core Keeper Schwer"
     },
     "description": {
-      "en": "A persistent Core Keeper Server that sprouts new worlds in Normal mode.",
-      "nl": "Een blijvende Core Keeper-Server die nieuwe werelden in de modus Normal ontkiemt.",
-      "de": "Ein persistenter Core-Keeper-Server, der neue Welten im normalen Modus startet."
+      "en": "A Core Keeper Server that sprouts new worlds in Hard mode.",
+      "nl": "Een Core Keeper-Server die nieuwe werelden in de modus Hard ontkiemt.",
+      "de": "Ein Core-Keeper-Server, der neue Welten im schweren Modus startet."
     },
     "icon": "gem"
   },
@@ -42,7 +42,7 @@
       "environment": {
         "MODS_ENABLED": "false",
         "WORLD_INDEX": "0",
-        "WORLD_MODE": "0"
+        "WORLD_MODE": "1"
       },
       "optionEnvironment": {
         "max-players": "MAX_PLAYERS",

@@ -1,6 +1,6 @@
 {
   "schemaVersion": "dauva.dev/seed/v1",
-  "id": "minecraft-fabric",
+  "id": "minecraft-paper",
   "version": "1.0.0",
   "status": "stable",
   "podId": "minecraft",
@@ -10,14 +10,14 @@
   ],
   "metadata": {
     "title": {
-      "en": "Minecraft Fabric",
-      "nl": "Minecraft Fabric",
-      "de": "Minecraft Fabric"
+      "en": "Minecraft Paper",
+      "nl": "Minecraft Paper",
+      "de": "Minecraft Paper"
     },
     "description": {
-      "en": "A mod-ready Minecraft Java Server with persistent data and an automatic backup companion.",
-      "nl": "Een modklare Minecraft Java-Server met blijvende data en een automatische back-upcomponent.",
-      "de": "Ein mod-fähiger Minecraft-Java-Server mit persistenten Daten und automatischer Backup-Komponente."
+      "en": "A performance-focused Minecraft Paper Server with automatic backups.",
+      "nl": "Een prestatiegerichte Minecraft Paper-Server met automatische back-ups.",
+      "de": "Ein leistungsorientierter Minecraft-Paper-Server mit automatischen Backups."
     },
     "icon": "shield"
   },
@@ -43,7 +43,7 @@
         "ENABLE_WHITELIST": "FALSE",
         "ENFORCE_WHITELIST": "FALSE",
         "MODE": "survival",
-        "TYPE": "FABRIC"
+        "TYPE": "PAPER"
       },
       "optionEnvironment": {
         "difficulty": "DIFFICULTY",
@@ -180,9 +180,9 @@
           "de": "Ausgewogen"
         },
         "description": {
-          "en": "Recommended for a persistent Fabric Server.",
-          "nl": "Aanbevolen voor een blijvende Fabric-Server.",
-          "de": "Für einen persistenten Fabric-Server empfohlen."
+          "en": "Recommended for a persistent Paper Server.",
+          "nl": "Aanbevolen voor een blijvende Paper-Server.",
+          "de": "Für einen persistenten Paper-Server empfohlen."
         },
         "memoryMb": 3072,
         "diskMb": 20480,
@@ -234,9 +234,9 @@
         "de": "Minecraft-Version"
       },
       "help": {
-        "en": "A Fabric-supported Minecraft version, or LATEST.",
-        "nl": "Een door Fabric ondersteunde Minecraft-versie, of LATEST.",
-        "de": "Eine von Fabric unterstützte Minecraft-Version oder LATEST."
+        "en": "A Paper-supported Minecraft version, or LATEST.",
+        "nl": "Een door Paper ondersteunde Minecraft-versie, of LATEST.",
+        "de": "Eine von Paper unterstützte Minecraft-Version oder LATEST."
       },
       "required": true,
       "defaultValue": "26.2",

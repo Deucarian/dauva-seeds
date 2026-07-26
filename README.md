@@ -9,6 +9,9 @@ store live worlds, saves, secrets, backups, or large game installations.
 ## Start here
 
 - [Native server platform design](docs/architecture/dauva-native-server-platform.md)
+- [ADR 0001: outbound device-code Leaf enrollment](docs/adr/0001-outbound-device-code-leaf-enrollment.md)
+- [ADR 0002: Leaf distribution and client surfaces](docs/adr/0002-leaf-distribution-and-client-surfaces.md)
+- [Managed-hosting separation and economics](docs/product/managed-hosting-separation-and-economics.md)
 - [Registry layout](registry/README.md)
 
 ## Layout
@@ -31,17 +34,42 @@ The first vertical slice is live:
   place.
 - Every Pod represents one game family and can contain multiple Seed variants;
   cross-game discovery uses explicit Seed genres instead of genre-shaped Pods.
-- All six existing Compose Server types have sanitized Seed manifests.
-- Minecraft Fabric, Factorio, Core Keeper, and Valheim are stable `1.0.0`
-  Seeds after disposable native lifecycle tests.
-- Satisfactory and Enshrouded remain candidate Seeds until the Leaf receives
-  its RAM upgrade and their heavier runtime behavior is tested end to end.
+- All six existing Compose Server types have sanitized Seed manifests, and
+  every Pod contains two meaningful Seed variants.
+- Factorio Stable, Valheim BepInEx, both Satisfactory branches, and both
+  Enshrouded runtimes passed disposable native lifecycle proofs. Together with
+  the original proven Seeds, they are stable `1.0.x` recipes.
+- Enshrouded Wine is recommended because its roughly 9 GB game install,
+  saves, logs, and local backups all live on explicit data-disk storage.
+  Enshrouded Proton persists saves but revalidates its large install on cold
+  starts.
+- Minecraft Paper passed its EULA-gated native lifecycle proof with Paper
+  26.2, a healthy primary container, dynamic port, persistent world, ordered
+  restart, and two real RCON backups. All twelve Seeds are now stable.
 - Dauva rejects mutable images, fixed secrets, saves, arbitrary host paths,
   privileged runtime access, and Docker socket mounts.
-- Disposable Fabric, Factorio, Core Keeper, and Valheim Servers completed
-  native create, status, power, and name-confirmed delete flows on the Debian
-  Leaf without using Pterodactyl.
+- Disposable Factorio, Core Keeper Normal and Hard, Valheim, Satisfactory, and Enshrouded
+  variants completed native install, status, port, stop, restart, persistence,
+  and cleanup proofs on the Debian Leaf without using Pterodactyl.
 - New Servers Sprout through Dauva's native Docker Branch by default;
   Pterodactyl remains an optional migration fallback.
+- The Leaf boundary now uses one persistent Linux-first Agent, short
+  device-code approval, unique revocable credentials, and outbound control
+  plane communication.
 
 Compiled registry output is committed at `dist/registry.json`.
+
+## Seed updates
+
+Every component keeps its immutable runtime image and a separate reviewed OCI
+tag used only for update discovery. `npm run updates:check` resolves those tags
+without changing a Seed. The daily GitHub workflow opens a pull request with
+patch-versioned release candidates when digests change.
+The same candidate batch increments the actual Seed Library package version;
+build metadata is never used as a substitute for that release number.
+
+Existing Servers never move automatically. A candidate must pass health, port,
+backup, stop, restart, persistence, and cleanup checks before
+`npm run seed:promote` accepts its matching proof receipt. Agreements stay
+unchecked: a required EULA or terms revision must have explicit acceptance in
+the proof receipt and in Dauva's server-side audit.
