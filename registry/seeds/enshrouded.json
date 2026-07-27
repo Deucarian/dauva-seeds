@@ -1,8 +1,8 @@
 {
   "schemaVersion": "dauva.dev/seed/v1",
   "id": "enshrouded",
-  "version": "1.0.0",
-  "status": "stable",
+  "version": "1.0.1-rc.1",
+  "status": "candidate",
   "podId": "enshrouded",
   "genres": [
     "adventure",
@@ -40,7 +40,7 @@
     {
       "id": "server",
       "role": "primary",
-      "image": "docker.io/sknnr/enshrouded-dedicated-server@sha256:45d8b62209fb60889068b3d679dd6d9af0e530516e46752a5f7c82a0bbb5366d",
+      "image": "docker.io/sknnr/enshrouded-dedicated-server@sha256:c410b742812cc55723cdaa97950f94cdef1b1f8a332bceedce13da9b681c98ee",
       "imageUpdate": {
         "reference": "docker.io/sknnr/enshrouded-dedicated-server:latest"
       },

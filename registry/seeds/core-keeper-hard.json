@@ -1,8 +1,8 @@
 {
   "schemaVersion": "dauva.dev/seed/v1",
   "id": "core-keeper-hard",
-  "version": "1.0.0",
-  "status": "stable",
+  "version": "1.0.1-rc.1",
+  "status": "candidate",
   "podId": "core-keeper",
   "genres": [
     "adventure",
@@ -40,7 +40,7 @@
     {
       "id": "server",
       "role": "primary",
-      "image": "docker.io/escaping/core-keeper-dedicated@sha256:6531227708c06db6850731609e2df3e0940e63149395c743f12a0ce5f0c34ead",
+      "image": "docker.io/escaping/core-keeper-dedicated@sha256:87fa7925596264e1460cb6c7c128e9d39ac5445206e04e587993b5d4afa7c90f",
       "imageUpdate": {
         "reference": "docker.io/escaping/core-keeper-dedicated:latest"
       },
