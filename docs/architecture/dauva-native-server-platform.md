@@ -573,9 +573,27 @@ Sprouting is an idempotent, observable workflow:
 The browser request ends after step 3 with `202 Accepted`. Steps 4 through 10
 run in a durable API worker and are never coupled to the portal's HTTP timeout.
 The worker scans both new `pending` records and interrupted `provisioning`
-records without a provider identity, including after an API restart. The
-portal polls transitional Servers every four seconds and can be closed or
-reloaded without cancelling the Sprout.
+records, including records whose Leaf identity was already assigned before an
+API restart. The portal polls transitional Servers every four seconds and can
+be closed or reloaded without cancelling the Sprout.
+
+The user-facing **Sprout Journey** consists of real, timestamped phases:
+
+1. accepted into the durable queue;
+2. validating the pinned Seed and protected settings;
+3. selecting or resuming the assigned Leaf;
+4. preparing persistent storage;
+5. downloading the approved images;
+6. creating every component;
+7. starting components in Seed order;
+8. waiting for the first healthy start;
+9. ready.
+
+Leaf stores phases 4 through 9 atomically below its control-plane storage,
+outside Server saves and mutable volumes. The API mirrors those phases into
+the durable Server record. Neither layer derives progress from elapsed time.
+The portal shows the current real step, timestamps, elapsed durations, Leaf
+messages, and the exact Withered phase. Closing any UI does not erase it.
 
 Retries reuse the same Server ID and reservations. A failure after partial
 creation must either reconcile forward or clean up only resources owned by that
@@ -583,6 +601,12 @@ Server. A Leaf retry adopts an already complete runtime only when every
 component, Seed version, manifest digest, and Registry digest still match.
 Otherwise it removes only resources carrying the matching Dauva ownership
 identity before rebuilding.
+
+A retry increments the attempt number while retaining the same Server and Leaf
+identity. It reuses a complete digest-matching runtime or safely clears only
+matching Dauva-owned partial resources. If a container or network cannot be
+removed, storage remains untouched and the retry Withers instead of continuing
+over an uncertain runtime.
 
 Deletion remains name-confirmed in the API. Runtime resources are removed
 before the database record. Backup deletion or retention is an explicit policy
