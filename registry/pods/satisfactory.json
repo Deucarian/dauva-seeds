@@ -2,6 +2,7 @@
   "schemaVersion": "dauva.dev/pod/v1",
   "id": "satisfactory",
   "status": "stable",
+  "recommendedSeedId": "satisfactory",
   "metadata": {
     "title": {
       "en": "Satisfactory",

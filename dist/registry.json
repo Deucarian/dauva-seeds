@@ -8,6 +8,7 @@
       "schemaVersion": "dauva.dev/pod/v1",
       "id": "core-keeper",
       "status": "stable",
+      "recommendedSeedId": "core-keeper",
       "metadata": {
         "title": {
           "en": "Core Keeper",
@@ -26,6 +27,7 @@
       "schemaVersion": "dauva.dev/pod/v1",
       "id": "enshrouded",
       "status": "stable",
+      "recommendedSeedId": "enshrouded-wine",
       "metadata": {
         "title": {
           "en": "Enshrouded",
@@ -44,6 +46,7 @@
       "schemaVersion": "dauva.dev/pod/v1",
       "id": "factorio",
       "status": "stable",
+      "recommendedSeedId": "factorio-stable",
       "metadata": {
         "title": {
           "en": "Factorio",
@@ -62,6 +65,7 @@
       "schemaVersion": "dauva.dev/pod/v1",
       "id": "garrys-mod",
       "status": "stable",
+      "recommendedSeedId": "garrys-mod-construct",
       "metadata": {
         "title": {
           "en": "Garry's Mod",
@@ -80,6 +84,7 @@
       "schemaVersion": "dauva.dev/pod/v1",
       "id": "minecraft",
       "status": "stable",
+      "recommendedSeedId": "minecraft-paper",
       "metadata": {
         "title": {
           "en": "Minecraft",
@@ -98,6 +103,7 @@
       "schemaVersion": "dauva.dev/pod/v1",
       "id": "project-zomboid",
       "status": "stable",
+      "recommendedSeedId": "project-zomboid-private",
       "metadata": {
         "title": {
           "en": "Project Zomboid",
@@ -116,6 +122,7 @@
       "schemaVersion": "dauva.dev/pod/v1",
       "id": "satisfactory",
       "status": "stable",
+      "recommendedSeedId": "satisfactory",
       "metadata": {
         "title": {
           "en": "Satisfactory",
@@ -134,6 +141,7 @@
       "schemaVersion": "dauva.dev/pod/v1",
       "id": "terraria",
       "status": "stable",
+      "recommendedSeedId": "terraria-vanilla",
       "metadata": {
         "title": {
           "en": "Terraria",
@@ -152,6 +160,7 @@
       "schemaVersion": "dauva.dev/pod/v1",
       "id": "valheim",
       "status": "stable",
+      "recommendedSeedId": "valheim",
       "metadata": {
         "title": {
           "en": "Valheim",
@@ -5838,5 +5847,5 @@
       ]
     }
   ],
-  "registryDigest": "sha256:8805b23a64a0bf5046052b1923624ef63b76a8a2a88ee232cee847f8ec7f305f"
+  "registryDigest": "sha256:f7901e5fac2eb9f538fa90c1db0c778b0e6812b5bcac9bb2f49f74ac8de716d3"
 }

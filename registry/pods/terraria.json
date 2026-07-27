@@ -2,6 +2,7 @@
   "schemaVersion": "dauva.dev/pod/v1",
   "id": "terraria",
   "status": "stable",
+  "recommendedSeedId": "terraria-vanilla",
   "metadata": {
     "title": {
       "en": "Terraria",

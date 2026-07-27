@@ -2,6 +2,7 @@
   "schemaVersion": "dauva.dev/pod/v1",
   "id": "project-zomboid",
   "status": "stable",
+  "recommendedSeedId": "project-zomboid-private",
   "metadata": {
     "title": {
       "en": "Project Zomboid",

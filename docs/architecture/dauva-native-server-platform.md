@@ -2,7 +2,7 @@
 
 Status: **Phase 4 control plane complete; Leaf fleet rollout included in this release**
 
-Last updated: 2026-07-26
+Last updated: 2026-07-27
 
 This document is the canonical product and architecture design for Dauva's
 native game-server platform. Keep it current when the Seed format, registry,
@@ -55,6 +55,12 @@ images, protocols, health checks, updates, and backups. Dauva selects a
 compatible Leaf automatically. Technical configuration may exist behind an
 explicit advanced section, but it must never be required for a supported,
 proofed Seed.
+
+The portal implements this contract as a four-step Sprout Wizard: choose a
+game, name and configure it, accept any required agreements, and review before
+Sprouting. Each Pod declares a recommended Seed for this default path. Other
+Seeds, resource controls, game-specific overrides, and autostart remain
+available as optional choices rather than mandatory infrastructure decisions.
 
 Every Server-creation and lifecycle feature must meet these rules:
 
@@ -708,6 +714,8 @@ Live acceptance evidence:
   (implemented);
 - deterministic proof expiry in the compiled Registry and portal
   (implemented);
+- recommended Seeds per Pod and the non-technical four-step Sprout Wizard
+  (implemented);
 - extracted authenticated Leaf Agent and Registry read API (implemented);
 - Terraria, Project Zomboid, and Garry's Mod Pods and six proven Seeds
   (implemented);
@@ -757,6 +765,9 @@ These are the current working decisions and should change only deliberately:
 12. The first host keeps active data on the dedicated data SSD. Backups use a
     separately mounted configurable root and are labeled local until the host
     confirms that root is a distinct filesystem.
+13. Every Pod declares a proven recommended Seed. The API falls back to the
+    first available compatible Seed only when an older Registry has no explicit
+    recommendation.
 
 ## Open design questions
 

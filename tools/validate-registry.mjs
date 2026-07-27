@@ -118,19 +118,32 @@ function validateUniqueReleaseIds(entries) {
 
 function validatePodMembership(pods, seeds) {
   const seedCountByPod = new Map(pods.map((entry) => [entry.value.id, 0]));
+  const seedIdsByPod = new Map(
+    pods.map((entry) => [entry.value.id, new Set()]),
+  );
   for (const entry of seeds) {
     if (seedCountByPod.has(entry.value.podId)) {
       seedCountByPod.set(
         entry.value.podId,
         seedCountByPod.get(entry.value.podId) + 1,
       );
+      seedIdsByPod.get(entry.value.podId).add(entry.value.id);
     }
   }
 
-  for (const [podId, seedCount] of seedCountByPod) {
+  for (const entry of pods) {
+    const podId = entry.value.id;
+    const seedCount = seedCountByPod.get(podId);
     if (seedCount < 2) {
       errors.push(
         `${podId}.json: every Pod must contain at least two related Seeds.`,
+      );
+    }
+    if (!entry.value.recommendedSeedId) {
+      errors.push(`${podId}.json: every Pod must recommend one Seed.`);
+    } else if (!seedIdsByPod.get(podId).has(entry.value.recommendedSeedId)) {
+      errors.push(
+        `${podId}.json: recommended Seed '${entry.value.recommendedSeedId}' does not belong to this Pod.`,
       );
     }
   }

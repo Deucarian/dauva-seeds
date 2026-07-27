@@ -31,6 +31,9 @@ The first vertical slice is live:
   place.
 - Every Pod represents one game family and can contain multiple Seed variants;
   cross-game discovery uses explicit Seed genres instead of genre-shaped Pods.
+- Every Pod names one proven recommended Seed. Dauva uses that recommendation
+  in the beginner-friendly Sprout flow while keeping other variants available
+  behind an optional choice.
 - All six existing Compose Server types have sanitized Seed manifests. Terraria,
   Project Zomboid, and Garry's Mod have now joined them, giving the Registry
   nine Pods and eighteen stable Seeds with two meaningful variants per Pod.

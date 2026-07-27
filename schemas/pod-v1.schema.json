@@ -25,6 +25,9 @@
         "withered"
       ]
     },
+    "recommendedSeedId": {
+      "$ref": "#/$defs/id"
+    },
     "metadata": {
       "$ref": "#/$defs/metadata"
     }
