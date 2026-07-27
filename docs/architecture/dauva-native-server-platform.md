@@ -302,6 +302,8 @@ connection with a unique 256-bit-or-stronger bearer credential. The Agent:
 
 The control plane provides one Server lifecycle model:
 
+- a dedicated, deep-linkable Server care page with status, power controls,
+  Leaf capacity, logs, backups, schedules, Seed changes, and console access;
 - component-aware logs with bounded tail sizes;
 - console commands only through a Seed-declared protocol, private RCON port,
   and generated or administrator-owned secret—never a host shell;
@@ -314,13 +316,21 @@ The control plane provides one Server lifecycle model:
 - read-only migration discovery for native workloads and trusted legacy
   candidates.
 
-Backups are stored outside the active Server tree. A Leaf reports whether the
-backup root resolves to a separate filesystem. Local backups are useful for
-operator mistakes but are explicitly shown as not disaster-safe. Large or
-important Servers should use a roomy separate disk, mounted backup target, or
-future object-storage adapter. The first production Leaf defaults to three
-retained archives per Server because its data SSD currently has about 223 GB
-free and the media disks are already heavily occupied.
+Backups are stored outside the active Server tree through the
+`ILeafBackupStorage` contract. The first adapter uses a filesystem root; a
+future NAS or object-storage adapter can replace it without changing
+stop/archive/retention/restore/rollback behavior. A Leaf reports the adapter's
+readiness and whether its target is disaster-safe. Local backups are useful
+for operator mistakes but are explicitly shown as not disaster-safe.
+
+At the 2026-07-27 production review, the active `/mnt/data` filesystem had
+about 215 GB free. No separate physical filesystem had more than 200 GB free:
+the media disks had about 158 GB and 160 GB individually, and the merger pool
+is not suitable for game-server recovery data. The initial filesystem adapter
+therefore remains on `/mnt/data/dauva-backups`, outside active Server
+directories but on the same data SSD, with three retained archives per
+Server. Dauva labels these as local restore points until a separate disk, NAS,
+or object-storage adapter is configured.
 
 ### Multi-Leaf placement
 
@@ -437,7 +447,7 @@ The initial placement is deliberately conservative:
 | OCI layers and runtime cache | `/var/lib/docker` on the data SSD | large, reusable, and already managed by Docker |
 | active saves/config/install volumes | `/mnt/data/dauva/servers` | low-latency persistent storage with the most suitable free capacity |
 | disposable proof data | `/mnt/data/dauva-proof/servers` | isolated ownership and easy verified cleanup |
-| local companion backups | approved backup volumes under the Server root | first-line recovery only; not disaster recovery |
+| local Server backups | `/mnt/data/dauva-backups` through the filesystem adapter | first-line recovery only; separate tree, same data SSD |
 | future durable backups | separate physical disk or object storage | survives loss of the runtime SSD |
 
 The media merger pool is not used for active game data: it was above 80%
@@ -754,7 +764,10 @@ Live acceptance evidence:
 - Terraria, Project Zomboid, and Garry's Mod Pods and six proven Seeds
   (implemented);
 - continuously refreshed logs and Seed-gated console (implemented);
-- backup, restore, retention, and UI (implemented);
+- dedicated deep-linkable Server care page with live/pauseable logs and
+  non-technical controls (implemented);
+- adapter-backed backup, restore, retention, storage classification, and UI
+  (filesystem adapter implemented);
 - installed-Server update and trusted-history rollback (implemented);
 - scheduled tasks (implemented);
 - registry signing and trusted sources;
