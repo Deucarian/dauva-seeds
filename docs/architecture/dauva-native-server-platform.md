@@ -570,9 +570,19 @@ Sprouting is an idempotent, observable workflow:
 9. Wait for readiness.
 10. Mark the Server ready or Withered with an actionable failure.
 
+The browser request ends after step 3 with `202 Accepted`. Steps 4 through 10
+run in a durable API worker and are never coupled to the portal's HTTP timeout.
+The worker scans both new `pending` records and interrupted `provisioning`
+records without a provider identity, including after an API restart. The
+portal polls transitional Servers every four seconds and can be closed or
+reloaded without cancelling the Sprout.
+
 Retries reuse the same Server ID and reservations. A failure after partial
 creation must either reconcile forward or clean up only resources owned by that
-Server.
+Server. A Leaf retry adopts an already complete runtime only when every
+component, Seed version, manifest digest, and Registry digest still match.
+Otherwise it removes only resources carrying the matching Dauva ownership
+identity before rebuilding.
 
 Deletion remains name-confirmed in the API. Runtime resources are removed
 before the database record. Backup deletion or retention is an explicit policy
