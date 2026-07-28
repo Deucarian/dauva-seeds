@@ -1,6 +1,6 @@
 # Dauva native server platform
 
-Status: **Phase 5 Leaf enrollment complete; fleet rollout ready**
+Status: **Phase 5 Leaf enrollment complete; Phase 6 one-click Windows delivery is next**
 
 Last updated: 2026-07-28
 
@@ -41,6 +41,9 @@ backup or object storage.
 - Keep provider-specific credentials and runtime details outside the client.
 - Let a non-technical administrator add a supported Server without needing to
   understand Docker, ports, images, storage paths, Seeds, Branches, or Leaves.
+- Let a non-technical Windows user install, pair, update, repair, and uninstall
+  a Leaf without a README, archive extraction, shell, command, manually copied
+  pairing code, separately installed container runtime, or port forwarding.
 
 ## Non-technical product contract
 
@@ -209,6 +212,7 @@ flowchart LR
     API --> Database["Desired state, instances,<br/>agreements and audit"]
     API --> AgentA["Dauva Leaf Agent A"]
     API --> AgentB["Dauva Leaf Agent B"]
+    Distribution["Dauva Leaf distribution<br/>signed installers and updates"] --> AgentB
     AgentA --> RuntimeA["Container runtime"]
     AgentB --> RuntimeB["Container runtime"]
     AgentA --> Data["Active Server storage"]
@@ -364,6 +368,143 @@ Pausing does not destroy existing Servers or their ability to receive lifecycle
 commands. Removing a Leaf revokes the stored credential and is refused while
 any managed Server still references that Leaf. Configuration-managed Leaves
 remain read-only in the portal.
+
+### One-click Windows Leaf installation
+
+Windows installation is a product flow, not an operator deployment guide. Its
+implementation belongs in the dedicated private `Deucarian/dauva-leaf`
+repository and the Dauva infrastructure/distribution layer. The Garden
+integration consumes the resulting installer and handoff contracts in its
+separate develop-only UI stream; this phase does not redesign or directly
+change that UI.
+
+The supported path starts from a pending Leaf created in Dauva and ends only
+when Dauva observes that Leaf as ready:
+
+1. The administrator chooses the Windows installation action for the pending
+   Leaf and downloads a generic Authenticode-signed
+   `DauvaLeafSetup.exe`.
+2. The user starts the installer and accepts the unavoidable Windows UAC
+   prompt. A browser security prompt or a Windows reboot is acceptable when
+   the operating system requires it; instructions, commands, prerequisites,
+   and copied codes are not.
+3. The bootstrapper installs a self-contained Dauva Leaf Windows Service,
+   updater, local maintenance entry, managed runtime, and only the required
+   firewall or loopback registrations. It resumes automatically after a
+   required reboot.
+4. The installer generates an ephemeral PKCE verifier, opens the authenticated
+   Dauva handoff in the system browser, and receives the authorization on a
+   random loopback port. The current Dauva session binds the installer to the
+   pending Leaf. If several pending Leaves exist, the user selects one by its
+   friendly name; no code is shown or copied.
+5. The handoff delivers the existing single-use enrollment claim to the
+   service in memory. The service claims through the versioned Leaf pairing
+   boundary, stores its immutable identity and credential with machine-level
+   protection, and starts normal Agent operation.
+6. The installer waits for service health, compatible Registry digest,
+   runtime readiness, capacity reporting, authenticated control-plane
+   reachability, and Dauva's observed-ready state. It then returns the browser
+   to that Leaf in Dauva.
+
+The raw pairing code or Leaf bearer credential must never appear in the
+installer filename, download URL, process arguments, browser history, registry,
+logs, crash reports, or ordinary files. Authorization codes are short-lived,
+single-use, bound to the PKCE challenge and pending Leaf, and safe against
+replay. The existing manual local setup page, headless Linux variables, direct
+private HTTP transport, lifecycle payloads, and bearer authentication remain
+compatible. Installer handoff and reverse transport are additive, versioned
+capabilities behind the same enrollment, endpoint-source, and Branch
+boundaries.
+
+#### Windows runtime and connectivity
+
+A Windows service alone cannot run the existing Linux OCI Seeds. The
+installer must therefore own a headless runtime rather than silently requiring
+Docker Desktop or a user-session process. The working target is a
+Dauva-managed WSL 2 distribution containing the reviewed Linux container
+engine and Agent runtime. The installer enables the required Windows features,
+imports the versioned Dauva runtime, handles a required reboot, and proves that
+it starts before user login. A short ADR and clean-VM spike must validate this
+service-account lifecycle before WSL 2 becomes the permanent decision; a
+managed Hyper-V runtime remains the fallback if unattended WSL ownership is not
+reliable enough.
+
+Remote Windows Leaves must not require inbound NAT, router changes, public
+ports, Tailscale installation, or a permanent unauthenticated listener. The
+Windows Agent establishes an outbound authenticated TLS session to Dauva over
+ordinary port 443. A new `ILeafTransport` boundary routes the unchanged,
+idempotent Leaf operation contracts through either:
+
+- the existing control-plane-initiated private HTTP transport; or
+- the outbound Windows session with correlation IDs, bounded payloads,
+  cancellation, timeouts, and reconnect-safe operation replay.
+
+The first outbound session may use the unique enrolled bearer credential over
+TLS. The transport must remain replaceable by per-Leaf mTLS without changing
+Portal, Seed, Server, or lifecycle contracts.
+
+#### Windows service, storage, updates, and removal
+
+The installer uses a per-machine Windows Installer package inside a signed WiX
+Burn bootstrapper. The Agent is a self-contained .NET Windows Service with
+automatic delayed start and service-recovery policy. Immutable binaries live
+below `%ProgramFiles%\Dauva\Leaf`; protected machine state, logs, staged
+updates, and enrollment live below `%ProgramData%\Dauva\Leaf`. The service
+runs under the least-privileged dedicated identity that can own its runtime;
+LocalSystem is not the default Agent identity and any privileged helper has a
+small, authenticated, declarative local contract rather than arbitrary command
+execution.
+
+Large runtime and Server data do not default to the operating-system or user
+profile directory. Setup automatically selects the eligible fixed local volume
+with sufficient free space while preserving Dauva's reserve, explains the
+choice in ordinary language, and keeps an optional advanced **Change**
+action. The managed runtime VHD, image cache, active Server volumes, and local
+restore points use separate logical roots so retention, migration, repair, and
+uninstall cannot confuse them. Network, removable, BitLocker-locked, and
+unsupported filesystems are not selected silently.
+
+The distribution layer publishes immutable stable and candidate channels with
+version, compatibility range, source commit, length, SHA-256, signer identity,
+release notes, and rollback metadata. The bootstrapper, MSI, service, updater,
+runtime payload, and channel manifest are signed. The updater stages downloads,
+verifies both the manifest and Authenticode chain, waits for active operations
+to drain, replaces binaries atomically, restarts the service, and rolls back
+when the new version cannot become healthy. An update cannot silently cross an
+incompatible Leaf protocol or runtime-storage migration boundary.
+
+Windows **Installed apps** provides change, repair, update, and uninstall.
+Uninstall stops and removes the service, updater, protocol/loopback
+registration, and installer-owned runtime only after it is safe. It revokes
+the Leaf credential when the control plane is reachable. If managed Servers
+remain, destructive runtime removal is blocked and the maintenance flow opens
+that Leaf in Dauva so the Servers can be moved or deleted. Server data and
+backups are retained by default; deleting them remains a separate,
+name-confirmed Dauva lifecycle action. An offline forced software removal may
+leave recoverable data but must state exactly what remains.
+
+#### Windows acceptance contract
+
+The Windows deliverable is not complete until an automated clean-VM matrix
+proves all of the following on supported Windows 10 and Windows 11 x64 builds:
+
+- a machine with no Agent, WSL distribution, Docker Desktop, container engine,
+  or development tools can complete installation through UAC and any required
+  reboot without instructions or commands;
+- authenticated browser handoff pairs the intended Leaf without displaying or
+  copying a pairing code and rejects replay, stale authorization, wrong-user,
+  and wrong-Leaf attempts;
+- the service starts before login, survives reboot, reconnects outbound through
+  ordinary HTTPS, and returns Dauva to an observed-ready Leaf;
+- install, repair, same-version repair, upgrade, interrupted upgrade, automatic
+  rollback, and uninstall pass with signed production-shaped artifacts;
+- credentials and authorization material are absent from URLs, arguments,
+  logs, registry values, crash output, and unprotected files;
+- storage selection and free-space reserve protect the Windows system volume;
+- uninstall with an active Server is non-destructive, while empty-Leaf
+  uninstall revokes credentials and removes installer-owned software;
+- a disposable proven Seed can Sprout, report healthy, stop, restart, preserve
+  data, back up, and delete through the unchanged Dauva lifecycle contract.
 
 ### Seed releases
 
@@ -811,6 +952,35 @@ Live acceptance evidence:
 - Multi-Leaf configuration, health, and placement are implemented; enrolling a
   second physical Leaf remains an operator action.
 
+### Phase 5: portal-owned Leaf enrollment — complete
+
+- Twenty-minute, single-use pairing codes are stored only as hashes.
+- Each paired Leaf receives a unique protected credential.
+- Portal-managed and configuration-managed Leaves share health, capability,
+  capacity, placement, lifecycle, pause, and safe-removal behavior.
+- Linux Agents retain both the local setup page and headless enrollment
+  variables.
+
+### Phase 6: one-click Windows Leaf delivery — next
+
+1. Create `Deucarian/dauva-leaf` and move Agent ownership there without
+   changing the versioned Leaf operation contracts.
+2. Record ADRs for the Windows runtime, service identity, outbound transport,
+   storage-volume selection, installer/update technology, and signing trust.
+3. Prove on a clean Windows VM that a service-owned WSL 2 runtime can install,
+   survive reboot, start before login, retain its VHD on the selected data
+   volume, and run one pinned Seed. Choose the managed Hyper-V fallback if that
+   proof fails.
+4. Add the outbound TLS `ILeafTransport` while retaining direct private HTTP
+   for every existing Leaf.
+5. Build the self-contained Windows Service and signed WiX Burn/MSI installer
+   with elevation, reboot resume, PKCE browser handoff, automatic pairing,
+   readiness return, repair, and safe uninstall.
+6. Publish signed stable/candidate manifests and implement staged,
+   health-checked update with rollback.
+7. Run the complete clean-VM and disposable-Seed acceptance contract before
+   advertising Windows installation as ready.
+
 ## Initial decisions
 
 These are the current working decisions and should change only deliberately:
@@ -840,6 +1010,22 @@ These are the current working decisions and should change only deliberately:
 13. Every Pod declares a proven recommended Seed. The API falls back to the
     first available compatible Seed only when an older Registry has no explicit
     recommendation.
+14. Agent source, platform packaging, Windows service integration, installer,
+    updater, and runtime adapter belong to `Deucarian/dauva-leaf`; this
+    Registry repository retains the product contract and Seed compatibility
+    requirements.
+15. Windows distribution is a signed per-machine installer, not a ZIP,
+    script, copied binary, Docker Desktop checklist, or user-session tray app.
+16. Windows Leaves use additive outbound TLS transport so the default install
+    requires no inbound port or network expertise. Existing direct HTTP Leaves
+    remain supported.
+17. The working Windows runtime target is a Dauva-managed WSL 2 distribution,
+    subject to a clean-VM service-lifecycle proof before it becomes permanent.
+18. Windows binaries and large Server data have separate roots. Dauva selects
+    a suitable fixed data volume automatically and preserves a free-space
+    reserve.
+19. Uninstall is non-destructive by default and cannot erase active Server
+    data as a side effect of removing Agent software.
 
 ## Open design questions
 
@@ -849,3 +1035,12 @@ These are the current working decisions and should change only deliberately:
   artifacts?
 - Which file-management capability is actually required after logs, backups,
   and configuration editing exist in Dauva?
+- Can a service-owned WSL 2 distribution reliably start before user login,
+  resume across Windows servicing reboots, and retain predictable networking
+  on every supported Windows build, or must the first installer use a managed
+  Hyper-V runtime?
+- Which Authenticode certificate custody and release-signing service should
+  back stable Windows distribution without placing exportable signing keys on
+  a general-purpose runner?
+- Should Windows ARM64 follow after x64 runtime proof, or wait until every
+  recommended Seed has a proven multi-architecture image?
