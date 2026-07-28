@@ -983,26 +983,41 @@ Live acceptance evidence:
    failed explicitly under LocalSystem. Managed Hyper-V is selected. The next
    runtime proof must deploy its VHD, survive reboot, start before login, and
    run the same pinned Seed.
-4. **Complete on the Agent boundary:** the existing Leaf v1 outbound HTTPS
-   heartbeat and command contract remains unchanged. Browser installation
-   sessions are an additive PKCE capability; direct private HTTP Leaves remain
-   compatible.
-5. **Implemented in `dauva-leaf` 0.4.0:** the self-contained Windows Service,
+4. **Complete on the Agent and API boundary:** the existing Leaf v1 outbound
+   HTTPS heartbeat now leases persistent, bounded Sprout, status, power, logs,
+   and safe-delete commands. Secret Seed inputs are encrypted for the paired
+   machine before queueing, stale uncollected commands expire, and Windows
+   delete removes only its exact Dauva-owned port mappings. Browser
+   installation sessions remain an additive PKCE capability; direct private
+   HTTP Leaves remain compatible.
+5. **Implemented in `dauva-leaf` 0.5.0:** the self-contained Windows Service,
    WiX Burn/MSI bootstrapper, elevation, reboot resume, managed Hyper-V runtime,
    private Hyper-V socket, automatic storage selection, PKCE browser handoff,
    readiness return, repair, non-destructive uninstall, and browser return are
-   present. The matching API and Garden handoff endpoints remain owned by their
-   separate integration stream.
+   present. `dauva-api` 2.8.0 implements the matching short-lived installation
+   session, authenticated pending-Leaf selection, administrator approval,
+   PKCE token exchange, machine-key binding, token protection, authenticated
+   heartbeat, capacity observation, and outbound command queue. The Garden
+   page itself remains owned by its separate develop-only UI stream.
 6. **Implemented on the Leaf and distribution boundary:** runtime and stable
    update manifests use an Ed25519 trust root, Windows artifacts require
    Authenticode, active commands drain before update launch, runtime updates
    preserve the data disk, and a failed runtime health probe rolls back the OS
    slot. Publishing the first stable channel waits for step 7.
-7. **Pending release gate:** run the complete signed clean-VM, reboot,
-   browser-pairing, upgrade/rollback, uninstall, and disposable-Seed acceptance
-   contract before advertising Windows installation as ready.
+7. **Acceptance infrastructure implemented; evidence pending:** the release
+   workflow now requires dedicated self-hosted Hyper-V hosts to produce clean
+   Windows 10 and Windows 11 receipts before a draft can publish. The harness
+   creates disposable differencing VMs, proves Hyper-V-off setup and reboot,
+   attaches a blank data disk and proves automatic non-system storage choice,
+   delegates browser approval and disposable Server lifecycle to the separately
+   owned Garden test scripts, checks pre-login recovery, repair, safe uninstall,
+   and state retention, then removes the VM. The immutable clean base images,
+   Garden automation, immutable base images, and final signed receipts remain
+   required before advertising Windows installation as ready. Console,
+   backup/restore, scheduled work, and Seed updates remain later additive
+   outbound command types and are not advertised by Windows v1.
 
-The 0.4.0 implementation has already produced a real x64 runtime image on the
+The 0.4.0 implementation already produced a real x64 runtime image on the
 self-hosted Debian builder from the checksum-pinned Ubuntu 24.04 Azure VHD. The
 build installed and validated Docker and the guest services, converted and
 checked the dynamic VHDX, and verified the final payload and manifest
