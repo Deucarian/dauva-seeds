@@ -1,8 +1,8 @@
 # Dauva native server platform
 
-Status: **Phase 4 control plane complete; Leaf fleet rollout included in this release**
+Status: **Phase 5 Leaf enrollment complete; fleet rollout ready**
 
-Last updated: 2026-07-27
+Last updated: 2026-07-28
 
 This document is the canonical product and architecture design for Dauva's
 native game-server platform. Keep it current when the Seed format, registry,
@@ -334,13 +334,36 @@ or object-storage adapter is configured.
 
 ### Multi-Leaf placement
 
-`PORTAL_LEAVES_JSON` configures a fleet without changing the Portal contract.
-Each entry has an immutable ID, display name, private URL, bearer token, and
-enabled flag. The API rejects unexpected Leaf identities and Registry digests.
-Sprouting selects only a healthy Leaf that advertises every required
-capability and has sufficient memory, disk headroom, and port capacity.
-Existing Server IDs retain their Leaf identity, so later fleet changes cannot
-silently move a Server.
+Retained infrastructure-managed Leaves may still be configured through
+`PORTAL_LEAVES_JSON`. New Leaves use the portal-owned enrollment flow:
+
+1. An administrator names the Leaf and requests a pairing code.
+2. Dauva stores only a SHA-256 digest of the random, 20-minute, single-use code.
+3. The unpaired Agent exposes a small local setup page and no management API.
+4. The Agent claims the code with the private address the control plane should
+   use.
+5. Dauva issues a unique 256-bit bearer credential, stores only an ASP.NET
+   Data Protection-encrypted copy, and marks the code as claimed.
+6. The Agent writes its immutable Leaf ID and token atomically to an
+   owner-readable enrollment file and restarts into paired mode.
+
+Public advertised addresses require HTTPS. Plain HTTP is accepted only for
+loopback, private, link-local, internal DNS, or Tailscale CGNAT addresses.
+This preserves private-network deployments without turning pairing into an
+SSRF primitive.
+
+Portal-managed and configuration-managed Leaves are merged behind one endpoint
+source. A static configuration wins if IDs ever conflict. The API rejects
+unexpected Leaf identities and Registry digests. Sprouting selects only an
+enabled healthy Leaf that advertises every required capability and has
+sufficient memory, disk headroom, and port capacity. Existing Server IDs retain
+their Leaf identity, so fleet changes cannot silently move a Server.
+
+An administrator can rename a portal-managed Leaf or pause it for new Sprouts.
+Pausing does not destroy existing Servers or their ability to receive lifecycle
+commands. Removing a Leaf revokes the stored credential and is refused while
+any managed Server still references that Leaf. Configuration-managed Leaves
+remain read-only in the portal.
 
 ### Seed releases
 
@@ -353,8 +376,10 @@ secret.
 
 TLS termination is not required on the private Compose network. Connections
 that leave a private host or overlay network must use HTTPS or mTLS. Bearer
-authentication is the first single-Leaf transport, not the final multi-Leaf
-enrollment design.
+authentication remains the private transport. Pairing now supplies unique,
+revocable per-Leaf credentials without hand-editing the control-plane
+environment. A later mTLS transport can replace bearer credentials behind the
+same enrollment and endpoint-source boundaries.
 
 ### OCI image registry
 
