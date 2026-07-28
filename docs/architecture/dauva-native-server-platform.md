@@ -1,6 +1,6 @@
 # Dauva native server platform
 
-Status: **Phase 5 Leaf enrollment complete; Phase 6 one-click Windows delivery is next**
+Status: **Phase 5 complete; Phase 6 Windows runtime decision complete and delivery in progress**
 
 Last updated: 2026-07-28
 
@@ -392,42 +392,51 @@ when Dauva observes that Leaf as ready:
    updater, local maintenance entry, managed runtime, and only the required
    firewall or loopback registrations. It resumes automatically after a
    required reboot.
-4. The installer generates an ephemeral PKCE verifier, opens the authenticated
-   Dauva handoff in the system browser, and receives the authorization on a
-   random loopback port. The current Dauva session binds the installer to the
-   pending Leaf. If several pending Leaves exist, the user selects one by its
-   friendly name; no code is shown or copied.
-5. The handoff delivers the existing single-use enrollment claim to the
-   service in memory. The service claims through the versioned Leaf pairing
-   boundary, stores its immutable identity and credential with machine-level
-   protection, and starts normal Agent operation.
+4. The Service generates an ephemeral PKCE verifier in memory and creates an
+   installation session over outbound TLS. The installer opens the
+   authenticated Dauva handoff in the system browser using only a public,
+   non-authorizing correlation ID. The current Dauva session binds the
+   installation session to the pending Leaf. If several pending Leaves exist,
+   the user selects one by its friendly name; no code is shown or copied.
+5. The Service polls the additive handoff boundary using proof of its
+   in-memory verifier. The control plane delivers the single-use enrollment
+   result only to that proven Service session. The Service stores its immutable
+   identity and credential with machine-level protection and starts normal
+   Agent operation.
 6. The installer waits for service health, compatible Registry digest,
    runtime readiness, capacity reporting, authenticated control-plane
    reachability, and Dauva's observed-ready state. It then returns the browser
    to that Leaf in Dauva.
 
-The raw pairing code or Leaf bearer credential must never appear in the
-installer filename, download URL, process arguments, browser history, registry,
-logs, crash reports, or ordinary files. Authorization codes are short-lived,
-single-use, bound to the PKCE challenge and pending Leaf, and safe against
-replay. The existing manual local setup page, headless Linux variables, direct
-private HTTP transport, lifecycle payloads, and bearer authentication remain
-compatible. Installer handoff and reverse transport are additive, versioned
-capabilities behind the same enrollment, endpoint-source, and Branch
+The raw pairing code, PKCE verifier, or Leaf bearer credential must never
+appear in the installer filename, download URL, process arguments, browser
+history, registry, logs, crash reports, or ordinary files. Installation sessions are short-lived,
+single-use, bound to the machine public key, PKCE challenge, and pending Leaf,
+and safe against replay. The public browser correlation ID is not
+authorization. The existing manual local setup page, headless Linux variables,
+direct private HTTP transport, lifecycle payloads, and bearer authentication
+remain compatible. Installer handoff and reverse transport are additive,
+versioned capabilities behind the same enrollment, endpoint-source, and Branch
 boundaries.
 
 #### Windows runtime and connectivity
 
-A Windows service alone cannot run the existing Linux OCI Seeds. The
-installer must therefore own a headless runtime rather than silently requiring
-Docker Desktop or a user-session process. The working target is a
-Dauva-managed WSL 2 distribution containing the reviewed Linux container
-engine and Agent runtime. The installer enables the required Windows features,
-imports the versioned Dauva runtime, handles a required reboot, and proves that
-it starts before user login. A short ADR and clean-VM spike must validate this
-service-account lifecycle before WSL 2 becomes the permanent decision; a
-managed Hyper-V runtime remains the fallback if unattended WSL ownership is not
-reliable enough.
+A Windows service alone cannot run the existing Linux OCI Seeds. The installer
+must therefore own a headless runtime rather than silently requiring Docker
+Desktop or a user-session process. The production target is now a
+Dauva-managed Hyper-V Linux microVM containing the reviewed container engine.
+The installer enables the required Windows feature, deploys the signed and
+versioned runtime image to the selected data volume, handles a required reboot,
+and proves that the VM starts before user login.
+
+WSL 2 was rejected by the hard service-ownership gate on 2026-07-28. The same
+checksum-verified runtime and pinned Seed worked under the interactive user,
+but Windows returned `Wsl/WSL_E_LOCAL_SYSTEM_NOT_SUPPORTED` when the proof ran
+under the actual LocalSystem service identity. LocalService and NetworkService
+also failed to provide a viable unattended WSL execution identity. Dauva will
+not create a password-bearing pseudo-user or depend on an interactive login to
+work around that platform boundary. WSL remains useful for development, not
+the Windows Leaf production runtime.
 
 Remote Windows Leaves must not require inbound NAT, router changes, public
 ports, Tailscale installation, or a permanent unauthenticated listener. The
@@ -446,9 +455,9 @@ Portal, Seed, Server, or lifecycle contracts.
 #### Windows service, storage, updates, and removal
 
 The installer uses a per-machine Windows Installer package inside a signed WiX
-Burn bootstrapper. The Agent is a self-contained .NET Windows Service with
-automatic delayed start and service-recovery policy. Immutable binaries live
-below `%ProgramFiles%\Dauva\Leaf`; protected machine state, logs, staged
+Burn bootstrapper. The existing restricted Go Agent is a self-contained
+Windows Service with automatic start and service-recovery policy. Immutable
+binaries live below `%ProgramFiles%\Dauva\Leaf`; protected machine state, logs, staged
 updates, and enrollment live below `%ProgramData%\Dauva\Leaf`. The service
 runs under the least-privileged dedicated identity that can own its runtime;
 LocalSystem is not the default Agent identity and any privileged helper has a
@@ -488,7 +497,7 @@ leave recoverable data but must state exactly what remains.
 The Windows deliverable is not complete until an automated clean-VM matrix
 proves all of the following on supported Windows 10 and Windows 11 x64 builds:
 
-- a machine with no Agent, WSL distribution, Docker Desktop, container engine,
+- a machine with no Agent, Hyper-V Leaf VM, Docker Desktop, container engine,
   or development tools can complete installation through UAC and any required
   reboot without instructions or commands;
 - authenticated browser handoff pairs the intended Leaf without displaying or
@@ -961,16 +970,18 @@ Live acceptance evidence:
 - Linux Agents retain both the local setup page and headless enrollment
   variables.
 
-### Phase 6: one-click Windows Leaf delivery — next
+### Phase 6: one-click Windows Leaf delivery — in progress
 
-1. Create `Deucarian/dauva-leaf` and move Agent ownership there without
-   changing the versioned Leaf operation contracts.
-2. Record ADRs for the Windows runtime, service identity, outbound transport,
-   storage-volume selection, installer/update technology, and signing trust.
-3. Prove on a clean Windows VM that a service-owned WSL 2 runtime can install,
-   survive reboot, start before login, retain its VHD on the selected data
-   volume, and run one pinned Seed. Choose the managed Hyper-V fallback if that
-   proof fails.
+1. **Complete:** `Deucarian/dauva-leaf` owns the Agent without changing the
+   versioned Leaf operation contracts.
+2. **Complete for the first slice:** ADRs and executable proofs cover the
+   Windows Service, WSL rejection, Hyper-V decision, storage-volume selection,
+   WiX installer, and signing gate.
+3. **Complete decision gate:** a checksum-verified WSL 2 runtime on the
+   selected data volume reached Dauva and ran one pinned Seed as a user, then
+   failed explicitly under LocalSystem. Managed Hyper-V is selected. The next
+   runtime proof must deploy its VHD, survive reboot, start before login, and
+   run the same pinned Seed.
 4. Add the outbound TLS `ILeafTransport` while retaining direct private HTTP
    for every existing Leaf.
 5. Build the self-contained Windows Service and signed WiX Burn/MSI installer
@@ -1019,8 +1030,10 @@ These are the current working decisions and should change only deliberately:
 16. Windows Leaves use additive outbound TLS transport so the default install
     requires no inbound port or network expertise. Existing direct HTTP Leaves
     remain supported.
-17. The working Windows runtime target is a Dauva-managed WSL 2 distribution,
-    subject to a clean-VM service-lifecycle proof before it becomes permanent.
+17. The Windows runtime target is a Dauva-managed Hyper-V Linux microVM. WSL 2
+    is rejected for production because Windows does not support running it as
+    LocalSystem and built-in service identities did not provide a viable
+    unattended alternative.
 18. Windows binaries and large Server data have separate roots. Dauva selects
     a suitable fixed data volume automatically and preserves a free-space
     reserve.
@@ -1035,10 +1048,8 @@ These are the current working decisions and should change only deliberately:
   artifacts?
 - Which file-management capability is actually required after logs, backups,
   and configuration editing exist in Dauva?
-- Can a service-owned WSL 2 distribution reliably start before user login,
-  resume across Windows servicing reboots, and retain predictable networking
-  on every supported Windows build, or must the first installer use a managed
-  Hyper-V runtime?
+- Which Windows editions enter the first Hyper-V support matrix, and does
+  Windows Home wait for a later replaceable runtime provider?
 - Which Authenticode certificate custody and release-signing service should
   back stable Windows distribution without placing exportable signing keys on
   a general-purpose runner?
