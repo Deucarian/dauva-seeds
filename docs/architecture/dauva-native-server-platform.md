@@ -102,8 +102,17 @@ perspective of a first-time, non-technical administrator.
 
 ## Product language
 
+Dauva's canonical non-technical flow is:
+
+> Kies in de Garden een Seed uit een Pod en Sprout daarmee een Server op een Leaf.
+
+This sentence defines the user-facing hierarchy and must remain the basis for
+Portal copy, onboarding, documentation, and future lifecycle features. Branch
+is an internal execution concept and must not be presented as a game.
+
 | Term | Meaning |
 | --- | --- |
+| Garden | One complete Dauva-managed environment containing its Seed Library, Leaves, Servers, policies, and operations. |
 | Seed Library | The catalog administrators see in Dauva. |
 | Seed Registry | The versioned technical source behind the Seed Library. |
 | Pod | One game family containing related Server variants, such as Minecraft. |
