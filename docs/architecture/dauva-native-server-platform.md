@@ -104,11 +104,15 @@ perspective of a first-time, non-technical administrator.
 
 Dauva's canonical non-technical flow is:
 
-> Kies in de Garden een Seed uit een Pod en Sprout daarmee een Server op een Leaf.
+> Kies in de Garden een Seed uit een Pod en Sprout daarmee een Server. Dauva
+> kiest automatisch een geschikte Leaf waarop die Server draait.
 
 This sentence defines the user-facing hierarchy and must remain the basis for
 Portal copy, onboarding, documentation, and future lifecycle features. Branch
-is an internal execution concept and must not be presented as a game.
+is an internal execution concept and must not be presented as a game. Sprouting
+happens in the Garden; Leaf placement is a technical decision that Dauva makes
+automatically by default. Advanced administrators may select a Leaf explicitly
+when placement control is relevant.
 
 | Term | Meaning |
 | --- | --- |
