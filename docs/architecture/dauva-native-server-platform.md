@@ -1004,7 +1004,7 @@ Live acceptance evidence:
    delete removes only its exact Dauva-owned port mappings. Browser
    installation sessions remain an additive PKCE capability; direct private
    HTTP Leaves remain compatible.
-5. **Implemented in `dauva-leaf` 0.5.0:** the self-contained Windows Service,
+5. **Implemented in `dauva-leaf` 0.5.1:** the self-contained Windows Service,
    WiX Burn/MSI bootstrapper, elevation, reboot resume, managed Hyper-V runtime,
    private Hyper-V socket, automatic storage selection, PKCE browser handoff,
    readiness return, repair, non-destructive uninstall, and browser return are
@@ -1019,15 +1019,20 @@ Live acceptance evidence:
    preserve the data disk, and a failed runtime health probe rolls back the OS
    slot. Publishing the first stable channel waits for step 7.
 7. **Acceptance infrastructure implemented; evidence pending:** the release
-   workflow now requires dedicated self-hosted Hyper-V hosts to produce clean
+   workflow now requires a dedicated self-hosted Hyper-V host to produce clean
    Windows 10 and Windows 11 receipts before a draft can publish. The harness
    creates disposable differencing VMs, proves Hyper-V-off setup and reboot,
    attaches a blank data disk and proves automatic non-system storage choice,
    delegates browser approval and disposable Server lifecycle to the separately
    owned Garden test scripts, checks pre-login recovery, repair, safe uninstall,
-   and state retention, then removes the VM. The immutable clean base images,
-   Garden automation, immutable base images, and final signed receipts remain
-   required before advertising Windows installation as ready. Console,
+   and state retention, then removes the VM. The host bootstrap pins and
+   checksum-verifies the official Actions Runner, confines all VHDX and work
+   data to a non-system volume, and uses a dedicated non-admin service identity
+   that belongs only to Hyper-V Administrators. Every clean base is detached,
+   read-only, and SHA-256 verified before use. The clean Windows Pro base
+   images, Garden automation, isolated guest credential, publicly trusted
+   Authenticode certificate, and final signed receipts remain required before
+   advertising Windows installation as ready. Console,
    backup/restore, scheduled work, and Seed updates remain later additive
    outbound command types and are not advertised by Windows v1.
 
