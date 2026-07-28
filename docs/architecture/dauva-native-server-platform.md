@@ -2,7 +2,7 @@
 
 Status: **Phase 5 complete; Phase 6 Leaf delivery implemented and end-to-end acceptance in progress**
 
-Last updated: 2026-07-28
+Last updated: 2026-07-29
 
 This document is the canonical product and architecture design for Dauva's
 native game-server platform. Keep it current when the Seed format, registry,
@@ -126,6 +126,7 @@ when placement control is relevant.
 | Branch | A replaceable runtime provider used by the Dauva control plane. |
 | Leaf | A machine that can host Servers. |
 | Leaf Agent | The restricted Dauva service that manages runtime resources on a Leaf. |
+| Leaf Provisioner | An internal provider-neutral adapter that obtains and enrolls a local or hosted Leaf; normally hidden behind a simple hosting choice. |
 | Withered | A failed Sprouting operation or inactive runtime condition, made explicit by accompanying text. |
 
 A Pod is catalog metadata, not a running workload or genre. Genres are Seed
@@ -223,9 +224,12 @@ flowchart LR
     Portal["Dauva Portal<br/>Seed Library"] --> API["Dauva API<br/>Control plane"]
     Registry["Dauva Seed Registry<br/>Pods and versioned Seeds"] --> API
     API --> Database["Desired state, instances,<br/>agreements and audit"]
-    API --> AgentA["Dauva Leaf Agent A"]
-    API --> AgentB["Dauva Leaf Agent B"]
-    Distribution["Dauva Leaf distribution<br/>signed installers and updates"] --> AgentB
+    API --> Provisioners["Leaf Provisioners<br/>local handoff and hosting APIs"]
+    Provisioners -. "create and enroll" .-> AgentB["Hosted Linux Leaf Agent"]
+    API --> AgentA["Local Linux or Windows Leaf Agent"]
+    API --> AgentB
+    Distribution["Dauva Leaf distribution<br/>signed installers and updates"] --> AgentA
+    Distribution --> AgentB
     AgentA --> RuntimeA["Container runtime"]
     AgentB --> RuntimeB["Container runtime"]
     AgentA --> Data["Active Server storage"]
@@ -381,6 +385,74 @@ Pausing does not destroy existing Servers or their ability to receive lifecycle
 commands. Removing a Leaf revokes the stored credential and is refused while
 any managed Server still references that Leaf. Configuration-managed Leaves
 remain read-only in the portal.
+
+### Local and externally hosted Leaves
+
+Local and external hosting share one Server model. A Seed declares required
+capabilities, resources, ports, storage, and agreements; it never embeds a
+hosting-company plan, region, account, host path, or provider credential. Once
+enrolled, every machine is an ordinary Leaf and participates in the same
+capacity reporting, placement, lifecycle, update, backup, restore, scheduling,
+and safe-removal contracts.
+
+The default Sprout flow may offer three hosting intentions without exposing
+infrastructure terminology:
+
+1. **Automatic (recommended):** reuse the best compatible healthy Leaf or,
+   when the administrator has enabled paid hosting, offer an exact hosted plan
+   when no suitable capacity exists.
+2. **My own device:** use an existing local Leaf or guide the administrator
+   through the signed one-click Windows or Linux installation flow.
+3. **Dauva Hosting:** provision and enroll a suitable external Leaf through a
+   configured hosting provider. An advanced administrator may later connect
+   their own supported cloud account through the same boundary.
+
+Automatic placement never creates billable infrastructure silently. Dauva
+must show the region, recurring price, included resources, storage, and
+provider before the administrator authorizes the first paid Leaf or a resize.
+After that authorization, the ordinary Server flow remains provider-neutral.
+
+The control plane owns an `ILeafProvisioner`-style contract separate from the
+Branch contract. A Leaf Provisioner can:
+
+- list supported regions, plans, capabilities, availability, and exact quotes;
+- create, inspect, resize, stop, start, and explicitly delete compute;
+- attach suitable persistent storage and configure the required network edge;
+- bootstrap a checksum-verified Leaf Agent through the provider's protected
+  initialization channel;
+- exchange the one-time bootstrap claim for normal outbound-TLS Leaf
+  enrollment without exposing SSH or a copied pairing code;
+- tag every resource with immutable Garden and Leaf ownership identifiers;
+- reconcile provider state and report actionable failures without leaking
+  provider-specific responses into the Server API.
+
+The local provisioner does not create infrastructure. It creates the pending
+Leaf handoff consumed by the signed installer and considers provisioning
+complete only after the authenticated Agent heartbeat proves readiness. The
+first external provisioner should create a Linux Leaf because the Agent can run
+the container Branch natively there. The provider owns its physical hardware,
+power, network, and hypervisor; Dauva owns Agent installation and everything
+above it. Managed Hyper-V remains only the Windows Leaf runtime implementation
+and is never an external-hosting or Seed requirement.
+
+Deleting a Server deletes only that Server. It never cancels or deletes its
+Leaf. Deleting a provider-managed Leaf is a separate typed-confirmation action,
+is refused while Servers still reference the Leaf, and checks backup policy
+before removing provider storage. Idle-host shutdown or deletion may later be
+policy-driven, but paid-resource consequences must stay visible.
+
+Portable backup and transactional restore provide the supported move path
+between local and hosted Leaves. Dauva can restore a Server onto another
+compatible Leaf, verify readiness, switch its desired placement, and only then
+remove the old instance. Live migration and automatic high availability remain
+separate later features.
+
+Every external provider receives its own disposable acceptance lane. That lane
+must prove create, Agent bootstrap, enrollment, Sprout, restart, backup,
+restore, Server delete, Leaf delete, orphan cleanup, quota failure, and
+idempotent retry. The clean Windows VM lane independently proves the local
+one-click Windows path; neither acceptance environment changes the
+provider-neutral user experience.
 
 ### One-click Windows Leaf installation
 
@@ -1043,6 +1115,27 @@ checked the dynamic VHDX, and verified the final payload and manifest
 checksums. This proves the image factory; it does not replace the clean Windows
 VM and end-to-end control-plane release gate.
 
+### Phase 7: portable local and external hosting — planned
+
+1. Define and version the provider-neutral Leaf Provisioner contract without
+   changing Seed or Server lifecycle contracts.
+2. Add the simple **Automatic**, **My own device**, and **Dauva Hosting**
+   intentions while keeping Leaf selection out of the default Sprout form.
+3. Implement one sandboxed external Linux provisioner with region, plan,
+   quote, storage, network, bootstrap, enrollment, health, resize, and explicit
+   deletion support.
+4. Require an administrator-visible quote before any billable resource is
+   created or enlarged; store provider credentials only in protected
+   control-plane infrastructure.
+5. Extend placement so it can reuse capacity or propose new hosted capacity
+   without binding a Seed to a provider.
+6. Add portable backup/restore movement between compatible local and hosted
+   Leaves, with readiness proof before retiring the source instance.
+7. Add disposable provider acceptance for success, retries, quota failures,
+   orphan cleanup, backup safety, and exact resource deletion.
+8. Add further hosting providers and bring-your-own-cloud accounts only after
+   the first adapter proves the common contract.
+
 ## Initial decisions
 
 These are the current working decisions and should change only deliberately:
@@ -1090,9 +1183,27 @@ These are the current working decisions and should change only deliberately:
     reserve.
 19. Uninstall is non-destructive by default and cannot erase active Server
     data as a side effect of removing Agent software.
+20. Hyper-V is only the managed runtime for a local Windows Leaf. It is not a
+    Seed requirement, a hosted-Leaf requirement, or the Dauva hosting model.
+21. External hosting provisions ordinary Leaves through a provider-neutral
+    Leaf Provisioner; game lifecycle continues through the existing Leaf Agent
+    and Branch contracts.
+22. A Seed and Server remain portable across compatible local and hosted
+    Leaves and never contain provider plan IDs, regions, credentials, or host
+    paths.
+23. Dauva never creates or enlarges billable infrastructure without an exact
+    administrator-visible quote and authorization.
+24. Server deletion and Leaf deletion remain separate operations. A Leaf with
+    referenced Servers cannot be deleted.
+25. Backup and transactional restore are the first supported movement
+    mechanism between Leaves; live migration is not implied.
 
 ## Open design questions
 
+- Which infrastructure provider, launch region, billing relationship, and
+  storage product should prove the first external Linux Leaf adapter?
+- Does the first hosted release expose only Dauva-managed billing, or also one
+  bring-your-own-cloud account after the common provisioner contract is proven?
 - Which remote backup target should follow the local backup root: NAS or
   S3-compatible object storage?
 - When should Git-compiled Seed bundles also be published as signed OCI
