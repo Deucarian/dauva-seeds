@@ -514,7 +514,8 @@ proves all of the following on supported Windows 10 and Windows 11 x64 builds:
 - uninstall with an active Server is non-destructive, while empty-Leaf
   uninstall revokes credentials and removes installer-owned software;
 - a disposable proven Seed can Sprout, report healthy, stop, restart, preserve
-  data, back up, and delete through the unchanged Dauva lifecycle contract.
+  data, expose bounded logs, and delete through the additive outbound Dauva
+  lifecycle contract.
 
 ### Seed releases
 
