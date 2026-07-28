@@ -1,6 +1,6 @@
 # Dauva native server platform
 
-Status: **Phase 5 complete; Phase 6 Windows runtime decision complete and delivery in progress**
+Status: **Phase 5 complete; Phase 6 Leaf delivery implemented and end-to-end acceptance in progress**
 
 Last updated: 2026-07-28
 
@@ -457,21 +457,22 @@ Portal, Seed, Server, or lifecycle contracts.
 The installer uses a per-machine Windows Installer package inside a signed WiX
 Burn bootstrapper. The existing restricted Go Agent is a self-contained
 Windows Service with automatic start and service-recovery policy. Immutable
-binaries live below `%ProgramFiles%\Dauva\Leaf`; protected machine state, logs, staged
-updates, and enrollment live below `%ProgramData%\Dauva\Leaf`. The service
-runs under the least-privileged dedicated identity that can own its runtime;
-LocalSystem is not the default Agent identity and any privileged helper has a
-small, authenticated, declarative local contract rather than arbitrary command
-execution.
+binaries live below `%ProgramFiles%\Dauva\Leaf`; protected machine state, logs,
+staged updates, and enrollment live below `%ProgramData%\Dauva\Leaf`. The
+service runs as LocalSystem because it owns machine-wide Hyper-V, NAT, and
+firewall resources before any user logs in. Its privileged surface remains a
+small declarative runtime-manager contract plus the private host/guest socket;
+it does not expose arbitrary command execution or a public management listener.
 
 Large runtime and Server data do not default to the operating-system or user
 profile directory. Setup automatically selects the eligible fixed local volume
-with sufficient free space while preserving Dauva's reserve, explains the
-choice in ordinary language, and keeps an optional advanced **Change**
-action. The managed runtime VHD, image cache, active Server volumes, and local
-restore points use separate logical roots so retention, migration, repair, and
-uninstall cannot confuse them. Network, removable, BitLocker-locked, and
-unsupported filesystems are not selected silently.
+with the most safe free space while preserving Dauva's reserve. A future
+maintenance flow may expose an advanced **Change storage** action, but storage
+knowledge is never required for the default installation. The managed runtime
+VHD, image cache, active Server volumes, and local restore points use separate
+logical roots so retention, migration, repair, and uninstall cannot confuse
+them. Network, removable, BitLocker-locked, and unsupported filesystems are not
+selected silently.
 
 The distribution layer publishes immutable stable and candidate channels with
 version, compatibility range, source commit, length, SHA-256, signer identity,
@@ -970,7 +971,7 @@ Live acceptance evidence:
 - Linux Agents retain both the local setup page and headless enrollment
   variables.
 
-### Phase 6: one-click Windows Leaf delivery — in progress
+### Phase 6: one-click Windows Leaf delivery — acceptance in progress
 
 1. **Complete:** `Deucarian/dauva-leaf` owns the Agent without changing the
    versioned Leaf operation contracts.
@@ -982,15 +983,31 @@ Live acceptance evidence:
    failed explicitly under LocalSystem. Managed Hyper-V is selected. The next
    runtime proof must deploy its VHD, survive reboot, start before login, and
    run the same pinned Seed.
-4. Add the outbound TLS `ILeafTransport` while retaining direct private HTTP
-   for every existing Leaf.
-5. Build the self-contained Windows Service and signed WiX Burn/MSI installer
-   with elevation, reboot resume, PKCE browser handoff, automatic pairing,
-   readiness return, repair, and safe uninstall.
-6. Publish signed stable/candidate manifests and implement staged,
-   health-checked update with rollback.
-7. Run the complete clean-VM and disposable-Seed acceptance contract before
-   advertising Windows installation as ready.
+4. **Complete on the Agent boundary:** the existing Leaf v1 outbound HTTPS
+   heartbeat and command contract remains unchanged. Browser installation
+   sessions are an additive PKCE capability; direct private HTTP Leaves remain
+   compatible.
+5. **Implemented in `dauva-leaf` 0.4.0:** the self-contained Windows Service,
+   WiX Burn/MSI bootstrapper, elevation, reboot resume, managed Hyper-V runtime,
+   private Hyper-V socket, automatic storage selection, PKCE browser handoff,
+   readiness return, repair, non-destructive uninstall, and browser return are
+   present. The matching API and Garden handoff endpoints remain owned by their
+   separate integration stream.
+6. **Implemented on the Leaf and distribution boundary:** runtime and stable
+   update manifests use an Ed25519 trust root, Windows artifacts require
+   Authenticode, active commands drain before update launch, runtime updates
+   preserve the data disk, and a failed runtime health probe rolls back the OS
+   slot. Publishing the first stable channel waits for step 7.
+7. **Pending release gate:** run the complete signed clean-VM, reboot,
+   browser-pairing, upgrade/rollback, uninstall, and disposable-Seed acceptance
+   contract before advertising Windows installation as ready.
+
+The 0.4.0 implementation has already produced a real x64 runtime image on the
+self-hosted Debian builder from the checksum-pinned Ubuntu 24.04 Azure VHD. The
+build installed and validated Docker and the guest services, converted and
+checked the dynamic VHDX, and verified the final payload and manifest
+checksums. This proves the image factory; it does not replace the clean Windows
+VM and end-to-end control-plane release gate.
 
 ## Initial decisions
 
