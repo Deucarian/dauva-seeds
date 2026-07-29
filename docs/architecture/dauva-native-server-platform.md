@@ -45,6 +45,41 @@ backup or object storage.
   a Leaf without a README, archive extraction, shell, command, manually copied
   pairing code, separately installed container runtime, or port forwarding.
 
+## Product ownership and open ecosystem policy
+
+The working policy is:
+
+> Keep the Dauva product code private for now, make the ecosystem boundaries
+> open, and sign official builds as Deucarian.
+
+This separates extensibility from ownership. Published, versioned contracts
+may let third parties build compatible Seeds, integrations, Leaf
+implementations, or hosting adapters without making the complete Garden,
+control plane, official Registry, distribution infrastructure, or managed
+hosting stack open source.
+
+- Dauva product source remains private and proprietary unless Deucarian makes
+  a deliberate, component-specific licensing decision.
+- Seed, Leaf, Registry, and provisioner boundaries should be documented well
+  enough for safe external implementations. An open contract does not by
+  itself grant a license to Dauva's implementation.
+- The official Seed Registry remains curated and governed by Deucarian.
+  Community or third-party content can be supported through explicit trust,
+  validation, proof, and signing boundaries.
+- Official Agents, installers, updates, Registry releases, and other
+  distributed artifacts are signed as Deucarian. Signing keys, official
+  update channels, and the right to present a build as official remain under
+  Deucarian's control.
+- Compatible forks or integrations must not imply that they are official
+  Dauva products or reuse Deucarian identity, signatures, or update channels
+  without permission.
+- Managed hosting, certified content, automation, backups, support, and
+  organization features can remain commercial product value even where an
+  ecosystem contract is publicly documented.
+- Publishing source code is treated as an intentional product, licensing,
+  trademark, and security decision. It is never an accidental requirement of
+  code signing or ecosystem extensibility.
+
 ## Non-technical product contract
 
 Adding a Server is a guided product flow, not an infrastructure form. The
@@ -381,469 +416,7 @@ sufficient memory, disk headroom, and port capacity. Existing Server IDs retain
 their Leaf identity, so fleet changes cannot silently move a Server.
 
 An administrator can rename a portal-managed Leaf or pause it for new Sprouts.
-Pausing does not destroy existing Servers or their ability to receive lifecycle
-commands. Removing a Leaf revokes the stored credential and is refused while
-any managed Server still references that Leaf. Configuration-managed Leaves
-remain read-only in the portal.
-
-### Local and externally hosted Leaves
-
-Local and external hosting share one Server model. A Seed declares required
-capabilities, resources, ports, storage, and agreements; it never embeds a
-hosting-company plan, region, account, host path, or provider credential. Once
-enrolled, every machine is an ordinary Leaf and participates in the same
-capacity reporting, placement, lifecycle, update, backup, restore, scheduling,
-and safe-removal contracts.
-
-The default Sprout flow may offer three hosting intentions without exposing
-infrastructure terminology:
-
-1. **Automatic (recommended):** reuse the best compatible healthy Leaf or,
-   when the administrator has enabled paid hosting, offer an exact hosted plan
-   when no suitable capacity exists.
-2. **My own device:** use an existing local Leaf or guide the administrator
-   through the signed one-click Windows or Linux installation flow.
-3. **Dauva Hosting:** provision and enroll a suitable external Leaf through a
-   configured hosting provider. An advanced administrator may later connect
-   their own supported cloud account through the same boundary.
-
-Automatic placement never creates billable infrastructure silently. Dauva
-must show the region, recurring price, included resources, storage, and
-provider before the administrator authorizes the first paid Leaf or a resize.
-After that authorization, the ordinary Server flow remains provider-neutral.
-
-The control plane owns an `ILeafProvisioner`-style contract separate from the
-Branch contract. A Leaf Provisioner can:
-
-- list supported regions, plans, capabilities, availability, and exact quotes;
-- create, inspect, resize, stop, start, and explicitly delete compute;
-- attach suitable persistent storage and configure the required network edge;
-- bootstrap a checksum-verified Leaf Agent through the provider's protected
-  initialization channel;
-- exchange the one-time bootstrap claim for normal outbound-TLS Leaf
-  enrollment without exposing SSH or a copied pairing code;
-- tag every resource with immutable Garden and Leaf ownership identifiers;
-- reconcile provider state and report actionable failures without leaking
-  provider-specific responses into the Server API.
-
-The local provisioner does not create infrastructure. It creates the pending
-Leaf handoff consumed by the signed installer and considers provisioning
-complete only after the authenticated Agent heartbeat proves readiness. The
-first external provisioner should create a Linux Leaf because the Agent can run
-the container Branch natively there. The provider owns its physical hardware,
-power, network, and hypervisor; Dauva owns Agent installation and everything
-above it. Managed Hyper-V remains only the Windows Leaf runtime implementation
-and is never an external-hosting or Seed requirement.
-
-Deleting a Server deletes only that Server. It never cancels or deletes its
-Leaf. Deleting a provider-managed Leaf is a separate typed-confirmation action,
-is refused while Servers still reference the Leaf, and checks backup policy
-before removing provider storage. Idle-host shutdown or deletion may later be
-policy-driven, but paid-resource consequences must stay visible.
-
-Portable backup and transactional restore provide the supported move path
-between local and hosted Leaves. Dauva can restore a Server onto another
-compatible Leaf, verify readiness, switch its desired placement, and only then
-remove the old instance. Live migration and automatic high availability remain
-separate later features.
-
-Every external provider receives its own disposable acceptance lane. That lane
-must prove create, Agent bootstrap, enrollment, Sprout, restart, backup,
-restore, Server delete, Leaf delete, orphan cleanup, quota failure, and
-idempotent retry. The clean Windows VM lane independently proves the local
-one-click Windows path; neither acceptance environment changes the
-provider-neutral user experience.
-
-### One-click Windows Leaf installation
-
-Windows installation is a product flow, not an operator deployment guide. Its
-implementation belongs in the dedicated private `Deucarian/dauva-leaf`
-repository and the Dauva infrastructure/distribution layer. The Garden
-integration consumes the resulting installer and handoff contracts in its
-separate develop-only UI stream; this phase does not redesign or directly
-change that UI.
-
-The supported path starts from a pending Leaf created in Dauva and ends only
-when Dauva observes that Leaf as ready:
-
-1. The administrator chooses the Windows installation action for the pending
-   Leaf and downloads a generic Authenticode-signed
-   `DauvaLeafSetup.exe`.
-2. The user starts the installer and accepts the unavoidable Windows UAC
-   prompt. A browser security prompt or a Windows reboot is acceptable when
-   the operating system requires it; instructions, commands, prerequisites,
-   and copied codes are not.
-3. The bootstrapper installs a self-contained Dauva Leaf Windows Service,
-   updater, local maintenance entry, managed runtime, and only the required
-   firewall or loopback registrations. It resumes automatically after a
-   required reboot.
-4. The Service generates an ephemeral PKCE verifier in memory and creates an
-   installation session over outbound TLS. The installer opens the
-   authenticated Dauva handoff in the system browser using only a public,
-   non-authorizing correlation ID. The current Dauva session binds the
-   installation session to the pending Leaf. If several pending Leaves exist,
-   the user selects one by its friendly name; no code is shown or copied.
-5. The Service polls the additive handoff boundary using proof of its
-   in-memory verifier. The control plane delivers the single-use enrollment
-   result only to that proven Service session. The Service stores its immutable
-   identity and credential with machine-level protection and starts normal
-   Agent operation.
-6. The installer waits for service health, compatible Registry digest,
-   runtime readiness, capacity reporting, authenticated control-plane
-   reachability, and Dauva's observed-ready state. It then returns the browser
-   to that Leaf in Dauva.
-
-The raw pairing code, PKCE verifier, or Leaf bearer credential must never
-appear in the installer filename, download URL, process arguments, browser
-history, registry, logs, crash reports, or ordinary files. Installation sessions are short-lived,
-single-use, bound to the machine public key, PKCE challenge, and pending Leaf,
-and safe against replay. The public browser correlation ID is not
-authorization. The existing manual local setup page, headless Linux variables,
-direct private HTTP transport, lifecycle payloads, and bearer authentication
-remain compatible. Installer handoff and reverse transport are additive,
-versioned capabilities behind the same enrollment, endpoint-source, and Branch
-boundaries.
-
-#### Windows runtime and connectivity
-
-A Windows service alone cannot run the existing Linux OCI Seeds. The installer
-must therefore own a headless runtime rather than silently requiring Docker
-Desktop or a user-session process. The production target is now a
-Dauva-managed Hyper-V Linux microVM containing the reviewed container engine.
-The installer enables the required Windows feature, deploys the signed and
-versioned runtime image to the selected data volume, handles a required reboot,
-and proves that the VM starts before user login.
-
-WSL 2 was rejected by the hard service-ownership gate on 2026-07-28. The same
-checksum-verified runtime and pinned Seed worked under the interactive user,
-but Windows returned `Wsl/WSL_E_LOCAL_SYSTEM_NOT_SUPPORTED` when the proof ran
-under the actual LocalSystem service identity. LocalService and NetworkService
-also failed to provide a viable unattended WSL execution identity. Dauva will
-not create a password-bearing pseudo-user or depend on an interactive login to
-work around that platform boundary. WSL remains useful for development, not
-the Windows Leaf production runtime.
-
-Remote Windows Leaves must not require inbound NAT, router changes, public
-ports, Tailscale installation, or a permanent unauthenticated listener. The
-Windows Agent establishes an outbound authenticated TLS session to Dauva over
-ordinary port 443. A new `ILeafTransport` boundary routes the unchanged,
-idempotent Leaf operation contracts through either:
-
-- the existing control-plane-initiated private HTTP transport; or
-- the outbound Windows session with correlation IDs, bounded payloads,
-  cancellation, timeouts, and reconnect-safe operation replay.
-
-The first outbound session may use the unique enrolled bearer credential over
-TLS. The transport must remain replaceable by per-Leaf mTLS without changing
-Portal, Seed, Server, or lifecycle contracts.
-
-#### Windows service, storage, updates, and removal
-
-The installer uses a per-machine Windows Installer package inside a signed WiX
-Burn bootstrapper. The existing restricted Go Agent is a self-contained
-Windows Service with automatic start and service-recovery policy. Immutable
-binaries live below `%ProgramFiles%\Dauva\Leaf`; protected machine state, logs,
-staged updates, and enrollment live below `%ProgramData%\Dauva\Leaf`. The
-service runs as LocalSystem because it owns machine-wide Hyper-V, NAT, and
-firewall resources before any user logs in. Its privileged surface remains a
-small declarative runtime-manager contract plus the private host/guest socket;
-it does not expose arbitrary command execution or a public management listener.
-
-Large runtime and Server data do not default to the operating-system or user
-profile directory. Setup automatically selects the eligible fixed local volume
-with the most safe free space while preserving Dauva's reserve. A future
-maintenance flow may expose an advanced **Change storage** action, but storage
-knowledge is never required for the default installation. The managed runtime
-VHD, image cache, active Server volumes, and local restore points use separate
-logical roots so retention, migration, repair, and uninstall cannot confuse
-them. Network, removable, BitLocker-locked, and unsupported filesystems are not
-selected silently.
-
-The distribution layer publishes immutable stable and candidate channels with
-version, compatibility range, source commit, length, SHA-256, signer identity,
-release notes, and rollback metadata. The bootstrapper, MSI, service, updater,
-runtime payload, and channel manifest are signed. The updater stages downloads,
-verifies both the manifest and Authenticode chain, waits for active operations
-to drain, replaces binaries atomically, restarts the service, and rolls back
-when the new version cannot become healthy. An update cannot silently cross an
-incompatible Leaf protocol or runtime-storage migration boundary.
-
-Windows **Installed apps** provides change, repair, update, and uninstall.
-Uninstall stops and removes the service, updater, protocol/loopback
-registration, and installer-owned runtime only after it is safe. It revokes
-the Leaf credential when the control plane is reachable. If managed Servers
-remain, destructive runtime removal is blocked and the maintenance flow opens
-that Leaf in Dauva so the Servers can be moved or deleted. Server data and
-backups are retained by default; deleting them remains a separate,
-name-confirmed Dauva lifecycle action. An offline forced software removal may
-leave recoverable data but must state exactly what remains.
-
-#### Windows acceptance contract
-
-The Windows deliverable is not complete until an automated clean-VM matrix
-proves all of the following on supported Windows 10 and Windows 11 x64 builds:
-
-- a machine with no Agent, Hyper-V Leaf VM, Docker Desktop, container engine,
-  or development tools can complete installation through UAC and any required
-  reboot without instructions or commands;
-- authenticated browser handoff pairs the intended Leaf without displaying or
-  copying a pairing code and rejects replay, stale authorization, wrong-user,
-  and wrong-Leaf attempts;
-- the service starts before login, survives reboot, reconnects outbound through
-  ordinary HTTPS, and returns Dauva to an observed-ready Leaf;
-- install, repair, same-version repair, upgrade, interrupted upgrade, automatic
-  rollback, and uninstall pass with signed production-shaped artifacts;
-- credentials and authorization material are absent from URLs, arguments,
-  logs, registry values, crash output, and unprotected files;
-- storage selection and free-space reserve protect the Windows system volume;
-- uninstall with an active Server is non-destructive, while empty-Leaf
-  uninstall revokes credentials and removes installer-owned software;
-- a disposable proven Seed can Sprout, report healthy, stop, restart, preserve
-  data, expose bounded logs, and delete through the additive outbound Dauva
-  lifecycle contract.
-
-### Seed releases
-
-The Registry keeps the current stable Seed plus immutable historical releases.
-Preparing a new candidate archives the previous stable manifest before it can
-be replaced. Rollback accepts only a historical manifest whose ID, version, and
-digest match the recorded deployment. The optional `console` contract is
-validated against an existing component, private TCP RCON port, and declared
-secret.
-
-TLS termination is not required on the private Compose network. Connections
-that leave a private host or overlay network must use HTTPS or mTLS. Bearer
-authentication remains the private transport. Pairing now supplies unique,
-revocable per-Leaf credentials without hand-editing the control-plane
-environment. A later mTLS transport can replace bearer credentials behind the
-same enrollment and endpoint-source boundaries.
-
-### OCI image registry
-
-Seeds reference images by immutable digest. Mutable tags such as `latest` and
-`stable` can be shown as channels but cannot be the stored runtime identity.
-
-Game binaries should not automatically be baked into very large images.
-SteamCMD-based Seeds may use a small trusted runtime image and install game
-content into persistent Leaf storage on first Sprouting. A Leaf-local download
-cache can be added later.
-
-## Seed v1 requirements
-
-A Seed v1 manifest must be declarative and contain at least:
-
-- `schemaVersion`;
-- immutable Seed `id`;
-- semantic `version`;
-- `podId`;
-- one or more discovery `genres`;
-- localized title and description;
-- supported operating systems and CPU architectures;
-- one or more runtime components;
-- an immutable image digest per component;
-- a primary component;
-- ports with protocol, purpose, exposure, and allocation rules;
-- volumes with a role such as `data`, `save`, `cache`, or `backup`;
-- resource minimums, maximums, and presets;
-- typed configuration inputs;
-- secret inputs that never receive defaults in the manifest;
-- agreements with canonical URL and agreement revision;
-- health and readiness checks;
-- graceful stop timeout and behavior;
-- update, backup, and restore capabilities;
-- required restricted runtime capabilities.
-
-Each Seed declares exactly one `podId`. A Pod groups one or more related
-Server variants for the same game family, and has no arbitrary per-Pod Seed
-limit. The compiled catalog derives membership from the Seeds so Pod and Seed
-manifests cannot maintain conflicting lists.
-
-Executable installation behavior belongs in reviewed, signed images. The
-registry must not permit arbitrary host shell scripts, privileged containers,
-host PID or network namespaces, Docker socket mounts, or unrestricted host
-paths.
-
-### Multi-component Servers
-
-A Seed can describe a small workload rather than only one container.
-
-The initial example is Minecraft:
-
-- primary component: the Minecraft Server;
-- companion component: the backup worker;
-- shared read-only or read-write volumes as explicitly declared;
-- a secret file for RCON authentication;
-- companion lifecycle tied to the primary Server.
-
-Each component receives Dauva ownership labels and the immutable Server and Seed
-identities. Creating the same Server command twice must not create duplicates.
-
-## Storage model
-
-The implemented initial Leaf layout is:
-
-```text
-/mnt/data/dauva/
-  servers/<server-id>/
-    .dauva-owned.json
-    volumes/
-      data/
-      backups/
-```
-
-The exact host paths are Agent implementation details and do not appear in
-public Seed manifests. Seeds declare logical volume roles; the Agent resolves
-those roles to approved storage roots.
-
-On the first Debian Leaf this root lives on `/mnt/data`, the dedicated 1 TB
-SSD-backed Docker/data filesystem, not on the 120 GB operating-system SSD or
-the nearly full media disks. At the 2026-07-26 capacity review it had about
-241 GB available. Container layers already live on the same filesystem through
-`/var/lib/docker`, which avoids duplicating multi-gigabyte installations onto
-the OS disk.
-
-The initial placement is deliberately conservative:
-
-| Data | Initial location | Reason |
-| --- | --- | --- |
-| OCI layers and runtime cache | `/var/lib/docker` on the data SSD | large, reusable, and already managed by Docker |
-| active saves/config/install volumes | `/mnt/data/dauva/servers` | low-latency persistent storage with the most suitable free capacity |
-| disposable proof data | `/mnt/data/dauva-proof/servers` | isolated ownership and easy verified cleanup |
-| local Server backups | `/mnt/data/dauva-backups` through the filesystem adapter | first-line recovery only; separate tree, same data SSD |
-| future durable backups | separate physical disk or object storage | survives loss of the runtime SSD |
-
-The media merger pool is not used for active game data: it was above 80%
-utilization and is optimized for media capacity rather than game-server
-latency. A local backup stored on the data SSD is explicitly not called an
-off-host or disaster-recovery backup.
-
-Storage rules:
-
-- active saves use persistent Leaf storage;
-- disposable download caches are separately identifiable and garbage
-  collectable;
-- secret inputs are excluded from Seed manifests and ordinary Server records;
-- the current single-Leaf implementation supplies secrets ephemerally while
-  Sprouting and only to the runtime component that requires them;
-- deletion distinguishes runtime cleanup from backup retention;
-- updates can require a successful pre-update backup;
-- backup retention and quotas are control-plane policy, not arbitrary Seed
-  values;
-- a future Leaf can advertise storage classes such as `fast`, `bulk`, and
-  `backup`.
-- the portal shows expected download, installed, and mutable size before
-  Sprouting a large Seed;
-- the Agent rejects a new Sprout when the approved storage root cannot retain
-  the configured free-space reserve after the selected disk allocation.
-
-## Port allocation
-
-Seeds declare logical ports, not fixed public host ports.
-
-Every port declaration includes:
-
-- component;
-- internal container port;
-- TCP, UDP, or both;
-- public or private exposure;
-- purpose such as game, query, RCON, voice, or file transfer;
-- whether two protocols must share the same public number;
-- any environment input that receives the allocated value.
-
-The Leaf Agent allocates ports atomically from configured pools and persists
-the complete allocation before starting components. Partial allocation failure
-must leave no leaked reservations.
-
-The native Docker Branch now supports single dynamic ports and contiguous
-paired allocations. Valheim proved a two-port public UDP pair, while Factorio
-proved that a private administration port is not published to the host.
-
-## Agreements and secrets
-
-Required agreements remain unchecked in the portal and are independently
-validated by the API.
-
-For every accepted agreement, Dauva stores:
-
-- Server and Seed identity;
-- Seed version and manifest digest;
-- agreement identifier, canonical URL, and revision;
-- accepting user;
-- timestamp;
-- the explicit accepted value.
-
-Passwords and tokens are never stored in the registry, ordinary instance
-options, or Server responses. In the current single-Leaf implementation they
-exist only during the Sprouting request and are supplied to the intended
-runtime container as required by the game. Durable protected secret storage is
-still required before updates, migration, or multi-Leaf reconciliation can
-recreate a Server without asking the administrator again.
-
-## Instance identity and persistence
-
-Every managed Server must persist:
-
-- Dauva Server ID;
-- display name;
-- Seed ID, version, and manifest digest;
-- Pod ID;
-- Branch and Leaf identity;
-- selected resource preset and resolved limits;
-- allocated ports;
-- logical volume assignments;
-- desired autostart mode;
-- provisioning and runtime state;
-- accepted agreement references;
-- created-by and audit timestamps;
-- last actionable error.
-
-Installed Servers continue using their pinned Seed version until an explicit
-update operation succeeds. Publishing a new Seed version never silently
-changes an existing Server.
-
-## Seed sources, updates, and proof promotion
-
-Source discovery and runtime identity are separate:
-
-1. A mutable upstream tag or release feed is checked on schedule.
-2. A changed digest creates a reviewable patch release candidate.
-3. The previous stable manifest remains untouched.
-4. License links, changelog, image source, and policy changes are reviewed.
-5. The candidate is Sprouted on a disposable Leaf allocation.
-6. Proof verifies pinned images, health stability, all declared public ports,
-   backup evidence when claimed, graceful stop, restart, persistent storage,
-   and complete cleanup.
-7. A passed receipt is stored with Leaf ID, time, agreement revisions, Seed
-   digest, Registry digest, non-secret evidence, and receipt digest.
-8. Guarded promotion changes that exact candidate to stable.
-
-Automatic checks are allowed. Automatic installation into an existing Server
-is not. Existing Servers receive an update offer and remain pinned until an
-administrator explicitly requests an update. A new image digest is never
-silently substituted at container start.
-
-Proof credentials and required administrator secrets are supplied only for the
-disposable request. They are neither written to the Seed nor copied into the
-receipt. An upstream image with a known cleartext secret logging path is
-rejected during source review even if it otherwise starts successfully.
-
-## Lifecycle and reconciliation
-
-Sprouting is an idempotent, observable workflow:
-
-1. Resolve and validate the exact Seed.
-2. Validate options, secrets, resources, and agreements.
-3. Persist the desired Server in a pending state.
-4. Select the Branch and Leaf.
-5. Reserve ports and storage.
-6. Pull and verify images.
-7. Create all components.
-8. Start components in dependency order when requested.
-9. Wait for readiness.
-10. Mark the Server ready or Withered with an actionable failure.
-
-The browser request ends after step 3 with `202 Accepted`. Steps 4 through 10
-run in a durable API worker and are never coupled to the portal's HTTP timeout.
+Pausin…5872 tokens truncated…nd are never coupled to the portal's HTTP timeout.
 The worker scans both new `pending` records and interrupted `provisioning`
 records, including records whose Leaf identity was already assigned before an
 API restart. The portal polls transitional Servers every four seconds and can
@@ -1217,3 +790,4 @@ These are the current working decisions and should change only deliberately:
   a general-purpose runner?
 - Should Windows ARM64 follow after x64 runtime proof, or wait until every
   recommended Seed has a proven multi-architecture image?
+
