@@ -380,14 +380,21 @@ stop/archive/retention/restore/rollback behavior. A Leaf reports the adapter's
 readiness and whether its target is disaster-safe. Local backups are useful
 for operator mistakes but are explicitly shown as not disaster-safe.
 
-At the 2026-07-27 production review, the active `/mnt/data` filesystem had
-about 215 GB free. No separate physical filesystem had more than 200 GB free:
-the media disks had about 158 GB and 160 GB individually, and the merger pool
-is not suitable for game-server recovery data. The initial filesystem adapter
-therefore remains on `/mnt/data/dauva-backups`, outside active Server
-directories but on the same data SSD, with three retained archives per
-Server. Dauva labels these as local restore points until a separate disk, NAS,
-or object-storage adapter is configured.
+After the 2026-07-28 production storage migration, the host has a dedicated
+300 GiB ext4 backup filesystem backed by the separate 3 TB disk and mounted at
+`/srv/backups/dauva-local`. Leaf restore points use its
+`leaf-restore-points` subtree, while active Server data remains on the
+container/data SSD. The hard filesystem boundary prevents restore points and
+the encrypted infrastructure-backup repository from consuming the media
+filesystem without limit. The filesystem adapter performs a write, durable
+flush, read-back, and cleanup probe before reporting itself ready; an existing
+but read-only or stale mount directory is a blocker before any Server is
+stopped. Three restore-point archives are retained per Server.
+
+This is physically separate first-line recovery for active game data, but it
+is still local to the same host. A future NAS or object-storage adapter remains
+the disaster-recovery target and must not require changes to Seed or lifecycle
+contracts.
 
 ### Multi-Leaf placement
 
@@ -745,13 +752,14 @@ The initial placement is deliberately conservative:
 | OCI layers and runtime cache | `/var/lib/docker` on the data SSD | large, reusable, and already managed by Docker |
 | active saves/config/install volumes | `/mnt/data/dauva/servers` | low-latency persistent storage with the most suitable free capacity |
 | disposable proof data | `/mnt/data/dauva-proof/servers` | isolated ownership and easy verified cleanup |
-| local Server backups | `/mnt/data/dauva-backups` through the filesystem adapter | first-line recovery only; separate tree, same data SSD |
-| future durable backups | separate physical disk or object storage | survives loss of the runtime SSD |
+| local Server backups | `/srv/backups/dauva-local/leaf-restore-points` through the filesystem adapter | hard-bounded first-line recovery on the separate 3 TB disk |
+| future off-host backups | NAS or object storage | survives loss of the complete Leaf |
 
-The media merger pool is not used for active game data: it was above 80%
-utilization and is optimized for media capacity rather than game-server
-latency. A local backup stored on the data SSD is explicitly not called an
-off-host or disaster-recovery backup.
+The media merger pool is not used for active game data. It is optimized for
+media capacity rather than game-server latency. The local backup filesystem
+has its own hard 300 GiB boundary on the 3 TB member disk; it is physically
+separate from active game data but is explicitly not called an off-host
+disaster-recovery backup.
 
 Storage rules:
 
