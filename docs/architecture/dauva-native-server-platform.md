@@ -1098,6 +1098,15 @@ Live acceptance evidence:
 - Creating a restore point briefly stops the complete Compose workload for a
   consistent archive and then resumes exactly the components that were
   running.
+- Restore-point creation and final adoption are server-side operations, not
+  long-lived browser requests. The Portal starts an idempotent operation,
+  polls its short status endpoint, and can reconnect to the same operation
+  after a browser or reverse-proxy interruption. Repeated clicks cannot create
+  parallel restore points or cutovers for the same verified plan.
+- A lost response after a completed restore point is recoverable: the Leaf
+  reuses the matching verified receipt and archive instead of stopping the
+  Server again or creating an unnecessary duplicate. Incomplete archives are
+  removed before a retry, while the retained source is always resumed.
 - Final cutover stops the source again and always creates a second fresh
   restore point. The native Server is accepted only after its Seed-defined
   health check succeeds.
