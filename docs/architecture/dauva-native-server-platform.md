@@ -1086,6 +1086,11 @@ Live acceptance evidence:
   Portal. Capacity accounting reserves the native copy plus both snapshots
   when backup storage shares the active disk; a separate backup target must
   independently have room for both snapshots.
+- Legacy data is read through Docker's authenticated container-archive
+  interface. The Leaf validates the underlying mount boundary but does not
+  require or receive a broad host-filesystem mount merely to see legacy bind
+  paths. Archive paths, links, devices, and traversal attempts are rejected
+  before a restore point can be accepted.
 - Active worlds, mods, plugins, and configuration move into a new
   Dauva-owned Server root. Historic backup/cache volumes remain with the old
   source and are not duplicated into active storage; native backups start a
