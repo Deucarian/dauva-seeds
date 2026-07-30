@@ -291,6 +291,12 @@ The API is the authoritative control plane. It:
 - stores audit and failure details;
 - serves a provider-neutral response to clients.
 
+Long-running operations additionally follow the canonical
+[Dauva incidents and observability](dauva-incidents-and-observability.md)
+contract. The API persists an immutable operation timeline, groups sanitized
+incident occurrences, preserves precise Leaf failure stages, and correlates
+Portal/API/Leaf traces without depending on a telemetry vendor.
+
 ### Dauva Seed Registry
 
 The initial registry should be Git-backed and compiled by CI into a validated,
