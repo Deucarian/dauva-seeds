@@ -1,0 +1,305 @@
+{
+  "schemaVersion": "dauva.dev/seed/v1",
+  "id": "project-zomboid-private",
+  "version": "1.0.0",
+  "status": "stable",
+  "podId": "project-zomboid",
+  "genres": [
+    "cooperative",
+    "survival"
+  ],
+  "metadata": {
+    "title": {
+      "en": "Project Zomboid Private",
+      "nl": "Project Zomboid Privé",
+      "de": "Project Zomboid Privat"
+    },
+    "description": {
+      "en": "A private, pause-when-empty Server for a close group of survivors.",
+      "nl": "Een privé-Server die zonder spelers pauzeert, voor een vaste groep overlevers.",
+      "de": "Ein privater Server, der ohne Spieler pausiert, für eine feste Überlebendengruppe."
+    },
+    "icon": "pulse"
+  },
+  "compatibility": {
+    "operatingSystems": [
+      "linux"
+    ],
+    "architectures": [
+      "amd64"
+    ],
+    "leafCapabilities": [
+      "dynamic-ports",
+      "multi-port",
+      "oci",
+      "persistent-storage",
+      "resource-limits"
+    ]
+  },
+  "components": [
+    {
+      "id": "server",
+      "role": "primary",
+      "image": "docker.io/sknnr/project-zomboid-server@sha256:380245ec450d0ac76bd4a96e7ca3e693db18ac16ac6bce344b55512a0c22fb42",
+      "imageUpdate": {
+        "reference": "docker.io/sknnr/project-zomboid-server:latest"
+      },
+      "environment": {
+        "ADMIN_USERNAME": "admin",
+        "AUTOSAVE_INTERVAL": "15",
+        "GAME_VERSION": "public",
+        "PAUSE_ON_EMPTY": "true",
+        "PUBLIC_SERVER": "false",
+        "SERVER_NAME": "DauvaServer",
+        "STEAM_VAC": "true",
+        "USE_STEAM": "true"
+      },
+      "optionEnvironment": {
+        "max-players": "MAX_PLAYERS"
+      },
+      "agreementEnvironment": {},
+      "secretEnvironment": {
+        "admin-password": "ADMIN_PASSWORD",
+        "rcon-password": "RCON_PASSWORD"
+      },
+      "runtimeEnvironment": {
+        "memoryMbLower": "MAX_RAM",
+        "timezone": "TZ"
+      },
+      "volumeMounts": [
+        {
+          "volumeId": "installation",
+          "target": "/home/steam/ZomboidDedicatedServer",
+          "readOnly": false
+        },
+        {
+          "volumeId": "zomboid",
+          "target": "/home/steam/Zomboid",
+          "readOnly": false
+        }
+      ],
+      "dependsOn": [],
+      "health": {
+        "source": "running",
+        "startupGraceSeconds": 1800
+      }
+    }
+  ],
+  "volumes": [
+    {
+      "id": "installation",
+      "role": "data",
+      "retention": "delete-with-server",
+      "ownerUid": 1000,
+      "ownerGid": 1000,
+      "directoryMode": "0770"
+    },
+    {
+      "id": "zomboid",
+      "role": "save",
+      "retention": "delete-with-server",
+      "ownerUid": 1000,
+      "ownerGid": 1000,
+      "directoryMode": "0770"
+    }
+  ],
+  "ports": [
+    {
+      "id": "game",
+      "componentId": "server",
+      "containerPort": 16261,
+      "containerPortMode": "allocated",
+      "protocols": [
+        "udp"
+      ],
+      "exposure": "public",
+      "purpose": "game",
+      "primary": true,
+      "sharedHostPort": true,
+      "environment": "DEFAULT_PORT"
+    },
+    {
+      "id": "direct",
+      "componentId": "server",
+      "containerPort": 16262,
+      "containerPortMode": "allocated",
+      "protocols": [
+        "udp"
+      ],
+      "exposure": "public",
+      "purpose": "query",
+      "primary": false,
+      "sharedHostPort": true,
+      "environment": "UDP_PORT"
+    },
+    {
+      "id": "rcon",
+      "componentId": "server",
+      "containerPort": 27015,
+      "containerPortMode": "fixed",
+      "protocols": [
+        "tcp"
+      ],
+      "exposure": "private",
+      "purpose": "rcon",
+      "primary": false,
+      "sharedHostPort": true,
+      "environment": "RCON_PORT"
+    }
+  ],
+  "resources": {
+    "defaultPresetId": "balanced",
+    "presets": [
+      {
+        "id": "balanced",
+        "title": {
+          "en": "Balanced",
+          "nl": "Gebalanceerd",
+          "de": "Ausgewogen"
+        },
+        "description": {
+          "en": "For up to eight players on a persistent private Server.",
+          "nl": "Voor maximaal acht spelers op een blijvende privé-Server.",
+          "de": "Für bis zu acht Spieler auf einem persistenten privaten Server."
+        },
+        "memoryMb": 4096,
+        "diskMb": 16384,
+        "cpuPercent": 200
+      },
+      {
+        "id": "large",
+        "title": {
+          "en": "Large",
+          "nl": "Groot",
+          "de": "Groß"
+        },
+        "description": {
+          "en": "Extra headroom for a growing world and Workshop content.",
+          "nl": "Extra ruimte voor een groeiende wereld en Workshop-content.",
+          "de": "Zusätzliche Reserven für eine wachsende Welt und Workshop-Inhalte."
+        },
+        "memoryMb": 6144,
+        "diskMb": 24576,
+        "cpuPercent": 300
+      }
+    ]
+  },
+  "inputs": [
+    {
+      "key": "accept-steam-agreement",
+      "type": "agreement",
+      "label": {
+        "en": "Steam Subscriber Agreement",
+        "nl": "Steam Subscriber Agreement",
+        "de": "Steam-Nutzungsvertrag"
+      },
+      "help": {
+        "en": "I have read and accept the Steam Subscriber Agreement and the applicable game terms.",
+        "nl": "Ik heb de Steam Subscriber Agreement en de toepasselijke gamevoorwaarden gelezen en accepteer deze.",
+        "de": "Ich habe den Steam-Nutzungsvertrag und die anwendbaren Spielbedingungen gelesen und akzeptiert."
+      },
+      "required": true,
+      "defaultValue": "false",
+      "url": "https://store.steampowered.com/subscriber_agreement/",
+      "revision": "official-current"
+    },
+    {
+      "key": "max-players",
+      "type": "integer",
+      "label": {
+        "en": "Maximum players",
+        "nl": "Maximumaantal spelers",
+        "de": "Maximale Spielerzahl"
+      },
+      "help": {
+        "en": "Maximum simultaneous players.",
+        "nl": "Maximaal aantal gelijktijdige spelers.",
+        "de": "Maximale Anzahl gleichzeitiger Spieler."
+      },
+      "required": true,
+      "defaultValue": "8",
+      "minLength": 1,
+      "maxLength": 2
+    }
+  ],
+  "secrets": [
+    {
+      "key": "admin-password",
+      "source": "admin",
+      "label": {
+        "en": "Admin password",
+        "nl": "Adminwachtwoord",
+        "de": "Adminpasswort"
+      },
+      "help": {
+        "en": "Required for the initial Project Zomboid administrator account. Dauva does not store the clear value.",
+        "nl": "Vereist voor het eerste Project Zomboid-adminaccount. Dauva bewaart de leesbare waarde niet.",
+        "de": "Für das erste Project-Zomboid-Administratorkonto erforderlich. Dauva speichert den Klartextwert nicht."
+      },
+      "minLength": 8,
+      "maxLength": 128
+    },
+    {
+      "key": "rcon-password",
+      "source": "generated",
+      "generatedBytes": 32
+    }
+  ],
+  "lifecycle": {
+    "startOrder": [
+      "server"
+    ],
+    "stopOrder": [
+      "server"
+    ],
+    "stopTimeoutSeconds": 180
+  },
+  "capabilities": {
+    "backup": false,
+    "restore": false,
+    "update": false,
+    "console": false
+  },
+  "source": {
+    "kind": "oci",
+    "homepage": "https://projectzomboid.com/",
+    "repository": "https://github.com/jsknnr/zomboid-dedicated-server",
+    "imageRegistries": [
+      "docker.io"
+    ],
+    "upstreamId": "steam:380870"
+  },
+  "trust": {
+    "level": "curated",
+    "reviewedAt": "2026-07-26",
+    "mutableRuntimeImagesAllowed": false
+  },
+  "storage": {
+    "class": "fast",
+    "backupClass": "backup",
+    "estimatedDownloadMb": 4000,
+    "estimatedInstallMb": 10000,
+    "estimatedMutableMb": 12288,
+    "backupPolicy": "recommended"
+  },
+  "updatePolicy": {
+    "discovery": "oci-tag",
+    "automaticCheck": true,
+    "automaticInstall": false,
+    "requiresBackup": false,
+    "rollback": true
+  },
+  "proofPolicy": {
+    "requiredChecks": [
+      "images-pinned",
+      "healthy",
+      "ports",
+      "backup-if-supported",
+      "graceful-stop",
+      "restart",
+      "persistence",
+      "cleanup"
+    ],
+    "expiresAfterDays": 90
+  }
+}

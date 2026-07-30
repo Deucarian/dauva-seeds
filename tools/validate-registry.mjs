@@ -20,10 +20,18 @@ const podSchema = await readJson(
 const seedSchema = await readJson(
   path.join(repositoryRoot, "schemas", "seed-v1.schema.json"),
 );
+const proofSchema = await readJson(
+  path.join(repositoryRoot, "schemas", "seed-proof-v1.schema.json"),
+);
 const validatePod = ajv.compile(podSchema);
 const validateSeed = ajv.compile(seedSchema);
+const validateProof = ajv.compile(proofSchema);
 const podFiles = await readManifestDirectory("registry/pods");
 const seedFiles = await readManifestDirectory("registry/seeds");
+const releaseFiles = await readManifestDirectory("registry/history", {
+  allowMissing: true,
+});
+const proofFiles = await readManifestDirectory("proofs");
 const errors = [];
 
 for (const entry of podFiles) {
@@ -32,15 +40,34 @@ for (const entry of podFiles) {
 for (const entry of seedFiles) {
   validateSchema(entry, validateSeed, "Seed");
 }
+for (const entry of releaseFiles) {
+  validateSchema(entry, validateSeed, "historical Seed", false);
+  if (`${entry.value.id}@${entry.value.version}.json` !== entry.name) {
+    errors.push(
+      `${entry.name}: historical filename must match ${entry.value.id}@${entry.value.version}.json.`,
+    );
+  }
+  if (entry.value.status !== "stable") {
+    errors.push(`${entry.name}: only stable Seeds may enter release history.`);
+  }
+}
+for (const entry of proofFiles) {
+  validateSchema(entry, validateProof, "Seed proof", false);
+}
 
 validateUniqueIds(podFiles, "Pod");
 validateUniqueIds(seedFiles, "Seed");
+validateUniqueReleaseIds(releaseFiles);
 
 const podIds = new Set(podFiles.map((entry) => entry.value.id));
 for (const entry of seedFiles) {
   validateSeedPolicy(entry, podIds);
 }
+for (const entry of releaseFiles) {
+  validateSeedPolicy(entry, podIds);
+}
 validatePodMembership(podFiles, seedFiles);
+validateProofPolicy(proofFiles, seedFiles);
 
 if (errors.length > 0) {
   for (const error of errors) {
@@ -49,11 +76,11 @@ if (errors.length > 0) {
   process.exitCode = 1;
 } else {
   console.log(
-    `Validated ${podFiles.length} Pods and ${seedFiles.length} Seeds without policy violations.`,
+    `Validated ${podFiles.length} Pods, ${seedFiles.length} Seeds, ${releaseFiles.length} historical releases, and ${proofFiles.length} proof receipt${proofFiles.length === 1 ? "" : "s"} without policy violations.`,
   );
 }
 
-function validateSchema(entry, validator, kind) {
+function validateSchema(entry, validator, kind, enforceIdFileName = true) {
   if (!validator(entry.value)) {
     for (const error of validator.errors ?? []) {
       errors.push(
@@ -61,7 +88,7 @@ function validateSchema(entry, validator, kind) {
       );
     }
   }
-  if (`${entry.value.id}.json` !== entry.name) {
+  if (enforceIdFileName && `${entry.value.id}.json` !== entry.name) {
     errors.push(
       `${entry.name}: filename must match the manifest id (${entry.value.id}.json).`,
     );
@@ -78,20 +105,46 @@ function validateUniqueIds(entries, kind) {
   }
 }
 
+function validateUniqueReleaseIds(entries) {
+  const seen = new Set();
+  for (const entry of entries) {
+    const key = `${entry.value.id}@${entry.value.version}`;
+    if (seen.has(key)) {
+      errors.push(`${entry.name}: duplicate historical Seed '${key}'.`);
+    }
+    seen.add(key);
+  }
+}
+
 function validatePodMembership(pods, seeds) {
   const seedCountByPod = new Map(pods.map((entry) => [entry.value.id, 0]));
+  const seedIdsByPod = new Map(
+    pods.map((entry) => [entry.value.id, new Set()]),
+  );
   for (const entry of seeds) {
     if (seedCountByPod.has(entry.value.podId)) {
       seedCountByPod.set(
         entry.value.podId,
         seedCountByPod.get(entry.value.podId) + 1,
       );
+      seedIdsByPod.get(entry.value.podId).add(entry.value.id);
     }
   }
 
-  for (const [podId, seedCount] of seedCountByPod) {
-    if (seedCount === 0) {
-      errors.push(`${podId}.json: every Pod must contain at least one Seed.`);
+  for (const entry of pods) {
+    const podId = entry.value.id;
+    const seedCount = seedCountByPod.get(podId);
+    if (seedCount < 2) {
+      errors.push(
+        `${podId}.json: every Pod must contain at least two related Seeds.`,
+      );
+    }
+    if (!entry.value.recommendedSeedId) {
+      errors.push(`${podId}.json: every Pod must recommend one Seed.`);
+    } else if (!seedIdsByPod.get(podId).has(entry.value.recommendedSeedId)) {
+      errors.push(
+        `${podId}.json: recommended Seed '${entry.value.recommendedSeedId}' does not belong to this Pod.`,
+      );
     }
   }
 }
@@ -131,6 +184,25 @@ function validateSeedPolicy(entry, podIds) {
   for (const component of seed.components) {
     if (!component.image.includes("@sha256:")) {
       errors.push(`${entry.name}: ${component.id} image is not pinned by digest.`);
+    }
+    const pinnedRepository = component.image.split("@", 1)[0];
+    const imageRegistry = pinnedRepository.slice(
+      0,
+      pinnedRepository.indexOf("/"),
+    );
+    if (!seed.source.imageRegistries.includes(imageRegistry)) {
+      errors.push(
+        `${entry.name}: ${component.id} uses registry '${imageRegistry}' outside source.imageRegistries.`,
+      );
+    }
+    const updateRepository = component.imageUpdate.reference.slice(
+      0,
+      component.imageUpdate.reference.lastIndexOf(":"),
+    );
+    if (pinnedRepository !== updateRepository) {
+      errors.push(
+        `${entry.name}: ${component.id} update reference must use repository '${pinnedRepository}'.`,
+      );
     }
     for (const name of Object.keys(component.environment)) {
       if (/(?:PASSWORD|PASSWD|TOKEN|SECRET|API_KEY|PRIVATE_KEY)/i.test(name)) {
@@ -249,12 +321,82 @@ function validateSeedPolicy(entry, podIds) {
     }
   }
 
+  if (seed.trust.mutableRuntimeImagesAllowed !== false) {
+    errors.push(`${entry.name}: mutable runtime images are forbidden.`);
+  }
+  if (seed.updatePolicy.automaticInstall !== false) {
+    errors.push(`${entry.name}: unattended Seed installation is forbidden.`);
+  }
+  if (
+    seed.updatePolicy.requiresBackup &&
+    !seed.capabilities.backup
+  ) {
+    errors.push(
+      `${entry.name}: update requires a backup but the Seed has no backup capability.`,
+    );
+  }
+  if (seed.capabilities.console !== Boolean(seed.console)) {
+    errors.push(
+      `${entry.name}: console capability and console contract must be enabled together.`,
+    );
+  }
+  if (seed.console) {
+    const consolePort = seed.ports.find(
+      (port) => port.id === seed.console.portId,
+    );
+    if (!componentIds.has(seed.console.componentId)) {
+      errors.push(
+        `${entry.name}: console references unknown component '${seed.console.componentId}'.`,
+      );
+    }
+    if (
+      !consolePort ||
+      consolePort.componentId !== seed.console.componentId ||
+      consolePort.purpose !== "rcon" ||
+      consolePort.exposure !== "private" ||
+      !consolePort.protocols.includes("tcp")
+    ) {
+      errors.push(
+        `${entry.name}: console must reference a private TCP RCON port on its component.`,
+      );
+    }
+    if (!secretIds.has(seed.console.secretKey)) {
+      errors.push(
+        `${entry.name}: console references unknown secret '${seed.console.secretKey}'.`,
+      );
+    }
+  }
+
   const forbiddenKeys = findForbiddenKeys(seed);
   for (const keyPath of forbiddenKeys) {
     errors.push(`${entry.name}: forbidden host/runtime property '${keyPath}'.`);
   }
 
   void portIds;
+}
+
+function validateProofPolicy(proofs, seeds) {
+  const seedById = new Map(seeds.map((entry) => [entry.value.id, entry.value]));
+  const proofKeys = new Set();
+
+  for (const entry of proofs) {
+    const proof = entry.value;
+    const proofKey = `${proof.seedId}@${proof.seedVersion}`;
+    if (proofKeys.has(proofKey)) {
+      errors.push(`${entry.name}: duplicate proof receipt for '${proofKey}'.`);
+    }
+    proofKeys.add(proofKey);
+
+    if (!seedById.has(proof.seedId)) {
+      errors.push(`${entry.name}: Seed '${proof.seedId}' does not exist.`);
+    }
+    if (`${proof.seedId}-${proof.seedVersion}.json` !== entry.name) {
+      errors.push(
+        `${entry.name}: proof filename must identify '${proof.seedId}-${proof.seedVersion}.json'.`,
+      );
+    }
+  }
+
 }
 
 function uniqueIds(fileName, kind, items, key = "id") {

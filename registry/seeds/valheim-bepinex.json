@@ -1,7 +1,7 @@
 {
   "schemaVersion": "dauva.dev/seed/v1",
-  "id": "valheim",
-  "version": "1.0.1",
+  "id": "valheim-bepinex",
+  "version": "1.0.0",
   "status": "stable",
   "podId": "valheim",
   "genres": [
@@ -11,14 +11,14 @@
   ],
   "metadata": {
     "title": {
-      "en": "Valheim Vanilla",
-      "nl": "Valheim Vanilla",
-      "de": "Valheim Vanilla"
+      "en": "Valheim BepInEx",
+      "nl": "Valheim BepInEx",
+      "de": "Valheim BepInEx"
     },
     "description": {
-      "en": "A persistent vanilla Valheim Server with automatic local backups.",
-      "nl": "Een blijvende vanilla Valheim-Server met automatische lokale back-ups.",
-      "de": "Ein persistenter Vanilla-Valheim-Server mit automatischen lokalen Backups."
+      "en": "A mod-ready Valheim Server with the BepInEx framework enabled.",
+      "nl": "Een modklare Valheim-Server met het BepInEx-framework ingeschakeld.",
+      "de": "Ein modbereiter Valheim-Server mit aktiviertem BepInEx-Framework."
     },
     "icon": "shield"
   },
@@ -51,7 +51,7 @@
         "BACKUPS_MAX_AGE": "14",
         "BACKUPS_MAX_COUNT": "24",
         "BACKUPS_ZIP": "true",
-        "BEPINEX": "false",
+        "BEPINEX": "true",
         "VALHEIM_PLUS": "false"
       },
       "optionEnvironment": {

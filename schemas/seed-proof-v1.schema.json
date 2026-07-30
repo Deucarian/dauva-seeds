@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dauva.dev/schemas/seed-proof-v1.schema.json",
+  "title": "Dauva Seed proof v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "seedId",
+    "seedVersion",
+    "result",
+    "provedAt",
+    "leaf",
+    "checks",
+    "agreements",
+    "evidence"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "dauva.dev/seed-proof/v1"
+    },
+    "seedId": {
+      "$ref": "seed-v1.schema.json#/$defs/id"
+    },
+    "seedVersion": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z.-]+)?$"
+    },
+    "result": {
+      "const": "passed"
+    },
+    "provedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "leaf": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "imagesPinned",
+        "healthy",
+        "ports",
+        "backup",
+        "gracefulStop",
+        "restart",
+        "persistence",
+        "cleanup"
+      ],
+      "properties": {
+        "imagesPinned": {
+          "const": true
+        },
+        "healthy": {
+          "const": true
+        },
+        "ports": {
+          "const": true
+        },
+        "backup": {
+          "const": true
+        },
+        "gracefulStop": {
+          "const": true
+        },
+        "restart": {
+          "const": true
+        },
+        "persistence": {
+          "const": true
+        },
+        "cleanup": {
+          "const": true
+        }
+      }
+    },
+    "agreements": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "url",
+          "revision",
+          "accepted"
+        ],
+        "properties": {
+          "key": {
+            "$ref": "seed-v1.schema.json#/$defs/id"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^https://"
+          },
+          "revision": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "accepted": {
+            "const": true
+          }
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 1000
+      }
+    }
+  }
+}

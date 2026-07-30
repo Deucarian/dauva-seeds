@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "dauva.dev/pod/v1",
+  "id": "terraria",
+  "status": "stable",
+  "recommendedSeedId": "terraria-vanilla",
+  "metadata": {
+    "title": {
+      "en": "Terraria",
+      "nl": "Terraria",
+      "de": "Terraria"
+    },
+    "description": {
+      "en": "Terraria Servers for persistent cooperative worlds, from vanilla to TShock.",
+      "nl": "Terraria-Servers voor blijvende coöperatieve werelden, van vanilla tot TShock.",
+      "de": "Terraria-Server für persistente kooperative Welten, von Vanilla bis TShock."
+    },
+    "icon": "gem"
+  }
+}

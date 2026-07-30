@@ -2,6 +2,7 @@
   "schemaVersion": "dauva.dev/pod/v1",
   "id": "core-keeper",
   "status": "stable",
+  "recommendedSeedId": "core-keeper",
   "metadata": {
     "title": {
       "en": "Core Keeper",
