@@ -180,7 +180,7 @@
     {
       "schemaVersion": "dauva.dev/seed/v1",
       "id": "core-keeper",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "status": "stable",
       "podId": "core-keeper",
       "genres": [
@@ -226,6 +226,7 @@
           "stopSignal": "SIGINT",
           "environment": {
             "MODS_ENABLED": "false",
+            "TINI_KILL_PROCESS_GROUP": "1",
             "WORLD_INDEX": "0",
             "WORLD_MODE": "0"
           },
@@ -454,15 +455,20 @@
         ],
         "expiresAfterDays": 90
       },
-      "manifestDigest": "sha256:36c1369e1f60d11049f6419090f64df8b993f7d937e616d3c1b667369af632eb",
+      "manifestDigest": "sha256:5c6fd177d82c3038bb2baf67ea26d480202d089936cfc6b6c14d30ba497a2ac7",
       "proof": {
-        "state": "unproven"
+        "state": "proven",
+        "provedAt": "2026-07-30T23:21:43.9296733+00:00",
+        "expiresAt": "2026-10-28T23:21:43.929Z",
+        "leaf": "proof-core-keeper-102rc1",
+        "provedVersion": "1.0.2-rc.1",
+        "receiptDigest": "sha256:f496cf2adb1fcdb635150ec719980dba6ef93ad90fbe551d4054693cb5eb54ef"
       }
     },
     {
       "schemaVersion": "dauva.dev/seed/v1",
       "id": "core-keeper-hard",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "status": "stable",
       "podId": "core-keeper",
       "genres": [
@@ -508,6 +514,7 @@
           "stopSignal": "SIGINT",
           "environment": {
             "MODS_ENABLED": "false",
+            "TINI_KILL_PROCESS_GROUP": "1",
             "WORLD_INDEX": "0",
             "WORLD_MODE": "1"
           },
@@ -736,9 +743,14 @@
         ],
         "expiresAfterDays": 90
       },
-      "manifestDigest": "sha256:85a967589129bb49b0865557f2d945444bb5c557c5ffbc4f896301b4541e86c1",
+      "manifestDigest": "sha256:9a5cab3342cf3d17273483d340d7add91b5a4d28b3b856c2f06fc06615fafbbb",
       "proof": {
-        "state": "unproven"
+        "state": "proven",
+        "provedAt": "2026-07-30T23:22:30.5074181+00:00",
+        "expiresAt": "2026-10-28T23:22:30.507Z",
+        "leaf": "proof-core-keeper-102rc1",
+        "provedVersion": "1.0.1-rc.1",
+        "receiptDigest": "sha256:07d83fca8200943dcc40f2544f9c39d6e36c2657014408bee5b1605c3f243195"
       }
     },
     {
@@ -975,7 +987,12 @@
       },
       "manifestDigest": "sha256:bd635359b943fff47470430241a3626aa824dd5b4fd5045004e5e255c8dcac33",
       "proof": {
-        "state": "unproven"
+        "state": "proven",
+        "provedAt": "2026-07-30T23:40:44.8566232+00:00",
+        "expiresAt": "2026-10-28T23:40:44.856Z",
+        "leaf": "primary-leaf",
+        "provedVersion": "1.0.0",
+        "receiptDigest": "sha256:52c734b3d7884f6f5a969a95c1770907269921364ffd41c5c1e310075b128248"
       }
     },
     {
@@ -1224,7 +1241,12 @@
       },
       "manifestDigest": "sha256:b95e8b6320df36563fbe8af5028144830143f18037d303c34d6ff617f1b46813",
       "proof": {
-        "state": "unproven"
+        "state": "proven",
+        "provedAt": "2026-07-30T23:26:07.8521358+00:00",
+        "expiresAt": "2026-10-28T23:26:07.852Z",
+        "leaf": "primary-leaf",
+        "provedVersion": "1.0.0",
+        "receiptDigest": "sha256:f1ab3d4ac2b881d1513120bb03af48262c4ed843e0baad7682a2a93b34d42061"
       }
     },
     {
@@ -1454,7 +1476,12 @@
       },
       "manifestDigest": "sha256:08f45c8a532550030a3e579fb535f8fa43103f270aaafb0dca4637e8d4121148",
       "proof": {
-        "state": "unproven"
+        "state": "proven",
+        "provedAt": "2026-07-30T23:24:57.2534464+00:00",
+        "expiresAt": "2026-10-28T23:24:57.253Z",
+        "leaf": "primary-leaf",
+        "provedVersion": "1.0.1",
+        "receiptDigest": "sha256:7aea326026c2945bf0512043b4fbf303258782fc3f26cec87b01d8acb2d8643c"
       }
     },
     {
@@ -5210,7 +5237,12 @@
       },
       "manifestDigest": "sha256:eb31f49db9a7dda23665d2f28623563a64c0934f61eec29ba3234d776f50e823",
       "proof": {
-        "state": "unproven"
+        "state": "proven",
+        "provedAt": "2026-07-30T23:24:14.4331067+00:00",
+        "expiresAt": "2026-10-28T23:24:14.433Z",
+        "leaf": "primary-leaf",
+        "provedVersion": "1.0.1",
+        "receiptDigest": "sha256:c85caace3b1558cd9bdb6f3a0a0cba9a94ad72fef2d7af933cfb45e49700da1a"
       }
     },
     {
@@ -5782,6 +5814,197 @@
   "proofs": [
     {
       "schemaVersion": "dauva.dev/seed-proof/v1",
+      "seedId": "core-keeper-hard",
+      "seedVersion": "1.0.1-rc.1",
+      "result": "passed",
+      "provedAt": "2026-07-30T23:22:30.5074181+00:00",
+      "leaf": "proof-core-keeper-102rc1",
+      "checks": {
+        "imagesPinned": true,
+        "healthy": true,
+        "ports": true,
+        "backup": true,
+        "gracefulStop": true,
+        "restart": true,
+        "persistence": true,
+        "cleanup": true
+      },
+      "agreements": [
+        {
+          "key": "accept-steam-agreement",
+          "url": "https://store.steampowered.com/subscriber_agreement/",
+          "revision": "official-current",
+          "accepted": true
+        }
+      ],
+      "evidence": {
+        "seedManifest": "sha256:db3a986734e7d156670878be7a705ea9cf90978f7f4c14f3c7563942b3cf1515",
+        "registry": "sha256:c7e362d510d2807a5b6a903930ffd1b5743c6866dbdd598a177b43a6ffea787f",
+        "agent": "0.12.1",
+        "sprout": "The Server was Sprouted on Dauva's native Docker Branch.",
+        "initialHealth": "The Server completed its health checks and is ready.",
+        "stabilitySeconds": "20",
+        "persistenceVolume": "data",
+        "restart": "The Server completed its health checks and is ready.",
+        "cleanup": "The Server, its components, and its native Dauva storage were permanently deleted. Backups removed: True."
+      },
+      "receiptDigest": "sha256:07d83fca8200943dcc40f2544f9c39d6e36c2657014408bee5b1605c3f243195"
+    },
+    {
+      "schemaVersion": "dauva.dev/seed-proof/v1",
+      "seedId": "core-keeper",
+      "seedVersion": "1.0.2-rc.1",
+      "result": "passed",
+      "provedAt": "2026-07-30T23:21:43.9296733+00:00",
+      "leaf": "proof-core-keeper-102rc1",
+      "checks": {
+        "imagesPinned": true,
+        "healthy": true,
+        "ports": true,
+        "backup": true,
+        "gracefulStop": true,
+        "restart": true,
+        "persistence": true,
+        "cleanup": true
+      },
+      "agreements": [
+        {
+          "key": "accept-steam-agreement",
+          "url": "https://store.steampowered.com/subscriber_agreement/",
+          "revision": "official-current",
+          "accepted": true
+        }
+      ],
+      "evidence": {
+        "seedManifest": "sha256:c4b29dc5e5cdbc7377fabf88895e73a394271bb431f5b8564addbaad543e866c",
+        "registry": "sha256:c7e362d510d2807a5b6a903930ffd1b5743c6866dbdd598a177b43a6ffea787f",
+        "agent": "0.12.1",
+        "sprout": "The Server was Sprouted on Dauva's native Docker Branch.",
+        "initialHealth": "The Server completed its health checks and is ready.",
+        "stabilitySeconds": "20",
+        "persistenceVolume": "data",
+        "restart": "The Server completed its health checks and is ready.",
+        "cleanup": "The Server, its components, and its native Dauva storage were permanently deleted. Backups removed: True."
+      },
+      "receiptDigest": "sha256:f496cf2adb1fcdb635150ec719980dba6ef93ad90fbe551d4054693cb5eb54ef"
+    },
+    {
+      "schemaVersion": "dauva.dev/seed-proof/v1",
+      "seedId": "enshrouded-wine",
+      "seedVersion": "1.0.0",
+      "result": "passed",
+      "provedAt": "2026-07-30T23:26:07.8521358+00:00",
+      "leaf": "primary-leaf",
+      "checks": {
+        "imagesPinned": true,
+        "healthy": true,
+        "ports": true,
+        "backup": true,
+        "gracefulStop": true,
+        "restart": true,
+        "persistence": true,
+        "cleanup": true
+      },
+      "agreements": [
+        {
+          "key": "accept-steam-agreement",
+          "url": "https://store.steampowered.com/subscriber_agreement/",
+          "revision": "official-current",
+          "accepted": true
+        }
+      ],
+      "evidence": {
+        "seedManifest": "sha256:b95e8b6320df36563fbe8af5028144830143f18037d303c34d6ff617f1b46813",
+        "registry": "sha256:7607e48e03f0ad0b075f4b46507bdfa636eedfa5af64bce9264b43fb5b123776",
+        "agent": "0.12.1",
+        "sprout": "The Server was Sprouted on Dauva's native Docker Branch.",
+        "initialHealth": "The Server completed its health checks and is ready.",
+        "stabilitySeconds": "20",
+        "backup": "The Leaf created a durable backup.",
+        "persistenceVolume": "data",
+        "restart": "The Server completed its health checks and is ready.",
+        "cleanup": "The Server, its components, and its native Dauva storage were permanently deleted. Backups removed: True."
+      },
+      "receiptDigest": "sha256:f1ab3d4ac2b881d1513120bb03af48262c4ed843e0baad7682a2a93b34d42061"
+    },
+    {
+      "schemaVersion": "dauva.dev/seed-proof/v1",
+      "seedId": "enshrouded",
+      "seedVersion": "1.0.0",
+      "result": "passed",
+      "provedAt": "2026-07-30T23:40:44.8566232+00:00",
+      "leaf": "primary-leaf",
+      "checks": {
+        "imagesPinned": true,
+        "healthy": true,
+        "ports": true,
+        "backup": true,
+        "gracefulStop": true,
+        "restart": true,
+        "persistence": true,
+        "cleanup": true
+      },
+      "agreements": [
+        {
+          "key": "accept-steam-agreement",
+          "url": "https://store.steampowered.com/subscriber_agreement/",
+          "revision": "official-current",
+          "accepted": true
+        }
+      ],
+      "evidence": {
+        "seedManifest": "sha256:bd635359b943fff47470430241a3626aa824dd5b4fd5045004e5e255c8dcac33",
+        "registry": "sha256:7607e48e03f0ad0b075f4b46507bdfa636eedfa5af64bce9264b43fb5b123776",
+        "agent": "0.12.1",
+        "sprout": "The Server was Sprouted on Dauva's native Docker Branch.",
+        "initialHealth": "The Server completed its health checks and is ready.",
+        "stabilitySeconds": "20",
+        "persistenceVolume": "saves",
+        "restart": "The Server completed its health checks and is ready.",
+        "cleanup": "The Server, its components, and its native Dauva storage were permanently deleted. Backups removed: True."
+      },
+      "receiptDigest": "sha256:52c734b3d7884f6f5a969a95c1770907269921364ffd41c5c1e310075b128248"
+    },
+    {
+      "schemaVersion": "dauva.dev/seed-proof/v1",
+      "seedId": "factorio",
+      "seedVersion": "1.0.1",
+      "result": "passed",
+      "provedAt": "2026-07-30T23:24:57.2534464+00:00",
+      "leaf": "primary-leaf",
+      "checks": {
+        "imagesPinned": true,
+        "healthy": true,
+        "ports": true,
+        "backup": true,
+        "gracefulStop": true,
+        "restart": true,
+        "persistence": true,
+        "cleanup": true
+      },
+      "agreements": [
+        {
+          "key": "accept-factorio-terms",
+          "url": "https://www.factorio.com/terms-of-service",
+          "revision": "2024-10-10",
+          "accepted": true
+        }
+      ],
+      "evidence": {
+        "seedManifest": "sha256:08f45c8a532550030a3e579fb535f8fa43103f270aaafb0dca4637e8d4121148",
+        "registry": "sha256:7607e48e03f0ad0b075f4b46507bdfa636eedfa5af64bce9264b43fb5b123776",
+        "agent": "0.12.1",
+        "sprout": "The Server was Sprouted on Dauva's native Docker Branch.",
+        "initialHealth": "The Server completed its health checks and is ready.",
+        "stabilitySeconds": "20",
+        "persistenceVolume": "data",
+        "restart": "The Server completed its health checks and is ready.",
+        "cleanup": "The Server, its components, and its native Dauva storage were permanently deleted. Backups removed: True."
+      },
+      "receiptDigest": "sha256:7aea326026c2945bf0512043b4fbf303258782fc3f26cec87b01d8acb2d8643c"
+    },
+    {
+      "schemaVersion": "dauva.dev/seed-proof/v1",
       "seedId": "garrys-mod-construct",
       "seedVersion": "1.0.0-rc.1",
       "result": "passed",
@@ -6098,6 +6321,45 @@
         "cleanup": "The Server, its components, and its native Dauva storage were permanently deleted."
       },
       "receiptDigest": "sha256:baccde5c1959225cba741d9fc2dc889aed1526cd589b21018db58540ef17b800"
+    },
+    {
+      "schemaVersion": "dauva.dev/seed-proof/v1",
+      "seedId": "valheim",
+      "seedVersion": "1.0.1",
+      "result": "passed",
+      "provedAt": "2026-07-30T23:24:14.4331067+00:00",
+      "leaf": "primary-leaf",
+      "checks": {
+        "imagesPinned": true,
+        "healthy": true,
+        "ports": true,
+        "backup": true,
+        "gracefulStop": true,
+        "restart": true,
+        "persistence": true,
+        "cleanup": true
+      },
+      "agreements": [
+        {
+          "key": "accept-steam-agreement",
+          "url": "https://store.steampowered.com/subscriber_agreement/",
+          "revision": "official-current",
+          "accepted": true
+        }
+      ],
+      "evidence": {
+        "seedManifest": "sha256:eb31f49db9a7dda23665d2f28623563a64c0934f61eec29ba3234d776f50e823",
+        "registry": "sha256:7607e48e03f0ad0b075f4b46507bdfa636eedfa5af64bce9264b43fb5b123776",
+        "agent": "0.12.1",
+        "sprout": "The Server was Sprouted on Dauva's native Docker Branch.",
+        "initialHealth": "The Server completed its health checks and is ready.",
+        "stabilitySeconds": "20",
+        "backup": "The Leaf created a durable backup.",
+        "persistenceVolume": "game",
+        "restart": "The Server completed its health checks and is ready.",
+        "cleanup": "The Server, its components, and its native Dauva storage were permanently deleted. Backups removed: True."
+      },
+      "receiptDigest": "sha256:c85caace3b1558cd9bdb6f3a0a0cba9a94ad72fef2d7af933cfb45e49700da1a"
     }
   ],
   "sources": [
@@ -6193,5 +6455,5 @@
       "upstreamId": "1690800"
     }
   ],
-  "registryDigest": "sha256:7607e48e03f0ad0b075f4b46507bdfa636eedfa5af64bce9264b43fb5b123776"
+  "registryDigest": "sha256:5b4493ea8bcaaa9da6c7f09a2e1dad31dcd17640566c788665b0da0b04a52468"
 }

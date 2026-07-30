@@ -1,7 +1,7 @@
 {
   "schemaVersion": "dauva.dev/seed/v1",
   "id": "core-keeper-hard",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "status": "stable",
   "podId": "core-keeper",
   "genres": [
@@ -47,6 +47,7 @@
       "stopSignal": "SIGINT",
       "environment": {
         "MODS_ENABLED": "false",
+        "TINI_KILL_PROCESS_GROUP": "1",
         "WORLD_INDEX": "0",
         "WORLD_MODE": "1"
       },

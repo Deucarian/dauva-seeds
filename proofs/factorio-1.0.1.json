@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "dauva.dev/seed-proof/v1",
+  "seedId": "factorio",
+  "seedVersion": "1.0.1",
+  "result": "passed",
+  "provedAt": "2026-07-30T23:24:57.2534464+00:00",
+  "leaf": "primary-leaf",
+  "checks": {
+    "imagesPinned": true,
+    "healthy": true,
+    "ports": true,
+    "backup": true,
+    "gracefulStop": true,
+    "restart": true,
+    "persistence": true,
+    "cleanup": true
+  },
+  "agreements": [
+    {
+      "key": "accept-factorio-terms",
+      "url": "https://www.factorio.com/terms-of-service",
+      "revision": "2024-10-10",
+      "accepted": true
+    }
+  ],
+  "evidence": {
+    "seedManifest": "sha256:08f45c8a532550030a3e579fb535f8fa43103f270aaafb0dca4637e8d4121148",
+    "registry": "sha256:7607e48e03f0ad0b075f4b46507bdfa636eedfa5af64bce9264b43fb5b123776",
+    "agent": "0.12.1",
+    "sprout": "The Server was Sprouted on Dauva's native Docker Branch.",
+    "initialHealth": "The Server completed its health checks and is ready.",
+    "stabilitySeconds": "20",
+    "persistenceVolume": "data",
+    "restart": "The Server completed its health checks and is ready.",
+    "cleanup": "The Server, its components, and its native Dauva storage were permanently deleted. Backups removed: True."
+  }
+}
