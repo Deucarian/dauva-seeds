@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "dauva.dev/seed-proof/v1",
+  "seedId": "core-keeper-hard",
+  "seedVersion": "1.0.1-rc.1",
+  "result": "passed",
+  "provedAt": "2026-07-30T23:22:30.5074181+00:00",
+  "leaf": "proof-core-keeper-102rc1",
+  "checks": {
+    "imagesPinned": true,
+    "healthy": true,
+    "ports": true,
+    "backup": true,
+    "gracefulStop": true,
+    "restart": true,
+    "persistence": true,
+    "cleanup": true
+  },
+  "agreements": [
+    {
+      "key": "accept-steam-agreement",
+      "url": "https://store.steampowered.com/subscriber_agreement/",
+      "revision": "official-current",
+      "accepted": true
+    }
+  ],
+  "evidence": {
+    "seedManifest": "sha256:db3a986734e7d156670878be7a705ea9cf90978f7f4c14f3c7563942b3cf1515",
+    "registry": "sha256:c7e362d510d2807a5b6a903930ffd1b5743c6866dbdd598a177b43a6ffea787f",
+    "agent": "0.12.1",
+    "sprout": "The Server was Sprouted on Dauva's native Docker Branch.",
+    "initialHealth": "The Server completed its health checks and is ready.",
+    "stabilitySeconds": "20",
+    "persistenceVolume": "data",
+    "restart": "The Server completed its health checks and is ready.",
+    "cleanup": "The Server, its components, and its native Dauva storage were permanently deleted. Backups removed: True."
+  }
+}

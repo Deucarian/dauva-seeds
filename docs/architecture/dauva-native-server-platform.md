@@ -330,6 +330,38 @@ OCI, SteamCMD, and LinuxGSM source adapters normalize upstream metadata into a
 draft Seed. They do not bypass curation, digest pinning, agreement review, or
 proof promotion.
 
+### Guided Pod and Seed creation
+
+Dauva should eventually provide a guided **Pod and Seed Creator** for
+administrators and Registry maintainers. It is a curation workflow, not an
+arbitrary-container launcher.
+
+The Creator:
+
+1. identifies an official game or trusted upstream runtime;
+2. proposes a Pod or adds a variant to an existing Pod;
+3. discovers candidate images, ports, persistent data, settings, secrets,
+   agreements, resources, update strategy, and health signals;
+4. separates reusable recipe material from instance saves, mods, player data,
+   credentials, logs, generated identifiers, and backups;
+5. emits a versioned draft Seed and a review summary;
+6. runs the draft on a disposable Leaf;
+7. requires the Seed's complete proof policy, including persistence and
+   cleanup, before promotion;
+8. submits the reviewed change to the official Git-backed Registry with
+   provenance and proof receipts.
+
+The non-technical path asks ordinary game questions and derives infrastructure
+choices. Advanced maintainers can inspect the generated technical contract,
+but the Creator never permits privileged mode, Docker socket mounts, arbitrary
+host paths, mutable production images, embedded secrets, or preaccepted
+agreements. A generated draft has no production trust until review, digest
+pinning, agreement verification, and proof promotion all succeed.
+
+The same source-analysis contract powers both the Creator and migration:
+discovering ports, storage roles, settings, runtime versions, and health from a
+known Server should produce suggestions, never silently grant trust.
+
 ### Dauva Leaf Agent
 
 The Leaf Agent owns privileged host operations:
@@ -378,6 +410,34 @@ The control plane provides one Server lifecycle model:
 - migration discovery plus backup-first adoption for trusted, explicitly
   labelled legacy candidates; unrelated containers remain invisible and
   immutable.
+
+Migration uses a provider-neutral **adoption source** contract. A source can
+be:
+
+- an explicitly labelled live or stopped Compose workload;
+- retained game data whose original workload no longer exists;
+- a verified backup archive;
+- later, a compatible Server on another Leaf or hosting provider.
+
+Every adapter produces the same sanitized inventory: source identity, suggested
+Seed, mapped Seed volumes, public port assignments, recoverable settings,
+byte/file counts, consistency requirements, and rollback capability. The
+Portal never receives host paths or secret values.
+
+An offline-data source is explicitly registered and scoped to one stable Seed.
+The Leaf accepts only absolute existing paths under administrator-configured
+import roots, maps each path to an exact Seed volume, rejects symlinks, special
+files, duplicate/nested sources, cache/backup data presented as active data,
+and all paths outside the configured boundary. Ports and options must validate
+against the Seed. The source is immutable after a restore point is created.
+The Leaf reads it through a restricted, read-only archive helper; it does not
+gain a broad host-filesystem mount and it never starts a reconstructed game
+container.
+
+Offline data is treated as already stopped and therefore consistent. Its
+original directories remain untouched as the rollback source after successful
+adoption. A failed native health check removes only the exact Dauva-owned
+destination and retains the registered source and its restore point.
 
 Backups are stored outside the active Server tree through the
 `ILeafBackupStorage` contract. The first adapter uses a filesystem root; a
@@ -1143,29 +1203,31 @@ Live acceptance evidence:
 
 ### Phase 4: migration and retirement — in progress
 
-- Minecraft Fabric is the first backup-first adoption pilot. Other games stay
-  discovery-only until their storage mapping and health proof are reviewed.
-- Adopt existing Compose Servers one at a time through a dry-run, restore
+- Minecraft Fabric and Satisfactory Stable are the first completed
+  backup-first adoptions. Other games remain read-only until their storage
+  mapping and health proof are reviewed.
+- Adopt existing Servers one at a time through a dry-run, restore
   point, typed confirmation, fresh cutover snapshot, native health check, and
   durable Portal record.
-- The dry-run inventories only Docker-declared bind/volume sources, maps them
-  to Seed volume IDs, counts bytes and files, checks free space, confirms the
-  stable Seed and trusted labels, and never returns host source paths to the
-  Portal. Capacity accounting reserves the native copy plus both snapshots
-  when backup storage shares the active disk; a separate backup target must
+- The dry-run inventories adapter-declared sources, maps them to Seed volume
+  IDs, counts bytes and files, checks free space, confirms the stable Seed and
+  trusted source receipt, and never returns host source paths to the Portal.
+  Capacity accounting reserves the native copy plus both snapshots when
+  backup storage shares the active disk; a separate backup target must
   independently have room for both snapshots.
-- Legacy data is read through Docker's authenticated container-archive
-  interface. The Leaf validates the underlying mount boundary but does not
-  require or receive a broad host-filesystem mount merely to see legacy bind
-  paths. Archive paths, links, devices, and traversal attempts are rejected
-  before a restore point can be accepted.
+- Compose data is read through Docker's authenticated container-archive
+  interface. Retained offline data uses the restricted read-only archive
+  helper described above. In both cases the Leaf validates the underlying
+  source boundary without receiving a broad host-filesystem mount. Archive
+  paths, links, devices, and traversal attempts are rejected before a restore
+  point can be accepted.
 - Active worlds, mods, plugins, and configuration move into a new
   Dauva-owned Server root. Historic backup/cache volumes remain with the old
   source and are not duplicated into active storage; native backups start a
   fresh retention history.
-- Creating a restore point briefly stops the complete Compose workload for a
+- Creating a restore point briefly stops a live Compose workload for a
   consistent archive and then resumes exactly the components that were
-  running.
+  running. An offline source is already immutable and is never started.
 - Restore-point creation and final adoption are server-side operations, not
   long-lived browser requests. The Portal starts an idempotent operation,
   polls its short status endpoint, and can reconnect to the same operation

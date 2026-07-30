@@ -1,6 +1,6 @@
 {
   "name": "@deucarian/dauva-seeds",
-  "version": "0.10.1",
+  "version": "0.11.0",
   "private": true,
   "type": "module",
   "description": "Validation and compilation tooling for the Dauva Seed Registry.",
