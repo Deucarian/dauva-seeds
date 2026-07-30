@@ -49,6 +49,7 @@ existing Servers, never merge automatically, and never pre-accept agreements.
 
 Runtime game versions and Seed recipe versions are separate. Satisfactory
 Stable declares Steam app `1690800`, the public Stable channel, a bounded
-app-manifest detector, and a trusted SteamCMD update strategy. The allocated
-game and messaging ports are configured and published 1:1; they must not be
-silently remapped to different container ports.
+app-manifest detector, and a trusted SteamCMD update strategy with an explicit,
+bounded `/home/steam` container home. The allocated game and messaging ports
+are configured and published 1:1; they must not be silently remapped to
+different container ports.

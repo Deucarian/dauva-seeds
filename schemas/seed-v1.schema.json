@@ -1036,6 +1036,12 @@
           "minLength": 2,
           "maxLength": 512
         },
+        "homeDirectory": {
+          "type": "string",
+          "pattern": "^/(?!.*\\.\\.)[A-Za-z0-9._/-]+$",
+          "minLength": 2,
+          "maxLength": 512
+        },
         "user": {
           "type": "string",
           "pattern": "^[1-9][0-9]*:[1-9][0-9]*$",
@@ -1071,6 +1077,7 @@
       "dependentRequired": {
         "strategy": [
           "executable",
+          "homeDirectory",
           "user",
           "componentId",
           "volumeId",

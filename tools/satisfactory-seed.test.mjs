@@ -70,6 +70,7 @@ test("Satisfactory Stable has one version-independent managed recipe", async () 
     rollback: true,
     strategy: "steamcmd",
     executable: "/usr/games/steamcmd",
+    homeDirectory: "/home/steam",
     user: "1000:1000",
     componentId: "server",
     volumeId: "config",
@@ -169,6 +170,14 @@ test("managed Steam updates cannot omit ownership or escape storage", async () =
   const incomplete = structuredClone(seed);
   delete incomplete.updatePolicy.appId;
   assert.equal(validate(incomplete), false);
+
+  const missingHome = structuredClone(seed);
+  delete missingHome.updatePolicy.homeDirectory;
+  assert.equal(validate(missingHome), false);
+
+  const unsafeHome = structuredClone(seed);
+  unsafeHome.updatePolicy.homeDirectory = "/home/../root";
+  assert.equal(validate(unsafeHome), false);
 
   const rootUpdater = structuredClone(seed);
   rootUpdater.updatePolicy.user = "0:0";

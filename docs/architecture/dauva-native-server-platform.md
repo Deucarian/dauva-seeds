@@ -909,7 +909,8 @@ supplied code:
 1. create and verify a restore point;
 2. stop the Server cleanly;
 3. run `/usr/games/steamcmd` from the pinned runtime image as the explicitly
-   declared unprivileged user `1000:1000`, with the fixed app ID, branch,
+   declared unprivileged user `1000:1000`, with `HOME` fixed to the
+   declarative `/home/steam` container directory and the fixed app ID, branch,
    install directory, and validation mode;
 4. read the new runtime build;
 5. start the Server and pass its normal health check;

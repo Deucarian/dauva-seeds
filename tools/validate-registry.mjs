@@ -505,12 +505,14 @@ function validateManagedUpdateContract(entry, componentIds, volumeIds) {
     );
   }
   if (policy.strategy === "steamcmd") {
-    if (
-      typeof policy.executable !== "string" ||
-      !/^\/(?!.*\.\.)[A-Za-z0-9._/-]+$/.test(policy.executable)
-    ) {
+    if (!isBoundedAbsoluteContainerPath(policy.executable)) {
       errors.push(
         `${entry.name}: SteamCMD executable must be a bounded absolute container path.`,
+      );
+    }
+    if (!isBoundedAbsoluteContainerPath(policy.homeDirectory)) {
+      errors.push(
+        `${entry.name}: SteamCMD home directory must be a bounded absolute container path.`,
       );
     }
     const userMatch =
@@ -557,6 +559,15 @@ function validateManagedUpdateContract(entry, componentIds, volumeIds) {
       );
     }
   }
+}
+
+function isBoundedAbsoluteContainerPath(value) {
+  return (
+    typeof value === "string" &&
+    value.length >= 2 &&
+    value.length <= 512 &&
+    /^\/(?!.*\.\.)[A-Za-z0-9._/-]+$/.test(value)
+  );
 }
 
 function validateProofPolicy(proofs, seeds) {

@@ -244,6 +244,7 @@
     "rollback": true,
     "strategy": "steamcmd",
     "executable": "/usr/games/steamcmd",
+    "homeDirectory": "/home/steam",
     "user": "1000:1000",
     "componentId": "server",
     "volumeId": "config",
