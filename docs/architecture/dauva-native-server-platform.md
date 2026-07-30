@@ -2,7 +2,7 @@
 
 Status: **Phase 5 complete; Phase 6 Leaf delivery implemented and end-to-end acceptance in progress**
 
-Last updated: 2026-07-29
+Last updated: 2026-07-30
 
 This document is the canonical product and architecture design for Dauva's
 native game-server platform. Keep it current when the Seed format, registry,
@@ -804,6 +804,20 @@ The Leaf Agent allocates ports atomically from configured pools and persists
 the complete allocation before starting components. Partial allocation failure
 must leave no leaked reservations.
 
+`containerPortMode: allocated` is a 1:1 allocation contract, not ordinary
+Docker NAT remapping. The allocated public number is also used as the
+container's listening port and is supplied through the declared environment
+input. When TCP and UDP share one logical port, both protocols receive that
+same number. This matters for games that advertise their listening port or
+reject redirected traffic.
+
+Satisfactory Stable therefore declares one allocated game port for TCP and UDP
+with fallback `7777`, plus one allocated reliable-messaging TCP port with
+fallback `8888`. `SERVERGAMEPORT` and `SERVERMESSAGINGPORT` receive those exact
+allocated numbers. A Leaf must never map public `7777` to an internally
+configured `26002`, for example; preserving an existing public port requires
+reserving and configuring that same number internally.
+
 The native Docker Branch now supports single dynamic ports and contiguous
 paired allocations. Valheim proved a two-port public UDP pair, while Factorio
 proved that a private administration port is not published to the host.
@@ -871,6 +885,42 @@ Automatic checks are allowed. Automatic installation into an existing Server
 is not. Existing Servers receive an update offer and remain pinned until an
 administrator explicitly requests an update. A new image digest is never
 silently substituted at container start.
+
+Seed version, game version, upstream build, and channel are distinct:
+
+- the Seed version identifies the immutable Dauva recipe;
+- the game version is the human release actually running;
+- the upstream build identifies the exact Steam or vendor payload;
+- the channel identifies a moving line such as Stable or Experimental.
+
+An optional `runtimeVersion` contract lets the Leaf inspect a bounded,
+Seed-owned file through a declared component volume. The
+`steam-app-manifest` strategy reads the Steam build from an app manifest;
+trusted game-specific enrichment may derive the human version only from
+bounded component logs. Seeds never contain a host path, shell command, or
+arbitrary regular expression for version discovery.
+
+Satisfactory Stable uses Steam app `1690800`, branch `public`, and channel
+`stable`. Its ordinary component environment sets `SKIPUPDATE=true`, so a
+restart cannot silently replace the game. Its trusted `steamcmd` update
+strategy is a fixed operation over the declared `/config` volume, not Seed
+supplied code:
+
+1. create and verify a restore point;
+2. stop the Server cleanly;
+3. run the pinned runtime image as its unprivileged Steam user with the fixed
+   app ID, branch, install directory, and validation mode;
+4. read the new runtime build;
+5. start the Server and pass its normal health check;
+6. retain the new build only after success, otherwise restore the verified
+   checkpoint and previous running state.
+
+An update-capable Seed must declare backup, restore, and update capabilities,
+require backup and rollback, and pass explicit runtime-version,
+managed-update, and rollback proof checks. The Satisfactory Stable `1.0.1`
+recipe remains a release candidate until that end-to-end proof is stored; the
+observed live Satisfactory 1.2 runtime is baseline evidence, not a substitute
+for the managed-update proof.
 
 Proof credentials and required administrator secrets are supplied only for the
 disposable request. They are neither written to the Seed nor copied into the

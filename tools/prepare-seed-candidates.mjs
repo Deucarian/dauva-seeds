@@ -69,6 +69,13 @@ for (const update of report.seeds) {
       "healthy",
       "ports",
       "backup-if-supported",
+      ...(seed.capabilities.update
+        ? [
+            "runtime-version",
+            "managed-update",
+            "rollback",
+          ]
+        : []),
       "graceful-stop",
       "restart",
       "persistence",

@@ -1,8 +1,8 @@
 {
   "schemaVersion": "dauva.dev/seed/v1",
   "id": "satisfactory",
-  "version": "1.0.1-rc.1",
-  "status": "candidate",
+  "version": "1.0.0",
+  "status": "stable",
   "podId": "satisfactory",
   "genres": [
     "automation",
@@ -36,13 +36,6 @@
       "resource-limits"
     ]
   },
-  "runtimeVersion": {
-    "strategy": "steam-app-manifest",
-    "componentId": "server",
-    "volumeId": "config",
-    "path": "gamefiles/steamapps/appmanifest_1690800.acf",
-    "channel": "stable"
-  },
   "components": [
     {
       "id": "server",
@@ -55,7 +48,7 @@
         "AUTOSAVENUM": "10",
         "DISABLESEASONALEVENTS": "false",
         "ROOTLESS": "false",
-        "SKIPUPDATE": "true",
+        "SKIPUPDATE": "false",
         "STEAMBETA": "false"
       },
       "optionEnvironment": {
@@ -208,23 +201,22 @@
     "stopTimeoutSeconds": 180
   },
   "capabilities": {
-    "backup": true,
-    "restore": true,
-    "update": true,
+    "backup": false,
+    "restore": false,
+    "update": false,
     "console": false
   },
   "source": {
-    "kind": "steamcmd",
+    "kind": "oci",
     "homepage": "https://www.satisfactorygame.com/",
     "repository": "https://github.com/wolveix/satisfactory-server",
     "imageRegistries": [
       "docker.io"
-    ],
-    "upstreamId": "1690800"
+    ]
   },
   "trust": {
     "level": "curated",
-    "reviewedAt": "2026-07-30",
+    "reviewedAt": "2026-07-26",
     "mutableRuntimeImagesAllowed": false
   },
   "storage": {
@@ -236,18 +228,11 @@
     "backupPolicy": "optional"
   },
   "updatePolicy": {
-    "discovery": "steamcmd",
+    "discovery": "oci-tag",
     "automaticCheck": true,
     "automaticInstall": false,
-    "requiresBackup": true,
-    "rollback": true,
-    "strategy": "steamcmd",
-    "componentId": "server",
-    "volumeId": "config",
-    "installDirectory": "/config/gamefiles",
-    "appId": "1690800",
-    "branch": "public",
-    "validate": true
+    "requiresBackup": false,
+    "rollback": true
   },
   "proofPolicy": {
     "requiredChecks": [
@@ -255,9 +240,6 @@
       "healthy",
       "ports",
       "backup-if-supported",
-      "runtime-version",
-      "managed-update",
-      "rollback",
       "graceful-stop",
       "restart",
       "persistence",

@@ -64,6 +64,15 @@
         "backup": {
           "const": true
         },
+        "runtimeVersion": {
+          "const": true
+        },
+        "managedUpdate": {
+          "const": true
+        },
+        "rollback": {
+          "const": true
+        },
         "gracefulStop": {
           "const": true
         },

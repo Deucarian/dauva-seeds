@@ -31,6 +31,19 @@ if (
 ) {
   throw new Error(`Proof receipt contains an incomplete lifecycle check.`);
 }
+if (seed.capabilities.update) {
+  for (const check of [
+    "runtimeVersion",
+    "managedUpdate",
+    "rollback",
+  ]) {
+    if (proof.checks[check] !== true) {
+      throw new Error(
+        `Proof receipt has no passing managed-update check '${check}'.`,
+      );
+    }
+  }
+}
 for (const agreement of seed.inputs.filter(
   (input) => input.type === "agreement",
 )) {
