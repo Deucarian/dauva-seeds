@@ -917,7 +917,9 @@ supplied code:
 
 An update-capable Seed must declare backup, restore, and update capabilities,
 require backup and rollback, and pass explicit runtime-version,
-managed-update, and rollback proof checks. The Satisfactory Stable `1.0.1`
+managed-update, and rollback proof checks. It also requires the
+`managed-game-updates-v1` Leaf capability so a Leaf that only understands the
+older lifecycle contract cannot accept it. The Satisfactory Stable `1.0.1`
 recipe remains a release candidate until that end-to-end proof is stored; the
 observed live Satisfactory 1.2 runtime is baseline evidence, not a substitute
 for the managed-update proof.

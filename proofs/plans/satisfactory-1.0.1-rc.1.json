@@ -27,6 +27,7 @@
     "cleanup"
   ],
   "acceptance": [
+    "The selected Leaf advertises managed-game-updates-v1 before Dauva assigns the candidate.",
     "A normal stop and restart with SKIPUPDATE=true leaves the installed Steam build unchanged.",
     "The Leaf reports Stable as the channel, Steam buildid from the owned app manifest, and the bounded Satisfactory game version and changelist without reading an arbitrary host path.",
     "The game port is published on one identical internal and public number for TCP and UDP; reliable messaging uses one identical internal and public TCP number.",

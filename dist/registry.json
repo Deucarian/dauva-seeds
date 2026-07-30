@@ -3746,6 +3746,7 @@
         ],
         "leafCapabilities": [
           "dynamic-ports",
+          "managed-game-updates-v1",
           "multi-port",
           "oci",
           "persistent-storage",
@@ -3981,7 +3982,7 @@
         ],
         "expiresAfterDays": 90
       },
-      "manifestDigest": "sha256:259d1546ea739fffc7290a85ccd15a3283f5fd3360fd0102ce760600f8eadf86",
+      "manifestDigest": "sha256:f831e28556809fa04a8d619a2ea9a829924fec5674e3691d9d8f5ee27c339ff9",
       "proof": {
         "state": "unproven"
       }
@@ -6129,5 +6130,5 @@
       "upstreamId": "1690800"
     }
   ],
-  "registryDigest": "sha256:6a2a3059485b6494b378b98260b99a128003915bdd711e3837fdd3c753961572"
+  "registryDigest": "sha256:89da9f7c25660cba43801b93fabd33984d88954127ac95a395d1f1dbe3add305"
 }

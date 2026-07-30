@@ -23,6 +23,12 @@ test("Satisfactory Stable has one version-independent managed recipe", async () 
   assert.equal(seed.status, "candidate");
   assert.equal(seed.metadata.title.en, "Satisfactory Stable");
   assert.equal(
+    seed.compatibility.leafCapabilities.includes(
+      "managed-game-updates-v1",
+    ),
+    true,
+  );
+  assert.equal(
     seedFiles.some((name) => /^satisfactory-1[.-]2/i.test(name)),
     false,
   );

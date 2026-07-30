@@ -336,6 +336,15 @@ function validateSeedPolicy(entry, podIds) {
     );
   }
   if (seed.capabilities.update) {
+    if (
+      !seed.compatibility.leafCapabilities.includes(
+        "managed-game-updates-v1",
+      )
+    ) {
+      errors.push(
+        `${entry.name}: managed updates require Leaf capability 'managed-game-updates-v1'.`,
+      );
+    }
     if (!seed.runtimeVersion) {
       errors.push(
         `${entry.name}: managed updates require a runtime version detector.`,

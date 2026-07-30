@@ -30,6 +30,7 @@
     ],
     "leafCapabilities": [
       "dynamic-ports",
+      "managed-game-updates-v1",
       "multi-port",
       "oci",
       "persistent-storage",
