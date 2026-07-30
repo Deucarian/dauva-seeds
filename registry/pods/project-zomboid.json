@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "dauva.dev/pod/v1",
+  "id": "project-zomboid",
+  "status": "stable",
+  "recommendedSeedId": "project-zomboid-private",
+  "metadata": {
+    "title": {
+      "en": "Project Zomboid",
+      "nl": "Project Zomboid",
+      "de": "Project Zomboid"
+    },
+    "description": {
+      "en": "Persistent Project Zomboid Servers with a private-by-default setup.",
+      "nl": "Blijvende Project Zomboid-Servers die standaard privé zijn.",
+      "de": "Persistente Project-Zomboid-Server, die standardmäßig privat sind."
+    },
+    "icon": "pulse"
+  }
+}

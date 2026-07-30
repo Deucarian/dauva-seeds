@@ -21,8 +21,12 @@
       "enum": [
         "draft",
         "candidate",
-        "stable"
+        "stable",
+        "withered"
       ]
+    },
+    "recommendedSeedId": {
+      "$ref": "#/$defs/id"
     },
     "metadata": {
       "$ref": "#/$defs/metadata"

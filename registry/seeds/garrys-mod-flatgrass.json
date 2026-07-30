@@ -1,25 +1,24 @@
 {
   "schemaVersion": "dauva.dev/seed/v1",
-  "id": "satisfactory",
+  "id": "garrys-mod-flatgrass",
   "version": "1.0.0",
   "status": "stable",
-  "podId": "satisfactory",
+  "podId": "garrys-mod",
   "genres": [
-    "automation",
-    "simulation"
+    "sandbox"
   ],
   "metadata": {
     "title": {
-      "en": "Satisfactory Stable",
-      "nl": "Satisfactory Stable",
-      "de": "Satisfactory Stable"
+      "en": "Garry's Mod Flatgrass",
+      "nl": "Garry's Mod Flatgrass",
+      "de": "Garry's Mod Flatgrass"
     },
     "description": {
-      "en": "A persistent Satisfactory Server that follows the stable Steam branch.",
-      "nl": "Een blijvende Satisfactory-Server die de stabiele Steam-tak volgt.",
-      "de": "Ein persistenter Satisfactory-Server auf dem stabilen Steam-Zweig."
+      "en": "A vanilla Sandbox Server that starts on gm_flatgrass.",
+      "nl": "Een vanilla Sandbox-Server die start op gm_flatgrass.",
+      "de": "Ein Vanilla-Sandbox-Server, der auf gm_flatgrass startet."
     },
-    "icon": "settings"
+    "icon": "toolbox"
   },
   "compatibility": {
     "operatingSystems": [
@@ -40,53 +39,65 @@
     {
       "id": "server",
       "role": "primary",
-      "image": "docker.io/wolveix/satisfactory-server@sha256:e103700ae6ae4c50f19dac80eadb2a805c5b885e179ae2a40850e967bf189efd",
+      "image": "docker.io/ceifa/garrysmod@sha256:08628a0c98cb545d56006294d86f02a64cd77f344ff4bc114e0a324045905841",
       "imageUpdate": {
-        "reference": "docker.io/wolveix/satisfactory-server:latest"
+        "reference": "docker.io/ceifa/garrysmod:ubuntu"
       },
       "environment": {
-        "AUTOSAVENUM": "10",
-        "DISABLESEASONALEVENTS": "false",
-        "ROOTLESS": "false",
-        "SKIPUPDATE": "false",
-        "STEAMBETA": "false"
+        "GAMEMODE": "sandbox",
+        "MAP": "gm_flatgrass",
+        "PRODUCTION": "1"
       },
       "optionEnvironment": {
-        "max-players": "MAXPLAYERS",
-        "max-tick-rate": "MAXTICKRATE"
+        "max-players": "MAXPLAYERS"
       },
       "agreementEnvironment": {},
       "secretEnvironment": {},
       "runtimeEnvironment": {
-        "primaryPort": "SERVERGAMEPORT",
-        "timezone": "TZ"
+        "serverName": "HOSTNAME"
       },
       "volumeMounts": [
         {
-          "volumeId": "config",
-          "target": "/config",
+          "volumeId": "data",
+          "target": "/home/gmod/server/garrysmod/data",
+          "readOnly": false
+        },
+        {
+          "volumeId": "addons",
+          "target": "/home/gmod/server/garrysmod/addons",
           "readOnly": false
         }
       ],
       "dependsOn": [],
       "health": {
         "source": "container",
-        "startupGraceSeconds": 1200
+        "startupGraceSeconds": 900
       }
     }
   ],
   "volumes": [
     {
-      "id": "config",
+      "id": "data",
+      "role": "save",
+      "retention": "delete-with-server",
+      "ownerUid": 1000,
+      "ownerGid": 1000,
+      "directoryMode": "0770"
+    },
+    {
+      "id": "addons",
       "role": "data",
-      "retention": "delete-with-server"
+      "retention": "delete-with-server",
+      "ownerUid": 1000,
+      "ownerGid": 1000,
+      "directoryMode": "0770"
     }
   ],
   "ports": [
     {
       "id": "game",
       "componentId": "server",
-      "containerPort": 7777,
+      "containerPort": 27015,
       "containerPortMode": "allocated",
       "protocols": [
         "tcp",
@@ -96,21 +107,20 @@
       "purpose": "game",
       "primary": true,
       "sharedHostPort": true,
-      "environment": "SERVERGAMEPORT"
+      "environment": "PORT"
     },
     {
-      "id": "messaging",
+      "id": "client",
       "componentId": "server",
-      "containerPort": 8888,
-      "containerPortMode": "allocated",
+      "containerPort": 27005,
+      "containerPortMode": "fixed",
       "protocols": [
-        "tcp"
+        "udp"
       ],
       "exposure": "public",
-      "purpose": "messaging",
+      "purpose": "query",
       "primary": false,
-      "sharedHostPort": true,
-      "environment": "SERVERMESSAGINGPORT"
+      "sharedHostPort": true
     }
   ],
   "resources": {
@@ -124,13 +134,29 @@
           "de": "Ausgewogen"
         },
         "description": {
-          "en": "Minimum practical resources for a small factory.",
-          "nl": "Minimaal praktische resources voor een kleine fabriek.",
-          "de": "Praktische Mindestressourcen für eine kleine Fabrik."
+          "en": "For a small vanilla Sandbox Server.",
+          "nl": "Voor een kleine vanilla Sandbox-Server.",
+          "de": "Für einen kleinen Vanilla-Sandbox-Server."
         },
-        "memoryMb": 8192,
-        "diskMb": 30720,
-        "cpuPercent": 250
+        "memoryMb": 3072,
+        "diskMb": 12288,
+        "cpuPercent": 200
+      },
+      {
+        "id": "large",
+        "title": {
+          "en": "Large",
+          "nl": "Groot",
+          "de": "Groß"
+        },
+        "description": {
+          "en": "Extra headroom for persistent addons and more players.",
+          "nl": "Extra ruimte voor blijvende addons en meer spelers.",
+          "de": "Zusätzliche Reserven für persistente Addons und mehr Spieler."
+        },
+        "memoryMb": 6144,
+        "diskMb": 24576,
+        "cpuPercent": 300
       }
     ]
   },
@@ -144,9 +170,9 @@
         "de": "Steam-Nutzungsvertrag"
       },
       "help": {
-        "en": "I have read and accept the Steam Subscriber Agreement and the applicable Satisfactory terms.",
-        "nl": "Ik heb de Steam Subscriber Agreement en de toepasselijke Satisfactory-voorwaarden gelezen en accepteer deze.",
-        "de": "Ich habe den Steam-Nutzungsvertrag und die anwendbaren Satisfactory-Bedingungen gelesen und akzeptiert."
+        "en": "I have read and accept the Steam Subscriber Agreement and the applicable game terms.",
+        "nl": "Ik heb de Steam Subscriber Agreement en de toepasselijke gamevoorwaarden gelezen en accepteer deze.",
+        "de": "Ich habe den Steam-Nutzungsvertrag und die anwendbaren Spielbedingungen gelesen und akzeptiert."
       },
       "required": true,
       "defaultValue": "false",
@@ -167,25 +193,7 @@
         "de": "Maximale Anzahl gleichzeitiger Spieler."
       },
       "required": true,
-      "defaultValue": "8",
-      "minLength": 1,
-      "maxLength": 2
-    },
-    {
-      "key": "max-tick-rate",
-      "type": "integer",
-      "label": {
-        "en": "Maximum tick rate",
-        "nl": "Maximale tickrate",
-        "de": "Maximale Tickrate"
-      },
-      "help": {
-        "en": "Upper simulation tick-rate limit.",
-        "nl": "Bovengrens voor de simulatietickrate.",
-        "de": "Obergrenze für die Simulations-Tickrate."
-      },
-      "required": true,
-      "defaultValue": "30",
+      "defaultValue": "16",
       "minLength": 1,
       "maxLength": 3
     }
@@ -198,7 +206,7 @@
     "stopOrder": [
       "server"
     ],
-    "stopTimeoutSeconds": 180
+    "stopTimeoutSeconds": 120
   },
   "capabilities": {
     "backup": false,
@@ -208,11 +216,12 @@
   },
   "source": {
     "kind": "oci",
-    "homepage": "https://www.satisfactorygame.com/",
-    "repository": "https://github.com/wolveix/satisfactory-server",
+    "homepage": "https://gmod.facepunch.com/",
+    "repository": "https://github.com/ceifa/garrysmod-docker",
     "imageRegistries": [
       "docker.io"
-    ]
+    ],
+    "upstreamId": "steam:4020"
   },
   "trust": {
     "level": "curated",
@@ -220,12 +229,12 @@
     "mutableRuntimeImagesAllowed": false
   },
   "storage": {
-    "class": "bulk",
+    "class": "fast",
     "backupClass": "backup",
-    "estimatedDownloadMb": 15000,
-    "estimatedInstallMb": 26000,
-    "estimatedMutableMb": 12288,
-    "backupPolicy": "optional"
+    "estimatedDownloadMb": 5200,
+    "estimatedInstallMb": 9000,
+    "estimatedMutableMb": 8192,
+    "backupPolicy": "recommended"
   },
   "updatePolicy": {
     "discovery": "oci-tag",

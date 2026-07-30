@@ -9,9 +9,15 @@ import {
 
 const podFiles = await readManifestDirectory("registry/pods");
 const seedFiles = await readManifestDirectory("registry/seeds");
+const releaseFiles = await readManifestDirectory("registry/history", {
+  allowMissing: true,
+});
+const proofFiles = await readManifestDirectory("proofs");
 const registry = compiledRegistry(
   podFiles.map((entry) => entry.value),
   seedFiles.map((entry) => entry.value),
+  proofFiles.map((entry) => entry.value),
+  releaseFiles.map((entry) => entry.value),
 );
 const rendered = `${JSON.stringify(registry, null, 2)}\n`;
 const outputPath = path.join(repositoryRoot, "dist", "registry.json");
@@ -32,6 +38,6 @@ if (process.argv.includes("--check")) {
   await mkdir(path.dirname(outputPath), { recursive: true });
   await writeFile(outputPath, rendered, "utf8");
   console.log(
-    `Compiled ${registry.pods.length} Pods and ${registry.seeds.length} Seeds to dist/registry.json (${registry.registryDigest}).`,
+    `Compiled ${registry.pods.length} Pods, ${registry.seeds.length} Seeds, ${registry.releases.length} historical releases, and ${registry.proofs.length} proof receipts to dist/registry.json (${registry.registryDigest}).`,
   );
 }

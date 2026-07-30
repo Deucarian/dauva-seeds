@@ -1,7 +1,8 @@
 {
   "schemaVersion": "dauva.dev/pod/v1",
   "id": "enshrouded",
-  "status": "candidate",
+  "status": "stable",
+  "recommendedSeedId": "enshrouded-wine",
   "metadata": {
     "title": {
       "en": "Enshrouded",

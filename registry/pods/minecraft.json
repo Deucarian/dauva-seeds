@@ -2,6 +2,7 @@
   "schemaVersion": "dauva.dev/pod/v1",
   "id": "minecraft",
   "status": "stable",
+  "recommendedSeedId": "minecraft-paper",
   "metadata": {
     "title": {
       "en": "Minecraft",
