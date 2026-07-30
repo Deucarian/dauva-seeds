@@ -243,6 +243,8 @@
     "requiresBackup": true,
     "rollback": true,
     "strategy": "steamcmd",
+    "executable": "/usr/games/steamcmd",
+    "user": "1000:1000",
     "componentId": "server",
     "volumeId": "config",
     "installDirectory": "/config/gamefiles",

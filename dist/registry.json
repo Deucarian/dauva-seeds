@@ -3959,6 +3959,8 @@
         "requiresBackup": true,
         "rollback": true,
         "strategy": "steamcmd",
+        "executable": "/usr/games/steamcmd",
+        "user": "1000:1000",
         "componentId": "server",
         "volumeId": "config",
         "installDirectory": "/config/gamefiles",
@@ -3982,7 +3984,7 @@
         ],
         "expiresAfterDays": 90
       },
-      "manifestDigest": "sha256:f831e28556809fa04a8d619a2ea9a829924fec5674e3691d9d8f5ee27c339ff9",
+      "manifestDigest": "sha256:63b4c4c188dfc3d6fc40944fadbb20550bef5f6ce6393ac6c18d25fc6fc1525b",
       "proof": {
         "state": "unproven"
       }
@@ -6130,5 +6132,5 @@
       "upstreamId": "1690800"
     }
   ],
-  "registryDigest": "sha256:89da9f7c25660cba43801b93fabd33984d88954127ac95a395d1f1dbe3add305"
+  "registryDigest": "sha256:c275f16a3c7ebe0eb7d144cacea5fa975623a023562eae6cd2b3e69b5ee497a3"
 }

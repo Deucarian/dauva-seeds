@@ -32,7 +32,7 @@
     "The Leaf reports Stable as the channel, Steam buildid from the owned app manifest, and the bounded Satisfactory game version and changelist without reading an arbitrary host path.",
     "The game port is published on one identical internal and public number for TCP and UDP; reliable messaging uses one identical internal and public TCP number.",
     "An explicit update cannot begin until a local restore point is written and verified.",
-    "The update runs the pinned image as uid 1000:gid 1000 with the declared config volume and the fixed SteamCMD app 1690800 public-branch validation operation.",
+    "The update runs /usr/games/steamcmd from the pinned image as uid 1000:gid 1000 with the declared config volume and the fixed SteamCMD app 1690800 public-branch validation operation.",
     "The Server starts healthy after the update and retains its saves and configuration.",
     "A deliberately failed post-update health check restores the verified checkpoint and the previous running state.",
     "The disposable proof Server, volumes, network, restore point, and proof-only allocations are removed after evidence is captured."

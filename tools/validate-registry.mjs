@@ -506,6 +506,27 @@ function validateManagedUpdateContract(entry, componentIds, volumeIds) {
   }
   if (policy.strategy === "steamcmd") {
     if (
+      typeof policy.executable !== "string" ||
+      !/^\/(?!.*\.\.)[A-Za-z0-9._/-]+$/.test(policy.executable)
+    ) {
+      errors.push(
+        `${entry.name}: SteamCMD executable must be a bounded absolute container path.`,
+      );
+    }
+    const userMatch =
+      typeof policy.user === "string"
+        ? policy.user.match(/^([1-9][0-9]*):([1-9][0-9]*)$/)
+        : null;
+    if (
+      !userMatch ||
+      BigInt(userMatch[1]) > 2147483647n ||
+      BigInt(userMatch[2]) > 2147483647n
+    ) {
+      errors.push(
+        `${entry.name}: SteamCMD update user must be an unprivileged numeric uid:gid.`,
+      );
+    }
+    if (
       seed.source.kind !== "steamcmd" ||
       seed.source.upstreamId !== policy.appId
     ) {

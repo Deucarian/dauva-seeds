@@ -1030,6 +1030,17 @@
         "strategy": {
           "const": "steamcmd"
         },
+        "executable": {
+          "type": "string",
+          "pattern": "^/(?!.*\\.\\.)[A-Za-z0-9._/-]+$",
+          "minLength": 2,
+          "maxLength": 512
+        },
+        "user": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]*:[1-9][0-9]*$",
+          "maxLength": 41
+        },
         "componentId": {
           "$ref": "#/$defs/id"
         },
@@ -1059,6 +1070,8 @@
       },
       "dependentRequired": {
         "strategy": [
+          "executable",
+          "user",
           "componentId",
           "volumeId",
           "installDirectory",
