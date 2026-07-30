@@ -4,6 +4,37 @@
   "title": "Dauva Seed proof v1",
   "type": "object",
   "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "seedVersion": {
+            "type": "string",
+            "pattern": "-rc\\.[1-9][0-9]*$"
+          }
+        },
+        "required": [
+          "seedVersion"
+        ]
+      },
+      "then": {
+        "properties": {
+          "evidence": {
+            "type": "object",
+            "properties": {
+              "seedManifest": {
+                "type": "string",
+                "pattern": "^sha256:[a-f0-9]{64}$"
+              }
+            },
+            "required": [
+              "seedManifest"
+            ]
+          }
+        }
+      }
+    }
+  ],
   "required": [
     "schemaVersion",
     "seedId",
@@ -64,6 +95,15 @@
         "backup": {
           "const": true
         },
+        "runtimeVersion": {
+          "const": true
+        },
+        "managedUpdate": {
+          "const": true
+        },
+        "rollback": {
+          "const": true
+        },
         "gracefulStop": {
           "const": true
         },
@@ -112,6 +152,12 @@
     },
     "evidence": {
       "type": "object",
+      "properties": {
+        "seedManifest": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        }
+      },
       "additionalProperties": {
         "type": "string",
         "minLength": 1,

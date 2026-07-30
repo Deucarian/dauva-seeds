@@ -36,10 +36,12 @@ The first vertical slice is live:
   behind an optional choice.
 - All six existing Compose Server types have sanitized Seed manifests. Terraria,
   Project Zomboid, and Garry's Mod have now joined them, giving the Registry
-  nine Pods and eighteen stable Seeds with two meaningful variants per Pod.
-- Factorio Stable, Valheim BepInEx, both Satisfactory branches, and both
-  Enshrouded runtimes passed disposable native lifecycle proofs. Together with
-  the original proven Seeds, they are stable `1.0.x` recipes.
+  nine Pods and eighteen Seed recipes with two meaningful variants per Pod.
+- Factorio Stable, Valheim BepInEx, Satisfactory Experimental, and both
+  Enshrouded runtimes passed disposable native lifecycle proofs.
+  Satisfactory Stable `1.0.1` additionally passed its exact runtime-version,
+  backup-first managed-update, forced-failure rollback, persistence, and
+  cleanup proof; immutable `1.0.0` remains in release history.
 - Enshrouded Wine is recommended because its roughly 9 GB game install,
   saves, logs, and local backups all live on explicit data-disk storage.
   Enshrouded Proton persists saves but revalidates its large install on cold
@@ -78,6 +80,12 @@ backup, stop, restart, persistence, and cleanup checks before
 `npm run seed:promote` accepts its matching proof receipt. Agreements stay
 unchecked: a required EULA or terms revision must have explicit acceptance in
 the proof receipt and in Dauva's server-side audit.
+
+Seed versions identify Dauva recipes, not game releases. A managed Server may
+therefore report Satisfactory 1.2 while using Satisfactory Stable Seed 1.0.1.
+The Seed's runtime-version contract reports the actual Steam build and Stable
+channel separately. Ordinary restarts do not install updates; update-capable
+Seeds require an explicit backup-first update and verified rollback path.
 
 `npm run seed:create` turns a curated OCI, SteamCMD, LinuxGSM, or Dauva source
 into a draft that still requires human review. `npm run seed:proof` asks an
