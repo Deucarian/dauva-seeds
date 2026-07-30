@@ -1,8 +1,8 @@
 {
   "schemaVersion": "dauva.dev/seed/v1",
   "id": "satisfactory",
-  "version": "1.0.1-rc.1",
-  "status": "candidate",
+  "version": "1.0.1",
+  "status": "stable",
   "podId": "satisfactory",
   "genres": [
     "automation",

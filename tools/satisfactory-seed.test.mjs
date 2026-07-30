@@ -19,8 +19,8 @@ test("Satisfactory Stable has one version-independent managed recipe", async () 
   const seed = await readJson("registry", "seeds", "satisfactory.json");
   const seedFiles = await readdir(path.join(repositoryRoot, "registry", "seeds"));
 
-  assert.equal(seed.version, "1.0.1-rc.1");
-  assert.equal(seed.status, "candidate");
+  assert.equal(seed.version, "1.0.1");
+  assert.equal(seed.status, "stable");
   assert.equal(seed.metadata.title.en, "Satisfactory Stable");
   assert.equal(
     seed.compatibility.leafCapabilities.includes(
@@ -79,6 +79,10 @@ test("Satisfactory Stable has one version-independent managed recipe", async () 
     branch: "public",
     validate: true,
   });
+  assert.equal(
+    sha256(canonicalJson(seed)),
+    "sha256:eece939e3fb8aa5d3c844d4d860dff52d879ec2d0129f17cea9668611228adf4",
+  );
 });
 
 test("Satisfactory ports allocate one internal and public number 1:1", async () => {
@@ -139,16 +143,36 @@ test("Satisfactory 1.0.0 remains an immutable historical recipe", async () => {
   );
 });
 
-test("managed-update promotion has an explicit unpassed proof plan", async () => {
+test("managed-update promotion retains its exact passing proof", async () => {
   const plan = await readJson(
     "proofs",
     "plans",
     "satisfactory-1.0.1-rc.1.json",
   );
+  const receipt = await readJson(
+    "proofs",
+    "satisfactory-1.0.1-rc.1.json",
+  );
 
   assert.equal(plan.seedId, "satisfactory");
   assert.equal(plan.candidateVersion, "1.0.1-rc.1");
-  assert.equal(plan.result, "not-run");
+  assert.equal(plan.result, "passed");
+  assert.equal(plan.completedAt, receipt.provedAt);
+  assert.equal(plan.receipt, "../satisfactory-1.0.1-rc.1.json");
+  assert.equal(receipt.seedVersion, "1.0.1-rc.1");
+  assert.equal(receipt.result, "passed");
+  assert.equal(
+    plan.proofEvidence.candidateManifest,
+    receipt.evidence.seedManifest,
+  );
+  assert.equal(
+    receipt.evidence.seedManifest,
+    "sha256:c5a2390802f50d3d24b4d474c412e68a9d6d5173a6a7be394db0a38fb314a51e",
+  );
+  assert.equal(receipt.checks.runtimeVersion, true);
+  assert.equal(receipt.checks.managedUpdate, true);
+  assert.equal(receipt.checks.rollback, true);
+  assert.equal(receipt.checks.cleanup, true);
   assert.match(plan.baselineEvidence.limitation, /not a managed-update/i);
   assert.deepEqual(
     plan.requiredChecks.filter((check) =>

@@ -37,11 +37,11 @@ The first vertical slice is live:
 - All six existing Compose Server types have sanitized Seed manifests. Terraria,
   Project Zomboid, and Garry's Mod have now joined them, giving the Registry
   nine Pods and eighteen Seed recipes with two meaningful variants per Pod.
-- Factorio Stable, Valheim BepInEx, both original Satisfactory recipes, and
-  both Enshrouded runtimes passed disposable native lifecycle proofs.
-  Satisfactory Stable `1.0.1-rc.1` now adds explicit runtime-version and
-  backup-first managed-update contracts; immutable `1.0.0` remains in release
-  history until the new capability proof promotes `1.0.1`.
+- Factorio Stable, Valheim BepInEx, Satisfactory Experimental, and both
+  Enshrouded runtimes passed disposable native lifecycle proofs.
+  Satisfactory Stable `1.0.1` additionally passed its exact runtime-version,
+  backup-first managed-update, forced-failure rollback, persistence, and
+  cleanup proof; immutable `1.0.0` remains in release history.
 - Enshrouded Wine is recommended because its roughly 9 GB game install,
   saves, logs, and local backups all live on explicit data-disk storage.
   Enshrouded Proton persists saves but revalidates its large install on cold
