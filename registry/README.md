@@ -53,3 +53,23 @@ app-manifest detector, and a trusted SteamCMD update strategy with an explicit,
 bounded `/home/steam` container home. The allocated game and messaging ports
 are configured and published 1:1; they must not be silently remapped to
 different container ports.
+
+## Pod and Seed Creator
+
+The Leaf exports a sanitized `dauva.dev/seed-creator-analysis/v1` document for
+an explicitly trusted existing Server. It never includes bind-source paths or
+secret values.
+
+`npm run creator:generate -- --analysis <analysis.json>` recognizes a matching
+proven Seed and writes only a review receipt, so existing recipes are never
+duplicated. Registry maintainers can test deterministic reconstruction with
+`--reference-seed <seed-id>`. For a genuinely new game, add a validated
+`--answers <request.json>` document using
+`dauva.dev/seed-creator-request/v1`; the Creator writes a draft Pod, draft
+Seed, review report, and proof plan under `dist/creator/`.
+
+Creator output is a proposal, never a publication. A new Pod still needs at
+least two meaningful related Seeds. Every unresolved source, image, port,
+volume, agreement, setting, secret, health, resource, and update choice must
+be reviewed before the draft enters `registry/`, and the exact manifest must
+then pass a disposable Leaf proof before promotion.
