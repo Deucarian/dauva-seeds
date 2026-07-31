@@ -1336,8 +1336,9 @@ pre-adoption Compose sources and data, not a dependency on Pterodactyl.
 #### Recovery & Reliability v1 — implemented
 
 Dauva owns the minimum recovery policy for every ready native Server whose
-installed Seed supports backups. The policy is additive to user-created
-schedules and consists of:
+installed Seed declares at least one persistent, non-cache volume. This is a
+storage-safety invariant and does not depend on an older optional UI feature
+flag. The policy is additive to user-created schedules and consists of:
 
 - one protected daily backup schedule, staggered between 03:30 and 05:29 in
   the Leaf's Amsterdam operating window;
@@ -1368,7 +1369,7 @@ eligible for a separate cleanup review. Recovery & Reliability v1 contains no
 automatic legacy-container, legacy-volume, or rollback-source deletion.
 
 The compatibility boundary is Leaf Agent `0.15`, Dauva Hosting `1.14`, Portal
-API `2.18`, and Portal `2.14`. Direct Leaves expose additive
+API `2.18.1`, and Portal `2.14`. Direct Leaves expose additive
 `restore-drills-v1` and `recovery-receipts-v1` capabilities. Outbound Leaf v1
 continues to refuse restore drills explicitly until that protocol gains an
 equivalent durable operation contract.
