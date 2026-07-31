@@ -73,3 +73,7 @@ least two meaningful related Seeds. Every unresolved source, image, port,
 volume, agreement, setting, secret, health, resource, and update choice must
 be reviewed before the draft enters `registry/`, and the exact manifest must
 then pass a disposable Leaf proof before promotion.
+
+For automation, pass `--analysis -` and stream the authenticated Leaf response
+over standard input. This keeps transient production analysis out of the
+repository and local shell history.
