@@ -17,7 +17,10 @@ if (answersPath && referenceSeedId) {
   throw new Error("Use either --answers or --reference-seed, not both.");
 }
 
-const analysis = await readJson(path.resolve(analysisPath));
+const analysis =
+  analysisPath === "-"
+    ? JSON.parse(await readStandardInput())
+    : await readJson(path.resolve(analysisPath));
 const schema = await readJson(
   path.join(
     repositoryRoot,
@@ -142,4 +145,16 @@ function safeDirectoryName(value) {
       .replace(/^-+|-+$/g, "")
       .slice(0, 80) || "proposal"
   );
+}
+
+async function readStandardInput() {
+  let value = "";
+  process.stdin.setEncoding("utf8");
+  for await (const chunk of process.stdin) {
+    value += chunk;
+  }
+  if (value.trim() === "") {
+    throw new Error("--analysis - requires a JSON document on standard input.");
+  }
+  return value;
 }
