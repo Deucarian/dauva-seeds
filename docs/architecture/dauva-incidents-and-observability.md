@@ -103,6 +103,21 @@ developer-safe diagnostics, versions, safety state, and trace correlation.
 - A notification level is emitted once per open incident level. The inbox
   remains available even when e-mail or a crash adapter is not configured.
 
+Recovery policy failures use the same durable admin activity surface even
+when they are not unexpected software crashes. A missing or failed scheduled
+backup, a restore check that cannot be queued, and a failed disposable restore
+produce an admin-only `server-recovery` activity with the affected Server and
+the last safe outcome. Identical unresolved policy states are deduplicated;
+a later successful backup or restore check clears the deduplication key so a
+new regression is visible. These alerts never claim that a live Server or
+retained legacy source was deleted.
+
+Restore checks themselves are durable control-plane operations. Their queued,
+running, succeeded, or failed state survives browser disconnection and API
+restart, while the Leaf performs cleanup of the unique disposable target even
+if its caller disconnects. The Portal polls that record and keeps the last
+known useful state during a transient network failure.
+
 ## Trace and log correlation
 
 Portal requests send W3C `traceparent`, `X-Correlation-ID`, and the Portal
