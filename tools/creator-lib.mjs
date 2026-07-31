@@ -1,4 +1,5 @@
 import path from "node:path";
+import { canonicalJson, sha256 } from "./registry-lib.mjs";
 
 const idPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const pinnedImagePattern =
@@ -37,6 +38,128 @@ export function createCreatorProposal({
     };
   }
   return guidedProposal(analysis, answers);
+}
+
+export function createComposeAnalysis({ compose, referenceSeed = null }) {
+  if (
+    !compose ||
+    typeof compose !== "object" ||
+    !compose.services ||
+    typeof compose.services !== "object"
+  ) {
+    throw new Error(
+      "Docker Compose analysis requires a resolved config document with services.",
+    );
+  }
+  assertNoForbiddenPropertiesInOutputShape(compose);
+  const serviceEntries = Object.entries(compose.services);
+  if (serviceEntries.length === 0 || serviceEntries.length > 8) {
+    throw new Error("Docker Compose analysis supports between one and eight services.");
+  }
+  const components = serviceEntries.map(([serviceName, service], index) => {
+    const labels = normalizeLabels(service.labels);
+    const requestedRole =
+      labels["dev.dauva.game.role"] ??
+      (index === 0 ? "primary" : "sidecar");
+    const referenceComponent =
+      referenceSeed?.components?.find(
+        (component) =>
+          component.id === serviceName ||
+          imageRepository(component.image) ===
+            imageRepository(normalizeImageReference(service.image)),
+      ) ??
+      (requestedRole === "primary" ? referenceSeed?.components?.find(
+        (component) => component.role === "primary",
+      ) : null);
+    const environmentNames = normalizeEnvironmentNames(service.environment);
+    return {
+      id:
+        referenceComponent?.id ??
+        normalizeId(serviceName, index === 0 ? "server" : `sidecar-${index}`),
+      role:
+        referenceComponent?.role ??
+        (requestedRole === "primary" ? "primary" : "sidecar"),
+      image: {
+        reference: normalizeImageReference(service.image),
+        localImageId: null,
+        immutable: pinnedImagePattern.test(
+          normalizeImageReference(service.image),
+        ),
+      },
+      environment: environmentNames.map((key) => ({
+        key,
+        classification:
+          classifyCreatorEnvironmentKey(key, referenceComponent),
+      })),
+      mounts: normalizeComposeMounts(service.volumes),
+    };
+  });
+  if (
+    components.filter((component) => component.role === "primary").length !== 1
+  ) {
+    throw new Error(
+      "Docker Compose analysis requires exactly one primary service.",
+    );
+  }
+  const componentIdByService = new Map(
+    serviceEntries.map(([name], index) => [name, components[index].id]),
+  );
+  const ports = serviceEntries.flatMap(([serviceName, service]) =>
+    normalizeComposePorts(
+      service.ports,
+      componentIdByService.get(serviceName),
+    ),
+  );
+  const structuralEvidence = {
+    name: compose.name ?? "compose-source",
+    components,
+    ports,
+  };
+  const existingSeed = referenceSeed
+    ? {
+        seedId: referenceSeed.id,
+        seedVersion: referenceSeed.version,
+        seedManifestDigest: sha256(canonicalJson(referenceSeed)),
+        podId: referenceSeed.podId,
+        canAdopt: false,
+        checks: [
+          {
+            key: "runtime-data",
+            status: "blocked",
+            message:
+              "A Compose definition proves recipe structure, not live data ownership or adoption readiness.",
+          },
+        ],
+      }
+    : null;
+  return {
+    schemaVersion: "dauva.dev/seed-creator-analysis/v1",
+    candidateId: sha256(canonicalJson(structuralEvidence)),
+    candidateName: normalizeText(
+      compose.name ?? serviceEntries[0][0],
+      "compose-source",
+    ),
+    sourceKind: "docker-compose",
+    runtimeState: "definition",
+    recommendedAction: referenceSeed
+      ? "resolve-adoption-blockers"
+      : "create-draft",
+    existingSeed,
+    components,
+    ports,
+    data: [],
+    suggestedOptions: {},
+    reviewQuestions: [
+      "Confirm the official homepage and trusted runtime source.",
+      "Confirm every persistent target, public and private port, resource estimate, health check, agreement, and update strategy.",
+      "Run the resulting draft on a disposable Leaf before promotion.",
+    ],
+    warnings: [
+      "Compose environment values, secret payloads, bind-source paths, generated identifiers, and runtime state were excluded.",
+      "A Compose definition can create or reconstruct a draft, but cannot prove that live data is safe to adopt.",
+    ],
+    observedAtUtc: new Date().toISOString(),
+  };
 }
 
 function reconstructProposal({ analysis, referenceSeed, referencePod }) {
@@ -575,6 +698,14 @@ function compareObservedContract(analysis, referenceSeed) {
     const observedEnvironment = new Set(
       observed.environment.map((item) => item.key),
     );
+    for (const name of observedEnvironment) {
+      if (!expectedEnvironment.has(name)) {
+        differences.push({
+          key: "environment",
+          message: `Observed environment key '${observed.id}.${name}' is absent from the reference Seed.`,
+        });
+      }
+    }
     for (const name of expectedEnvironment) {
       if (!observedEnvironment.has(name)) {
         differences.push({
@@ -733,6 +864,223 @@ function assertNoForbiddenProperties(value, currentPath = "") {
     }
     assertNoForbiddenProperties(nested, keyPath);
   }
+}
+
+function assertNoForbiddenPropertiesInOutputShape(compose) {
+  for (const [serviceName, service] of Object.entries(compose.services ?? {})) {
+    if (!idPattern.test(normalizeId(serviceName, ""))) {
+      throw new Error(`Compose service '${serviceName}' has no safe Dauva id.`);
+    }
+    if (service.privileged === true) {
+      throw new Error(
+        `Compose service '${serviceName}' requests privileged mode.`,
+      );
+    }
+    if (service.network_mode === "host" || service.pid === "host") {
+      throw new Error(
+        `Compose service '${serviceName}' requests unrestricted host runtime access.`,
+      );
+    }
+    for (const mount of service.volumes ?? []) {
+      const target =
+        typeof mount === "object" ? mount.target : parseShortMountTarget(mount);
+      if (target === "/var/run/docker.sock") {
+        throw new Error(
+          `Compose service '${serviceName}' mounts the Docker socket.`,
+        );
+      }
+    }
+  }
+}
+
+function normalizeLabels(value) {
+  if (Array.isArray(value)) {
+    return Object.fromEntries(
+      value.map((item) => {
+        const [key, labelValue = ""] = String(item).split("=", 2);
+        return [key, labelValue];
+      }),
+    );
+  }
+  return value && typeof value === "object" ? value : {};
+}
+
+function normalizeEnvironmentNames(value) {
+  const names = Array.isArray(value)
+    ? value.map((item) => String(item).split("=", 1)[0])
+    : Object.keys(value ?? {});
+  return names
+    .map((name) => name.trim())
+    .filter((name) => /^[A-Za-z_][A-Za-z0-9_]{0,159}$/.test(name))
+    .sort((left, right) => left.localeCompare(right));
+}
+
+function classifyCreatorEnvironmentKey(key, referenceComponent) {
+  const referenceClassifications = new Map([
+    ...Object.keys(referenceComponent?.environment ?? {}).map((name) => [
+      name,
+      "constant",
+    ]),
+    ...Object.values(referenceComponent?.optionEnvironment ?? {}).map((name) => [
+      name,
+      "setting",
+    ]),
+    ...Object.values(referenceComponent?.agreementEnvironment ?? {}).map(
+      (mapping) => [mapping.name, "agreement"],
+    ),
+    ...Object.values(referenceComponent?.secretEnvironment ?? {}).map((name) => [
+      name,
+      "secret",
+    ]),
+    ...Object.values(referenceComponent?.runtimeEnvironment ?? {}).map((name) => [
+      name,
+      "runtime",
+    ]),
+  ]);
+  if (referenceClassifications.has(key)) {
+    return referenceClassifications.get(key);
+  }
+  const normalized = key.toUpperCase();
+  if (secretNamePattern.test(normalized)) {
+    return "secret";
+  }
+  if (
+    normalized.includes("EULA") ||
+    normalized.includes("AGREEMENT") ||
+    normalized.startsWith("ACCEPT_")
+  ) {
+    return "agreement";
+  }
+  if (["PUID", "PGID", "UID", "GID", "TZ", "UMASK"].includes(normalized)) {
+    return "runtime";
+  }
+  return "review";
+}
+
+function normalizeComposeMounts(value) {
+  return (value ?? [])
+    .map((mount) => {
+      if (typeof mount === "string") {
+        return {
+          target: parseShortMountTarget(mount),
+          sourceKind: "volume",
+          readOnly: /:ro(?:$|,)/.test(mount),
+        };
+      }
+      return {
+        target: mount.target,
+        sourceKind: mount.type === "bind" ? "bind" : "volume",
+        readOnly: mount.read_only === true,
+      };
+    })
+    .filter(
+      (mount) =>
+        typeof mount.target === "string" &&
+        mount.target.startsWith("/") &&
+        !mount.target.includes("..") &&
+        mount.target !== "/run/secrets" &&
+        !mount.target.startsWith("/run/secrets/"),
+    )
+    .map((mount) => ({
+      target: mount.target,
+      sourceKind: mount.sourceKind,
+      readOnly: mount.readOnly,
+    }))
+    .sort((left, right) => left.target.localeCompare(right.target));
+}
+
+function parseShortMountTarget(value) {
+  const segments = String(value).split(":");
+  return segments.length >= 2 ? segments[1] : segments[0];
+}
+
+function normalizeComposePorts(value, componentId) {
+  return (value ?? [])
+    .flatMap((port) => {
+      if (typeof port === "object") {
+        const containerPort = Number(port.target);
+        const publicPort =
+          port.published == null ? null : Number(port.published);
+        return [
+          {
+            componentId,
+            containerPort,
+            publicPort:
+              Number.isInteger(publicPort) &&
+              publicPort >= 1 &&
+              publicPort <= 65535
+                ? publicPort
+                : null,
+            protocol: String(port.protocol ?? "tcp").toLowerCase(),
+          },
+        ];
+      }
+      const match = String(port).match(
+        /^(?:(?<published>[0-9]+):)?(?<target>[0-9]+)(?:\/(?<protocol>tcp|udp))?$/,
+      );
+      return match
+        ? [
+            {
+              componentId,
+              containerPort: Number(match.groups.target),
+              publicPort: match.groups.published
+                ? Number(match.groups.published)
+                : null,
+              protocol: match.groups.protocol ?? "tcp",
+            },
+          ]
+        : [];
+    })
+    .filter(
+      (port) =>
+        Number.isInteger(port.containerPort) &&
+        port.containerPort >= 1 &&
+        port.containerPort <= 65535 &&
+        ["tcp", "udp"].includes(port.protocol),
+    )
+    .sort(
+      (left, right) =>
+        left.containerPort - right.containerPort ||
+        left.protocol.localeCompare(right.protocol),
+    );
+}
+
+function normalizeImageReference(value) {
+  const image = String(value ?? "").trim();
+  if (
+    image === "" ||
+    image.length > 500 ||
+    image.includes("://") ||
+    /\s/.test(image)
+  ) {
+    throw new Error("Compose services require a safe OCI image reference.");
+  }
+  const withoutDigest = image.split("@", 1)[0];
+  const lastSlash = withoutDigest.lastIndexOf("/");
+  const lastColon = withoutDigest.lastIndexOf(":");
+  const repository =
+    lastColon > lastSlash
+      ? withoutDigest.slice(0, lastColon)
+      : withoutDigest;
+  const firstSegment = repository.split("/", 1)[0];
+  if (
+    repository.includes("/") &&
+    (firstSegment.includes(".") ||
+      firstSegment.includes(":") ||
+      firstSegment === "localhost")
+  ) {
+    return image;
+  }
+  return repository.includes("/")
+    ? `docker.io/${image}`
+    : `docker.io/library/${image}`;
+}
+
+function normalizeText(value, fallback) {
+  const normalized = String(value ?? "").trim();
+  return normalized.length >= 1 && normalized.length <= 160
+    ? normalized
+    : fallback;
 }
 
 function uniqueVolumeId(candidate, volumesById) {
