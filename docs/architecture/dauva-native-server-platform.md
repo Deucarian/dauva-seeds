@@ -1,8 +1,8 @@
 # Dauva native server platform
 
-Status: **Phase 5 complete; Phase 6 Leaf delivery implemented and end-to-end acceptance in progress**
+Status: **Phase 5 complete; Phase 4 adoption complete with retirement burn-in active; Phase 6 Leaf delivery acceptance in progress**
 
-Last updated: 2026-07-30
+Last updated: 2026-07-31
 
 This document is the canonical product and architecture design for Dauva's
 native game-server platform. Keep it current when the Seed format, registry,
@@ -1213,23 +1213,36 @@ Live acceptance evidence:
 - extracted authenticated Leaf Agent and Registry read API (implemented);
 - Terraria, Project Zomboid, and Garry's Mod Pods and six proven Seeds
   (implemented);
-- continuously refreshed logs and Seed-gated console (implemented);
+- continuously refreshed logs, bounded downloadable log snapshots, and
+  Seed-gated console (implemented);
 - dedicated deep-linkable Server care page with live/pauseable logs and
   non-technical controls (implemented);
 - adapter-backed backup, restore, retention, storage classification, and UI
   (filesystem adapter implemented);
 - installed-Server update and trusted-history rollback (implemented);
+- backup-first editing of Seed-declared Server settings with exact-name
+  confirmation, protected secret handling, restart, and automatic rollback
+  (implemented);
+- Minecraft Fabric mod discovery and lifecycle through version- and
+  loader-compatible Modrinth releases, required dependency resolution,
+  exact SHA-512 verification, a safety backup, and automatic rollback
+  (implemented);
+- arbitrary file uploads and arbitrary download URLs remain intentionally
+  unsupported; Dauva exposes unmanaged existing mods without claiming
+  ownership of them;
 - scheduled tasks (implemented);
 - registry signing and trusted sources;
 - Leaf capacity reporting and placement (implemented);
 - protected API-side option storage (implemented);
 - remove direct Docker access from the API (implemented).
 
-### Phase 4: migration and retirement — in progress
+### Phase 4: migration and retirement — adoption complete, retirement in burn-in
 
-- Minecraft Fabric and Satisfactory Stable are the first completed
-  backup-first adoptions. Other games remain read-only until their storage
-  mapping and health proof are reviewed.
+- Minecraft Fabric, Satisfactory Stable, Core Keeper, Factorio, Valheim, and
+  Enshrouded completed backup-first adoption with their active saves and
+  configuration, native ownership receipts, and retained rollback sources.
+- Adoption completion does not authorize legacy deletion. Every old Compose
+  source remains stopped and intact while its native Server burns in.
 - Adopt existing Servers one at a time through a dry-run, restore
   point, typed confirmation, fresh cutover snapshot, native health check, and
   durable Portal record.
@@ -1294,6 +1307,31 @@ Live acceptance evidence:
   it.
 - Multi-Leaf configuration, health, and placement are implemented; enrolling a
   second physical Leaf remains an operator action.
+
+#### Burn-in and legacy-retirement gate
+
+Legacy cleanup is a separate, explicit administrator operation and never a
+side effect of adoption, a Seed update, or retention. A retained source becomes
+eligible for cleanup only when all of these are true:
+
+1. the native Server has remained healthy through at least fourteen days of
+   ordinary use;
+2. at least three scheduled backup cycles completed and their archives passed
+   verification;
+3. the relevant storage class passed a restore drill into a disposable target,
+   including a post-restore health or join check;
+4. logs, power control, editable settings where supported, Seed update or
+   rollback, and game-specific operations have been observed without an
+   unresolved Withered operation;
+5. the ownership receipt, active storage root, and retained legacy source map
+   to the intended Server; and
+6. an administrator explicitly confirms cleanup after Dauva shows exactly
+   which stopped containers and storage would be removed.
+
+Until this gate passes, Dauva may hide an adopted legacy source from ordinary
+Server lists, but it must keep the source and its rollback evidence intact.
+Pterodactyl has already left the runtime path; this gate concerns retained
+pre-adoption Compose sources and data, not a dependency on Pterodactyl.
 
 ### Phase 5: portal-owned Leaf enrollment — complete
 
