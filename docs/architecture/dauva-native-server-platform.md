@@ -332,9 +332,21 @@ proof promotion.
 
 ### Guided Pod and Seed creation
 
-Dauva should eventually provide a guided **Pod and Seed Creator** for
-administrators and Registry maintainers. It is a curation workflow, not an
-arbitrary-container launcher.
+Dauva provides a guided **Pod and Seed Creator** contract for administrators
+and Registry maintainers. It is a curation workflow, not an
+arbitrary-container launcher. The first production slice is deliberately
+split between the Leaf and the Git-backed Registry:
+
+- the Leaf performs authenticated, read-only source analysis and emits
+  `dauva.dev/seed-creator-analysis/v1`;
+- the analysis contains container targets, public port mappings, immutable
+  image evidence, environment-key names and classifications, but never host
+  paths or environment values;
+- the Registry validates that evidence and either recognizes an existing
+  proven Seed without creating a duplicate, or emits a draft Pod, draft Seed,
+  review report, and disposable proof plan;
+- draft output stays outside the official Registry until a maintainer reviews
+  every unresolved choice and submits the normal Git change.
 
 The Creator:
 
@@ -361,6 +373,12 @@ pinning, agreement verification, and proof promotion all succeed.
 The same source-analysis contract powers both the Creator and migration:
 discovering ports, storage roles, settings, runtime versions, and health from a
 known Server should produce suggestions, never silently grant trust.
+
+Existing proven Seeds are also reconstruction fixtures. A Creator
+reconstruction must match the observed image repositories, container targets,
+and ports before it may be considered ready for proof. This tests Creator
+evolution without deleting Registry history or replacing signed proof
+receipts.
 
 ### Dauva Leaf Agent
 
