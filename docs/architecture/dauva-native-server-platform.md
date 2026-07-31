@@ -1333,6 +1333,46 @@ Server lists, but it must keep the source and its rollback evidence intact.
 Pterodactyl has already left the runtime path; this gate concerns retained
 pre-adoption Compose sources and data, not a dependency on Pterodactyl.
 
+#### Recovery & Reliability v1 — implemented
+
+Dauva owns the minimum recovery policy for every ready native Server whose
+installed Seed supports backups. The policy is additive to user-created
+schedules and consists of:
+
+- one protected daily backup schedule, staggered between 03:30 and 05:29 in
+  the Leaf's Amsterdam operating window;
+- one protected weekly disposable restore-check schedule, staggered by day
+  and between 06:00 and 07:59;
+- durable restore-check operations in the control plane, so a closed Portal,
+  lost HTTP response, API restart, or browser timeout cannot erase the known
+  outcome;
+- restore into a unique temporary native Server, the installed Seed's normal
+  startup and health checks, and verified removal of only that temporary
+  Server; the live Server and backup are never modified by a drill;
+- persistent counters and evidence for scheduled backups, restore checks,
+  logs, power, settings, Seed changes, game-specific operations, ownership,
+  and the retained-source mapping;
+- an admin-only recovery alert when a scheduled backup fails or becomes stale,
+  a restore check cannot start, or a restore check fails; and
+- a plain-language Recovery protection surface in Server care, including the
+  next automatic backup, protected schedules, active drill progress, and every
+  retirement-gate condition.
+
+The daily backup and weekly restore-check schedules are control-plane policy:
+they are visibly marked as protected and cannot be deleted through the normal
+schedule API. Operators can still add their own schedules. Three retained
+backups remain the default per-Server storage policy.
+
+Passing every automated condition only marks a retained legacy source as
+eligible for a separate cleanup review. Recovery & Reliability v1 contains no
+automatic legacy-container, legacy-volume, or rollback-source deletion.
+
+The compatibility boundary is Leaf Agent `0.15`, Dauva Hosting `1.14`, Portal
+API `2.18`, and Portal `2.14`. Direct Leaves expose additive
+`restore-drills-v1` and `recovery-receipts-v1` capabilities. Outbound Leaf v1
+continues to refuse restore drills explicitly until that protocol gains an
+equivalent durable operation contract.
+
 ### Phase 5: portal-owned Leaf enrollment — complete
 
 - Twenty-minute, single-use pairing codes are stored only as hashes.
