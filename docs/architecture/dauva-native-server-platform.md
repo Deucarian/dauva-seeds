@@ -348,6 +348,12 @@ split between the Leaf and the Git-backed Registry:
 - draft output stays outside the official Registry until a maintainer reviews
   every unresolved choice and submits the normal Git change.
 
+If the runtime container no longer exists, maintainers can stream a resolved
+Docker Compose definition into the same analysis schema. The Compose adapter
+discards environment values, bind sources, secrets, and generated identifiers
+before producing evidence. It can recover recipe structure, but it cannot
+claim live-data ownership or adoption readiness.
+
 The Creator:
 
 1. identifies an official game or trusted upstream runtime;

@@ -77,3 +77,18 @@ then pass a disposable Leaf proof before promotion.
 For automation, pass `--analysis -` and stream the authenticated Leaf response
 over standard input. This keeps transient production analysis out of the
 repository and local shell history.
+
+When a container no longer exists, a retained Compose definition can still be
+used as recipe evidence:
+
+```text
+docker compose config --format json |
+  npm run --silent creator:analyze-compose -- --reference-seed <seed-id> |
+  npm run --silent creator:generate -- --analysis - --reference-seed <seed-id>
+```
+
+The Compose analyzer emits only service names, image references, environment
+key names, container targets, and ports. Environment values, bind sources,
+secret payloads, and generated identifiers are discarded. This path can
+reconstruct or create a draft, but it never claims that live data exists or is
+safe to adopt.
