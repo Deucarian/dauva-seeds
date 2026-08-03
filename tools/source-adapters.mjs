@@ -28,13 +28,20 @@ export function normalizeSource(descriptor) {
   };
 }
 
-export function sourceRuntimeDefaults(source) {
+export function sourceRuntimeDefaults(source, { reviewedAt } = {}) {
   const normalized = normalizeSource(source);
+  if (
+    typeof reviewedAt !== "string" ||
+    !/^[0-9]{4}-(0[1-9]|1[0-2])-([0-2][0-9]|3[01])$/.test(reviewedAt) ||
+    Number.isNaN(Date.parse(`${reviewedAt}T00:00:00.000Z`))
+  ) {
+    throw new Error("Source review date must be supplied as YYYY-MM-DD.");
+  }
   return {
     source: normalized,
     trust: {
       level: normalized.kind === "dauva" ? "verified" : "community",
-      reviewedAt: new Date().toISOString().slice(0, 10),
+      reviewedAt,
       mutableRuntimeImagesAllowed: false,
     },
     updatePolicy: {

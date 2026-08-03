@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dauva.dev/schemas/seed-proof-bundle-v1.schema.json",
+  "title": "Dauva per-Seed proof bundle v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "baseRegistryDigest",
+    "podManifest",
+    "seedManifest",
+    "transitiveInputs"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "dauva.dev/seed-proof-bundle/v1"
+    },
+    "baseRegistryDigest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "podManifest": {
+      "$ref": "pod-v1.schema.json"
+    },
+    "seedManifest": {
+      "$ref": "seed-v1.schema.json"
+    },
+    "transitiveInputs": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "digest"],
+        "properties": {
+          "id": {
+            "$ref": "seed-v1.schema.json#/$defs/id"
+          },
+          "digest": {
+            "type": "string",
+            "pattern": "^sha256:[a-f0-9]{64}$"
+          }
+        }
+      }
+    }
+  }
+}

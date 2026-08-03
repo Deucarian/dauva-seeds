@@ -456,7 +456,10 @@
       },
       "manifestDigest": "sha256:36c1369e1f60d11049f6419090f64df8b993f7d937e616d3c1b667369af632eb",
       "proof": {
-        "state": "unproven"
+        "state": "unproven",
+        "missingArchitectures": [
+          "amd64"
+        ]
       }
     },
     {
@@ -738,7 +741,10 @@
       },
       "manifestDigest": "sha256:85a967589129bb49b0865557f2d945444bb5c557c5ffbc4f896301b4541e86c1",
       "proof": {
-        "state": "unproven"
+        "state": "unproven",
+        "missingArchitectures": [
+          "amd64"
+        ]
       }
     },
     {
@@ -975,7 +981,10 @@
       },
       "manifestDigest": "sha256:bd635359b943fff47470430241a3626aa824dd5b4fd5045004e5e255c8dcac33",
       "proof": {
-        "state": "unproven"
+        "state": "unproven",
+        "missingArchitectures": [
+          "amd64"
+        ]
       }
     },
     {
@@ -1224,7 +1233,10 @@
       },
       "manifestDigest": "sha256:b95e8b6320df36563fbe8af5028144830143f18037d303c34d6ff617f1b46813",
       "proof": {
-        "state": "unproven"
+        "state": "unproven",
+        "missingArchitectures": [
+          "amd64"
+        ]
       }
     },
     {
@@ -1454,7 +1466,10 @@
       },
       "manifestDigest": "sha256:08f45c8a532550030a3e579fb535f8fa43103f270aaafb0dca4637e8d4121148",
       "proof": {
-        "state": "unproven"
+        "state": "unproven",
+        "missingArchitectures": [
+          "amd64"
+        ]
       }
     },
     {
@@ -1684,7 +1699,10 @@
       },
       "manifestDigest": "sha256:70801c5a046173ad2c151c041a6a26bf5faa8f4678f2107c4dbdd2f504c249b1",
       "proof": {
-        "state": "unproven"
+        "state": "unproven",
+        "missingArchitectures": [
+          "amd64"
+        ]
       }
     },
     {
@@ -1947,12 +1965,17 @@
       },
       "manifestDigest": "sha256:1dd52a967be771169f45879328a2c2d653e295d845af93d1e39d8a2a9f2cb2aa",
       "proof": {
-        "state": "proven",
+        "state": "legacy",
+        "schemaVersion": "dauva.dev/seed-proof/v1",
+        "binding": "legacy-unverified",
         "provedAt": "2026-07-26T01:26:39.2596794+00:00",
         "expiresAt": "2026-10-24T01:26:39.259Z",
         "leaf": "j-hoef-debian-proof",
         "provedVersion": "1.0.0-rc.1",
-        "receiptDigest": "sha256:79051b219dbb15fe2a1994b37488252e094ef144697a1284b1c20f84a21f5940"
+        "receiptDigest": "sha256:79051b219dbb15fe2a1994b37488252e094ef144697a1284b1c20f84a21f5940",
+        "missingArchitectures": [
+          "amd64"
+        ]
       }
     },
     {
@@ -2215,12 +2238,17 @@
       },
       "manifestDigest": "sha256:d92b50b953a8f0f9018e349b70a8ff05460cfd61efa69b55c9f761a0879e001f",
       "proof": {
-        "state": "proven",
+        "state": "legacy",
+        "schemaVersion": "dauva.dev/seed-proof/v1",
+        "binding": "legacy-unverified",
         "provedAt": "2026-07-26T01:39:05.3043617+00:00",
         "expiresAt": "2026-10-24T01:39:05.304Z",
         "leaf": "j-hoef-debian-proof",
         "provedVersion": "1.0.0-rc.1",
-        "receiptDigest": "sha256:ccdb57b8b07ef48f005ed3b77f8413bbb3c55227c4b77b21afb32707e2c01a29"
+        "receiptDigest": "sha256:ccdb57b8b07ef48f005ed3b77f8413bbb3c55227c4b77b21afb32707e2c01a29",
+        "missingArchitectures": [
+          "amd64"
+        ]
       }
     },
     {
@@ -2649,7 +2677,10 @@
       },
       "manifestDigest": "sha256:6ebbd77db5dee22c6b428f256aeb88635f06a33b1f125bb83f467d6e6c0ae94d",
       "proof": {
-        "state": "unproven"
+        "state": "unproven",
+        "missingArchitectures": [
+          "amd64"
+        ]
       }
     },
     {
@@ -3078,12 +3109,17 @@
       },
       "manifestDigest": "sha256:31e06e591bfa4afb6f6f11ad3f02dab1bfbd4c80255bdda3aa9b333cac3d40fb",
       "proof": {
-        "state": "proven",
+        "state": "legacy",
+        "schemaVersion": "dauva.dev/seed-proof/v1",
+        "binding": "legacy-unverified",
         "provedAt": "2026-07-26T00:45:48+02:00",
         "expiresAt": "2026-10-23T22:45:48.000Z",
         "leaf": "j-hoef-debian",
         "provedVersion": "1.0.0",
-        "receiptDigest": "sha256:a13066bf8448e1ccbda8a3d390c34a9688166566b6ec14cdd17fa0a6e9b5849e"
+        "receiptDigest": "sha256:a13066bf8448e1ccbda8a3d390c34a9688166566b6ec14cdd17fa0a6e9b5849e",
+        "missingArchitectures": [
+          "amd64"
+        ]
       }
     },
     {
@@ -3392,12 +3428,17 @@
       },
       "manifestDigest": "sha256:c2490ab6eee9f9ab82efdde487c49f876b9c6b6b6ae754d163a4062cb84f59e9",
       "proof": {
-        "state": "proven",
+        "state": "legacy",
+        "schemaVersion": "dauva.dev/seed-proof/v1",
+        "binding": "legacy-unverified",
         "provedAt": "2026-07-26T01:50:57.4407996+00:00",
         "expiresAt": "2026-10-24T01:50:57.440Z",
         "leaf": "j-hoef-debian-proof",
         "provedVersion": "1.0.0-rc.1",
-        "receiptDigest": "sha256:b52f3f719c0b52b13b4240895cba71972557fc64e1a6341ae29d4a443056d59c"
+        "receiptDigest": "sha256:b52f3f719c0b52b13b4240895cba71972557fc64e1a6341ae29d4a443056d59c",
+        "missingArchitectures": [
+          "amd64"
+        ]
       }
     },
     {
@@ -3706,12 +3747,17 @@
       },
       "manifestDigest": "sha256:8c7f7d4972347b7c84ba0bb1d9e94df93ee70b25aaa2f6256895ac3ea5d86147",
       "proof": {
-        "state": "proven",
+        "state": "legacy",
+        "schemaVersion": "dauva.dev/seed-proof/v1",
+        "binding": "legacy-unverified",
         "provedAt": "2026-07-26T01:46:40.2283983+00:00",
         "expiresAt": "2026-10-24T01:46:40.228Z",
         "leaf": "j-hoef-debian-proof",
         "provedVersion": "1.0.0-rc.1",
-        "receiptDigest": "sha256:48783aea23da1c2aad4abb773a97ae4afbc94b50fab8a41ab048dc19cc8359ef"
+        "receiptDigest": "sha256:48783aea23da1c2aad4abb773a97ae4afbc94b50fab8a41ab048dc19cc8359ef",
+        "missingArchitectures": [
+          "amd64"
+        ]
       }
     },
     {
@@ -3965,7 +4011,10 @@
       },
       "manifestDigest": "sha256:5281035469f673818a789032776ca91aa1ea27d98b1d7e6a2b01e3e41b7a34b3",
       "proof": {
-        "state": "unproven"
+        "state": "unproven",
+        "missingArchitectures": [
+          "amd64"
+        ]
       }
     },
     {
@@ -4219,7 +4268,10 @@
       },
       "manifestDigest": "sha256:5bc871e338c56afd3394de9550307e69d0ac5afbf35a2d021677ddfc70122f30",
       "proof": {
-        "state": "unproven"
+        "state": "unproven",
+        "missingArchitectures": [
+          "amd64"
+        ]
       }
     },
     {
@@ -4567,12 +4619,17 @@
       },
       "manifestDigest": "sha256:8c825c740cb121700574469f252f895870ff07df08c1e2694f3c445bd456bbff",
       "proof": {
-        "state": "proven",
+        "state": "legacy",
+        "schemaVersion": "dauva.dev/seed-proof/v1",
+        "binding": "legacy-unverified",
         "provedAt": "2026-07-26T00:46:43.9364324+00:00",
         "expiresAt": "2026-10-24T00:46:43.936Z",
         "leaf": "j-hoef-debian-proof",
         "provedVersion": "1.0.0-rc.1",
-        "receiptDigest": "sha256:20e7acfce168c68caf3e518167ba31d4b7f760e0e4ea9f87b3d78a843b80b824"
+        "receiptDigest": "sha256:20e7acfce168c68caf3e518167ba31d4b7f760e0e4ea9f87b3d78a843b80b824",
+        "missingArchitectures": [
+          "amd64"
+        ]
       }
     },
     {
@@ -4869,12 +4926,17 @@
       },
       "manifestDigest": "sha256:d0bf0f9ec7a0c6d4e5334794207cab162f0d91f1dbd1a22695832a3fce2e1659",
       "proof": {
-        "state": "proven",
+        "state": "legacy",
+        "schemaVersion": "dauva.dev/seed-proof/v1",
+        "binding": "legacy-unverified",
         "provedAt": "2026-07-26T00:41:40.3421719+00:00",
         "expiresAt": "2026-10-24T00:41:40.342Z",
         "leaf": "j-hoef-debian-proof",
         "provedVersion": "1.0.0-rc.1",
-        "receiptDigest": "sha256:baccde5c1959225cba741d9fc2dc889aed1526cd589b21018db58540ef17b800"
+        "receiptDigest": "sha256:baccde5c1959225cba741d9fc2dc889aed1526cd589b21018db58540ef17b800",
+        "missingArchitectures": [
+          "amd64"
+        ]
       }
     },
     {
@@ -5183,7 +5245,10 @@
       },
       "manifestDigest": "sha256:eb31f49db9a7dda23665d2f28623563a64c0934f61eec29ba3234d776f50e823",
       "proof": {
-        "state": "unproven"
+        "state": "unproven",
+        "missingArchitectures": [
+          "amd64"
+        ]
       }
     },
     {
@@ -5492,7 +5557,10 @@
       },
       "manifestDigest": "sha256:91f12ac696dcdc8a40e12293a9b56f105043b03728b208af0249f215cd16b4c0",
       "proof": {
-        "state": "unproven"
+        "state": "unproven",
+        "missingArchitectures": [
+          "amd64"
+        ]
       }
     }
   ],
@@ -5774,6 +5842,14 @@
     },
     {
       "kind": "oci",
+      "homepage": "https://terraria.org/",
+      "repository": "https://github.com/Finallf/terraria",
+      "imageRegistries": [
+        "docker.io"
+      ]
+    },
+    {
+      "kind": "oci",
       "homepage": "https://gmod.facepunch.com/",
       "repository": "https://github.com/ceifa/garrysmod-docker",
       "imageRegistries": [
@@ -5785,14 +5861,6 @@
       "kind": "oci",
       "homepage": "https://www.factorio.com/",
       "repository": "https://github.com/factoriotools/factorio-docker",
-      "imageRegistries": [
-        "docker.io"
-      ]
-    },
-    {
-      "kind": "oci",
-      "homepage": "https://terraria.org/",
-      "repository": "https://github.com/Finallf/terraria",
       "imageRegistries": [
         "docker.io"
       ]
@@ -5847,5 +5915,5 @@
       ]
     }
   ],
-  "registryDigest": "sha256:f7901e5fac2eb9f538fa90c1db0c778b0e6812b5bcac9bb2f49f74ac8de716d3"
+  "registryDigest": "sha256:1dc461ebad8eac1b4a5d38ec223e4811b65b5fbaed26edc22d42c87ae12fba54"
 }

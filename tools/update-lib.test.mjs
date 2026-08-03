@@ -72,6 +72,31 @@ test("reports each changed component and reuses a shared resolution", async () =
   assert.equal(report.seeds[0].components[0].availableImage, `docker.io/example/server@${digestB}`);
 });
 
+test("update discovery ignores non-stable Seeds", async () => {
+  const reference = "docker.io/example/server:stable";
+  const seed = (id, status) => ({
+    value: {
+      id,
+      version: "1.0.1-rc.1",
+      status,
+      components: [
+        {
+          id: "server",
+          image: `docker.io/example/server@${digestA}`,
+          imageUpdate: { reference },
+        },
+      ],
+    },
+  });
+  const report = await createUpdateReport(
+    [seed("candidate", "candidate"), seed("draft", "draft"), seed("withered", "withered")],
+    fixtureDigestResolver({ [reference]: digestB }),
+  );
+
+  assert.equal(report.updatesAvailable, 0);
+  assert.deepEqual(report.seeds, []);
+});
+
 test("prepares a patch release candidate from a fresh report", () => {
   const currentImage = `docker.io/example/server@${digestA}`;
   const availableImage = `docker.io/example/server@${digestB}`;

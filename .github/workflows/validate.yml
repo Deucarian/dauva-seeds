@@ -19,6 +19,4 @@ jobs:
           node-version: "22"
           cache: npm
       - run: npm ci
-      - run: npm run validate
-      - run: npm run compile
-      - run: git diff --exit-code -- dist/registry.json
+      - run: npm run check

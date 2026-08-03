@@ -1,0 +1,290 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dauva.dev/schemas/seed-proof-plan-v1.schema.json",
+  "title": "Dauva Seed proof plan v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "planId",
+    "revisionId",
+    "seedId",
+    "seedVersion",
+    "architecture",
+    "manifestDigest",
+    "proofContractDigest",
+    "baseRegistryDigest",
+    "proofBundleDigest",
+    "policyVersion",
+    "engineVersion",
+    "deadlineSeconds",
+    "checks"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "dauva.dev/seed-proof-plan/v1"
+    },
+    "planId": {
+      "$ref": "#/$defs/uuid"
+    },
+    "revisionId": {
+      "$ref": "#/$defs/uuid"
+    },
+    "seedId": {
+      "$ref": "seed-v1.schema.json#/$defs/id"
+    },
+    "seedVersion": {
+      "$ref": "#/$defs/semanticVersion"
+    },
+    "architecture": {
+      "$ref": "#/$defs/architecture"
+    },
+    "manifestDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "proofContractDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "baseRegistryDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "proofBundleDigest": {
+      "$ref": "#/$defs/digest"
+    },
+    "policyVersion": {
+      "$ref": "#/$defs/versionLabel"
+    },
+    "engineVersion": {
+      "$ref": "#/$defs/versionLabel"
+    },
+    "deadlineSeconds": {
+      "type": "integer",
+      "minimum": 60,
+      "maximum": 14400
+    },
+    "checks": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 16,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/check"
+      }
+    }
+  },
+  "$defs": {
+    "uuid": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "semanticVersion": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-rc\\.[1-9][0-9]*)?$"
+    },
+    "architecture": {
+      "enum": [
+        "amd64",
+        "arm64"
+      ]
+    },
+    "versionLabel": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._+-]*$"
+    },
+    "identifier": {
+      "$ref": "seed-v1.schema.json#/$defs/id"
+    },
+    "fixture": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120,
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "check": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "const": "images-pinned"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "stabilitySeconds"
+          ],
+          "properties": {
+            "kind": {
+              "const": "healthy"
+            },
+            "stabilitySeconds": {
+              "type": "integer",
+              "minimum": 5,
+              "maximum": 600
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "portIds"
+          ],
+          "properties": {
+            "kind": {
+              "const": "ports"
+            },
+            "portIds": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 32,
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/$defs/identifier"
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "$ref": "#/$defs/fixtureCheck",
+          "unevaluatedProperties": false,
+          "properties": {
+            "kind": {
+              "const": "backup"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "$ref": "#/$defs/fixtureCheck",
+          "unevaluatedProperties": false,
+          "properties": {
+            "kind": {
+              "const": "restore"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "const": "graceful-stop"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "const": "stopped-remains-stopped"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "const": "restart"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "volumeId",
+            "fixtureId"
+          ],
+          "properties": {
+            "kind": {
+              "const": "persistence"
+            },
+            "volumeId": {
+              "$ref": "#/$defs/identifier"
+            },
+            "fixtureId": {
+              "$ref": "#/$defs/fixture"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "$ref": "#/$defs/fixtureCheck",
+          "unevaluatedProperties": false,
+          "properties": {
+            "kind": {
+              "const": "console"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "$ref": "#/$defs/fixtureCheck",
+          "unevaluatedProperties": false,
+          "properties": {
+            "kind": {
+              "const": "update"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "const": "cleanup"
+            }
+          }
+        }
+      ]
+    },
+    "fixtureCheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "fixtureId"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string"
+        },
+        "fixtureId": {
+          "$ref": "#/$defs/fixture"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,707 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Dauva direct Proof Leaf jobs",
+    "version": "2.0.0",
+    "description": "Internal, asynchronous, replay-safe Proof Leaf contract. Candidate commands are not accepted."
+  },
+  "servers": [
+    {
+      "url": "https://{proofLeafAuthority}",
+      "variables": {
+        "proofLeafAuthority": {
+          "default": "proof-leaf.invalid"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/v2/seed-proof-runs": {
+      "post": {
+        "operationId": "startSeedProofRun",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "$ref": "#/components/responses/AcceptedOperation"
+          },
+          "400": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "413": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "429": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "503": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/v2/seed-proof-runs/{runId}/attempts/{attemptId}": {
+      "get": {
+        "operationId": "getSeedProofRun",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RunId"
+          },
+          {
+            "$ref": "#/components/parameters/AttemptId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Durable current operation state.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Operation"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/v2/seed-proof-runs/{runId}/attempts/{attemptId}/events": {
+      "get": {
+        "operationId": "getSeedProofRunEvents",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RunId"
+          },
+          {
+            "$ref": "#/components/parameters/AttemptId"
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2147483647
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "At most 200 monotonic events after the requested sequence.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventPage"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/v2/seed-proof-runs/{runId}/attempts/{attemptId}/cancel": {
+      "post": {
+        "operationId": "cancelSeedProofRun",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RunId"
+          },
+          {
+            "$ref": "#/components/parameters/AttemptId"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "$ref": "#/components/responses/AcceptedOperation"
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/v2/seed-proof-runs/{runId}/attempts/{attemptId}/finalize": {
+      "post": {
+        "operationId": "finalizeSeedProofRun",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/RunId"
+          },
+          {
+            "$ref": "#/components/parameters/AttemptId"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FinalizeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Replay-stable Leaf attestation for the exact finalized bytes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FinalizeResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "opaque control-plane token"
+      }
+    },
+    "parameters": {
+      "RunId": {
+        "name": "runId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "$ref": "#/components/schemas/Uuid"
+        }
+      },
+      "AttemptId": {
+        "name": "attemptId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "$ref": "#/components/schemas/Uuid"
+        }
+      },
+      "IdempotencyKey": {
+        "name": "Idempotency-Key",
+        "in": "header",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "minLength": 16,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9._:-]+$"
+        }
+      }
+    },
+    "responses": {
+      "AcceptedOperation": {
+        "description": "The exact operation was durably accepted or replayed.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Operation"
+            }
+          }
+        }
+      },
+      "Problem": {
+        "description": "Bounded machine-readable failure without secrets.",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problem"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "Uuid": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+      },
+      "Digest": {
+        "type": "string",
+        "pattern": "^sha256:[a-f0-9]{64}$"
+      },
+      "Timestamp": {
+        "type": "string",
+        "format": "date-time",
+        "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-([0-2][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$"
+      },
+      "StartRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "schemaVersion",
+          "runId",
+          "attemptId",
+    "revisionId",
+    "proofBundleDigest",
+    "proofBundle",
+    "proofPlan",
+          "seedManifest",
+          "podManifest",
+          "encryptedInputs",
+          "deadlineAt"
+        ],
+        "properties": {
+          "schemaVersion": {
+            "const": "dauva.dev/seed-proof-start/v2"
+          },
+          "runId": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "attemptId": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "revisionId": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+    "proofBundleDigest": {
+      "$ref": "#/components/schemas/Digest"
+    },
+    "proofBundle": {
+      "$ref": "./seed-proof-bundle-v1.schema.json"
+    },
+    "proofPlan": {
+            "$ref": "./seed-proof-plan-v1.schema.json"
+          },
+          "seedManifest": {
+            "$ref": "./seed-v1.schema.json"
+          },
+          "podManifest": {
+            "$ref": "./pod-v1.schema.json"
+          },
+          "encryptedInputs": {
+            "$ref": "#/components/schemas/EncryptedInputs"
+          },
+          "deadlineAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          }
+        }
+      },
+      "EncryptedInputs": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "format",
+          "keyId",
+          "compactJwe"
+        ],
+        "properties": {
+          "format": {
+            "const": "compact-jwe"
+          },
+          "keyId": {
+            "$ref": "#/components/schemas/Digest"
+          },
+          "compactJwe": {
+            "type": "string",
+            "minLength": 32,
+            "maxLength": 131072,
+            "pattern": "^[A-Za-z0-9_-]+(?:\\.[A-Za-z0-9_-]*){4}$"
+          }
+        }
+      },
+      "Operation": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "schemaVersion",
+          "runId",
+          "attemptId",
+          "state",
+          "cleanupState",
+          "lastSequence",
+          "heartbeatAt"
+        ],
+        "properties": {
+          "schemaVersion": {
+            "const": "dauva.dev/seed-proof-operation/v2"
+          },
+          "runId": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "attemptId": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "state": {
+            "enum": [
+              "accepted",
+              "running",
+              "cancel_requested",
+              "cleaning",
+              "passed",
+              "failed",
+              "canceled",
+              "cleanup_failed"
+            ]
+          },
+          "cleanupState": {
+            "enum": [
+              "not_started",
+              "running",
+              "passed",
+              "failed"
+            ]
+          },
+          "lastSequence": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "heartbeatAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "resultStatementDigest": {
+            "$ref": "#/components/schemas/Digest"
+          },
+          "resultStatement": {
+            "$ref": "#/components/schemas/RunStatement"
+          }
+        }
+      },
+      "EventParameter": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "value"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[a-z][A-Za-z0-9]*$",
+            "maxLength": 64
+          },
+          "value": {
+            "type": "string",
+            "maxLength": 256
+          }
+        }
+      },
+      "Event": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sequence",
+          "code",
+          "occurredAt",
+          "parameters"
+        ],
+        "properties": {
+          "sequence": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "code": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$",
+            "maxLength": 80
+          },
+          "occurredAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "parameters": {
+            "type": "array",
+            "maxItems": 16,
+            "items": {
+              "$ref": "#/components/schemas/EventParameter"
+            }
+          }
+        }
+      },
+      "EventPage": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "events",
+          "lastSequence",
+          "hasMore"
+        ],
+        "properties": {
+          "events": {
+            "type": "array",
+            "maxItems": 200,
+            "items": {
+              "$ref": "#/components/schemas/Event"
+            }
+          },
+          "lastSequence": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "hasMore": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CancelRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "schemaVersion",
+          "reasonCode"
+        ],
+        "properties": {
+          "schemaVersion": {
+            "const": "dauva.dev/seed-proof-cancel/v2"
+          },
+          "reasonCode": {
+            "enum": [
+              "author_requested",
+              "deadline_exceeded",
+              "worker_reconciliation",
+              "operator_requested"
+            ]
+          }
+        }
+      },
+      "RunStatement": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "schemaVersion",
+          "runId",
+          "attemptId",
+          "revisionId",
+          "proofBundleDigest",
+          "proofPlanDigest",
+          "leafId",
+          "leafKeyId",
+          "policyVersion",
+          "eventsDigest",
+          "checksDigest",
+          "agreementsDigest",
+          "startedAt",
+          "deadlineAt",
+          "completedAt",
+          "finalOutcome",
+          "cleanupOutcome",
+          "leafJournalDigest"
+        ],
+        "properties": {
+          "schemaVersion": {
+            "const": "dauva.dev/seed-proof-run-statement/v2"
+          },
+          "runId": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "attemptId": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "revisionId": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "proofBundleDigest": {
+            "$ref": "#/components/schemas/Digest"
+          },
+          "proofPlanDigest": {
+            "$ref": "#/components/schemas/Digest"
+          },
+          "leafId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
+            "maxLength": 128
+          },
+          "leafKeyId": {
+            "$ref": "#/components/schemas/Digest"
+          },
+          "policyVersion": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._+-]*$",
+            "maxLength": 64
+          },
+          "eventsDigest": {
+            "$ref": "#/components/schemas/Digest"
+          },
+          "checksDigest": {
+            "$ref": "#/components/schemas/Digest"
+          },
+          "agreementsDigest": {
+            "$ref": "#/components/schemas/Digest"
+          },
+          "startedAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "deadlineAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "completedAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "finalOutcome": {
+            "const": "passed"
+          },
+          "cleanupOutcome": {
+            "const": "passed"
+          },
+          "leafJournalDigest": {
+            "$ref": "#/components/schemas/Digest"
+          }
+        }
+      },
+      "FinalizeRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "schemaVersion",
+          "runStatement",
+          "receiptPayload"
+        ],
+        "properties": {
+          "schemaVersion": {
+            "const": "dauva.dev/seed-proof-finalize/v2"
+          },
+          "runStatement": {
+            "$ref": "#/components/schemas/RunStatement"
+          },
+          "receiptPayload": {
+            "$ref": "./seed-proof-v2.schema.json#/$defs/receiptPayload"
+          }
+        }
+      },
+      "FinalizeResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "schemaVersion",
+          "runId",
+          "attemptId",
+          "leafAttestation"
+        ],
+        "properties": {
+          "schemaVersion": {
+            "const": "dauva.dev/seed-proof-finalized/v2"
+          },
+          "runId": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "attemptId": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "leafAttestation": {
+            "$ref": "./seed-proof-v2.schema.json#/$defs/attestation"
+          }
+        }
+      },
+      "Problem": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code",
+          "requestId"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "format": "uri",
+            "maxLength": 2048
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "status": {
+            "type": "integer",
+            "minimum": 400,
+            "maximum": 599
+          },
+          "code": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$",
+            "maxLength": 80
+          },
+          "requestId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        }
+      }
+    }
+  }
+}
