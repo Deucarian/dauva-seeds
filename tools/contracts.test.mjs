@@ -32,6 +32,15 @@ const validateProof = ajv.compile(documents["seed-proof-v2.schema.json"]);
 const validateBundle = ajv.compile(
   documents["seed-release-bundle-v1.schema.json"],
 );
+const studioApi = documents["seed-studio-api-v1.openapi.json"];
+const validateCreateWorkspace = ajv.compile({
+  $id: "https://dauva.dev/schemas/seed-studio-create-workspace-test.json",
+  ...resolveStudioComponent(studioApi, "CreateWorkspaceRequest"),
+});
+const validateWorkingSeedDocument = ajv.compile({
+  $id: "https://dauva.dev/schemas/seed-studio-working-seed-test.json",
+  ...resolveStudioComponent(studioApi, "WorkingSeedDocument"),
+});
 
 const uuid = "123e4567-e89b-42d3-a456-426614174000";
 const uuid2 = "223e4567-e89b-42d3-a456-426614174001";
@@ -227,8 +236,150 @@ test("contract schemas reject commands, extension fields, and unsafe paths", () 
   assert.equal(validateBundle(traversingBundle), false);
 });
 
+test("Studio OpenAPI accepts only the exact guided workspace starter shapes", () => {
+  assert.equal(studioApi.info.version, "1.1.0");
+  const existing = {
+    mode: "new",
+    source: "guided",
+    starter: {
+      kind: "existing_pod_variant",
+      podId: "minecraft",
+      seedId: "minecraft-guided",
+      displayName: "Minecraft Guided",
+    },
+  };
+  assert.equal(
+    validateCreateWorkspace(existing),
+    true,
+    JSON.stringify(validateCreateWorkspace.errors),
+  );
+  assert.equal(
+    validateCreateWorkspace({ mode: "new", source: "empty" }),
+    true,
+    JSON.stringify(validateCreateWorkspace.errors),
+  );
+  assert.equal(
+    validateCreateWorkspace({
+      ...existing,
+      seedId: null,
+      document: null,
+    }),
+    true,
+    JSON.stringify(validateCreateWorkspace.errors),
+  );
+  assert.equal(
+    validateCreateWorkspace({
+      ...existing,
+      starter: { ...existing.starter, templateSeedId: "minecraft-paper" },
+    }),
+    true,
+    JSON.stringify(validateCreateWorkspace.errors),
+  );
+  assert.equal(
+    validateCreateWorkspace({
+      ...existing,
+      starter: { ...existing.starter, templateSeedId: null },
+    }),
+    true,
+    JSON.stringify(validateCreateWorkspace.errors),
+  );
+  assert.equal(
+    validateCreateWorkspace({
+      mode: "new",
+      source: "guided",
+      starter: {
+        kind: "new_pod",
+        podId: "example-game",
+        podDisplayName: "Example Game",
+        seedId: "example-game-vanilla",
+        seedDisplayName: "Example Game Vanilla",
+      },
+    }),
+    true,
+    JSON.stringify(validateCreateWorkspace.errors),
+  );
+  const imported = {
+    mode: "update",
+    source: "json_import",
+    seedId: null,
+    document: {
+      podJson: "{}",
+      seeds: [{ clientKey: "example", json: "{\"id\":\"example\"}" }],
+    },
+  };
+  assert.equal(
+    validateCreateWorkspace(imported),
+    true,
+    JSON.stringify(validateCreateWorkspace.errors),
+  );
+  assert.equal(
+    validateCreateWorkspace({
+      ...imported,
+      document: { ...imported.document, podJson: null },
+    }),
+    false,
+  );
+
+  for (const invalid of [
+    {
+      ...existing,
+      starter: { ...existing.starter, reviewedAt: "2026-08-03" },
+    },
+    {
+      ...existing,
+      starter: { ...existing.starter, displayName: "   " },
+    },
+    {
+      ...existing,
+      starter: { ...existing.starter, displayName: " Minecraft Guided" },
+    },
+    {
+      mode: "update",
+      source: "guided",
+      starter: existing.starter,
+    },
+    {
+      ...existing,
+      document: { podJson: "{}", seeds: [] },
+    },
+    {
+      mode: "new",
+      source: "guided",
+      starter: {
+        kind: "new_pod",
+        podId: "example-game",
+        podDisplayName: "Example Game",
+        seedId: "example-game-vanilla",
+        displayName: "Wrong field",
+      },
+    },
+  ]) {
+    assert.equal(validateCreateWorkspace(invalid), false, JSON.stringify(invalid));
+  }
+});
+
+test("Studio WorkingSeedDocument clientKey uses the canonical Seed identifier", () => {
+  assert.equal(
+    validateWorkingSeedDocument({ clientKey: "minecraft-paper", json: "{}" }),
+    true,
+    JSON.stringify(validateWorkingSeedDocument.errors),
+  );
+  assert.equal(
+    validateWorkingSeedDocument({ clientKey: "Minecraft Paper", json: "{}" }),
+    false,
+  );
+  assert.equal(
+    validateWorkingSeedDocument({ clientKey: "a", json: "{}" }),
+    false,
+  );
+  assert.equal(
+    validateWorkingSeedDocument({ clientKey: "a".repeat(81), json: "{}" }),
+    false,
+  );
+});
+
 test("OpenAPI contracts expose only the approved Studio and Leaf operations", async () => {
-  const api = documents["seed-studio-api-v1.openapi.json"];
+  const api = studioApi;
   const leaf = documents["seed-studio-leaf-v2.openapi.json"];
   const requiredApiPaths = [
     "/reference",
@@ -309,4 +460,33 @@ function collectExternalReferences(value) {
     }
   }
   return [...new Set(references)];
+}
+
+function resolveStudioComponent(api, name, stack = []) {
+  if (stack.includes(name)) {
+    throw new Error(`Circular Studio schema reference: ${[...stack, name].join(" -> ")}`);
+  }
+  const schema = api.components.schemas[name];
+  if (!schema) throw new Error(`Studio schema '${name}' does not exist.`);
+  return resolveStudioValue(api, schema, [...stack, name]);
+}
+
+function resolveStudioValue(api, value, stack) {
+  if (Array.isArray(value)) {
+    return value.map((item) => resolveStudioValue(api, item, stack));
+  }
+  if (value === null || typeof value !== "object") return value;
+  if (
+    typeof value.$ref === "string" &&
+    value.$ref.startsWith("#/components/schemas/")
+  ) {
+    const name = value.$ref.slice("#/components/schemas/".length);
+    return resolveStudioComponent(api, name, stack);
+  }
+  return Object.fromEntries(
+    Object.entries(value).map(([key, nested]) => [
+      key,
+      resolveStudioValue(api, nested, stack),
+    ]),
+  );
 }

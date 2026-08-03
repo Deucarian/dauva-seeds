@@ -3,9 +3,11 @@
 import path from "node:path";
 import {
   canonicalDocument,
+  createGuidedDraft,
   creatorEngineVersion,
   creatorPolicyVersion,
   freezeSeedRevision,
+  prepareSeedForFreeze,
   validateProofReceipt,
   validateWorkspace,
 } from "./creator-engine.mjs";
@@ -41,6 +43,8 @@ async function dispatch(request) {
       return reference();
     case "clone":
       return clone(request.seedId);
+    case "create-draft":
+      return createDraft(request.starter);
     case "candidate-digest":
       return candidateDigest(request.document);
     case "validate":
@@ -95,6 +99,15 @@ async function clone(seedId) {
   };
 }
 
+async function createDraft(starter) {
+  const { pods, seeds } = await loadRegistryInputs();
+  return createGuidedDraft({
+    starter,
+    basePods: pods,
+    baseSeeds: seeds,
+  });
+}
+
 function candidateDigest(document) {
   const parsed = parseWorkingDocument(document);
   return canonicalDocument(parsed);
@@ -112,6 +125,8 @@ async function validate(request) {
     profile: request.profile,
     validationTime: request.validationTime,
     meaningfulVariantSeedIds: request.meaningfulVariantSeedIds ?? [],
+    semanticImpact: request.semanticImpact ?? null,
+    candidateNumber: request.candidateNumber ?? 1,
   });
   return {
     ...result,
@@ -121,10 +136,52 @@ async function validate(request) {
   };
 }
 
-function freeze(request) {
-  const parsed = parseWorkingDocument(request.document);
+async function freeze(request) {
+  const working = parseWorkingDocument(request.document);
   requireUuid(request.revisionId, "revisionId");
   requireUuid(request.revisionGroupId, "revisionGroupId");
+  const candidateNumber = request.candidateNumber ?? 1;
+  if (!Number.isSafeInteger(candidateNumber) || candidateNumber < 1) {
+    throw new Error("candidateNumber must be a positive integer.");
+  }
+  const { pods, seeds: baseSeeds, proofs } = await loadRegistryInputs();
+  const registry = await readJson(
+    path.join(repositoryRoot, "dist", "registry.json"),
+  );
+  assertRegistryDigest(registry);
+  if (registry.registryDigest !== request.baseRegistryDigest) {
+    throw new Error("The freeze base Registry is stale.");
+  }
+  const validation = validateWorkspace({
+    pod: working.pod,
+    seeds: working.seeds,
+    basePods: pods,
+    baseSeeds,
+    proofs,
+    profile: "freeze",
+    meaningfulVariantSeedIds: request.meaningfulVariantSeedIds ?? [],
+    semanticImpact: request.semanticImpact,
+    candidateNumber,
+  });
+  if (!validation.valid) {
+    throw new Error(
+      `Freeze validation failed: ${validation.issues.map((item) => item.code).join(", ")}.`,
+    );
+  }
+  const parsed = {
+    pod:
+      request.semanticImpact === "reproof"
+        ? structuredClone(working.pod)
+        : { ...structuredClone(working.pod), status: "candidate" },
+    seeds: working.seeds.map((seed) =>
+      prepareSeedForFreeze({
+        seed,
+        baseSeed: baseSeeds.find((candidate) => candidate.id === seed.id),
+        semanticImpact: request.semanticImpact,
+        candidateNumber,
+      }),
+    ),
+  };
   const planIds = new Map(
     (request.planIds ?? []).map((entry) => [
       `${entry.seedId}:${entry.architecture}`,
@@ -218,10 +275,17 @@ function parseWorkingDocument(document) {
     if (typeof entry?.clientKey !== "string" || typeof entry?.json !== "string") {
       throw new Error(`Working Seed ${index} is malformed.`);
     }
+    requireIdentifier(entry.clientKey, `Working Seed ${index} clientKey`);
     if (entry.json.length > 512 * 1024) {
       throw new Error(`Working Seed ${index} exceeds the engine limit.`);
     }
-    return parseJsonStrict(entry.json, `working Seed '${entry.clientKey}' JSON`);
+    const seed = parseJsonStrict(entry.json, `working Seed '${entry.clientKey}' JSON`);
+    if (seed?.id !== entry.clientKey) {
+      throw new Error(
+        `Working Seed '${entry.clientKey}' clientKey must equal its parsed Seed id.`,
+      );
+    }
+    return seed;
   });
   return { pod, seeds };
 }
@@ -241,7 +305,12 @@ async function readStandardInput() {
 }
 
 function requireIdentifier(value, label) {
-  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value ?? "")) {
+  if (
+    typeof value !== "string" ||
+    value.length < 2 ||
+    value.length > 80 ||
+    !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value)
+  ) {
     throw new Error(`${label} is invalid.`);
   }
 }

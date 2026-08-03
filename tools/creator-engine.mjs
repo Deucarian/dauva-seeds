@@ -17,8 +17,8 @@ import {
   steamCmdDescriptor,
 } from "./source-adapters.mjs";
 
-export const creatorEngineVersion = "0.12.0";
-export const creatorPolicyVersion = "1.0.0";
+export const creatorEngineVersion = "0.13.0";
+export const creatorPolicyVersion = "1.1.0";
 
 const idPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const pinnedImagePattern =
@@ -64,7 +64,6 @@ export function createSeedDraft({
   image,
   updateReference,
   upstreamId,
-  reviewedAt,
 }) {
   requireId(id, "id");
   requireId(podId, "podId");
@@ -84,7 +83,7 @@ export function createSeedDraft({
     registry: imageMatch.groups.registry,
     upstreamId,
   });
-  const defaults = sourceRuntimeDefaults(source, { reviewedAt });
+  const defaults = sourceRuntimeDefaults(source);
   const localized = (value) => ({ en: value, nl: value, de: value });
   return {
     schemaVersion: "dauva.dev/seed/v1",
@@ -99,6 +98,7 @@ export function createSeedDraft({
       icon: "server",
     },
     ...defaults,
+    trust: {},
     compatibility: {
       operatingSystems: ["linux"],
       architectures: ["amd64"],
@@ -181,6 +181,241 @@ export function createSeedDraft({
   };
 }
 
+export function createGuidedDraft({ starter, basePods = [], baseSeeds = [] }) {
+  if (starter === null || typeof starter !== "object" || Array.isArray(starter)) {
+    throw new Error("starter must be an object.");
+  }
+  if (starter.kind === "existing_pod_variant") {
+    requireExactKeys(
+      starter,
+      ["displayName", "kind", "podId", "seedId"],
+      ["templateSeedId"],
+      "existing Pod starter",
+    );
+    const podId = requireId(starter.podId, "podId");
+    const seedId = requireId(starter.seedId, "seedId");
+    const displayName = requireDisplayName(starter.displayName, "displayName");
+    if (baseSeeds.some((seed) => seed.id === seedId)) {
+      throw new Error(`Seed '${seedId}' already exists in the base Registry.`);
+    }
+    const pod = basePods.find((candidate) => candidate.id === podId);
+    if (!pod || pod.status !== "stable") {
+      throw new Error(`Stable Pod '${podId}' does not exist in the base Registry.`);
+    }
+    const templateSeedId =
+      Object.hasOwn(starter, "templateSeedId") && starter.templateSeedId !== null
+      ? starter.templateSeedId
+      : pod.recommendedSeedId;
+    requireId(templateSeedId, "templateSeedId");
+    const template = baseSeeds.find(
+      (candidate) => candidate.id === templateSeedId,
+    );
+    if (
+      !template ||
+      template.status !== "stable" ||
+      template.podId !== pod.id
+    ) {
+      throw new Error(
+        `Stable template Seed '${templateSeedId}' does not belong to Pod '${pod.id}'.`,
+      );
+    }
+
+    const seed = structuredClone(template);
+    seed.id = seedId;
+    seed.podId = pod.id;
+    seed.version = "1.0.0-rc.1";
+    seed.status = "draft";
+    seed.metadata.title = localizedCopy(displayName);
+    return workingDocument(pod, [seed]);
+  }
+
+  if (starter.kind === "new_pod") {
+    requireExactKeys(
+      starter,
+      ["kind", "podDisplayName", "podId", "seedDisplayName", "seedId"],
+      [],
+      "new Pod starter",
+    );
+    const podId = requireId(starter.podId, "podId");
+    const seedId = requireId(starter.seedId, "seedId");
+    const podDisplayName = requireDisplayName(
+      starter.podDisplayName,
+      "podDisplayName",
+    );
+    const seedDisplayName = requireDisplayName(
+      starter.seedDisplayName,
+      "seedDisplayName",
+    );
+    if (basePods.some((pod) => pod.id === podId)) {
+      throw new Error(`Pod '${podId}' already exists in the base Registry.`);
+    }
+    if (baseSeeds.some((seed) => seed.id === seedId)) {
+      throw new Error(`Seed '${seedId}' already exists in the base Registry.`);
+    }
+    const pod = {
+      schemaVersion: "dauva.dev/pod/v1",
+      id: podId,
+      status: "draft",
+      metadata: {
+        title: localizedCopy(podDisplayName),
+        description: emptyLocalizedText(),
+        icon: "server",
+      },
+    };
+    return workingDocument(pod, [
+      createIncompleteSeedDraft({
+        id: seedId,
+        podId,
+        displayName: seedDisplayName,
+      }),
+    ]);
+  }
+
+  throw new Error(
+    "starter.kind must be existing_pod_variant or new_pod.",
+  );
+}
+
+function createIncompleteSeedDraft({ id, podId, displayName }) {
+  return {
+    schemaVersion: "dauva.dev/seed/v1",
+    id,
+    version: "1.0.0-rc.1",
+    status: "draft",
+    podId,
+    genres: ["multiplayer"],
+    metadata: {
+      title: localizedCopy(displayName),
+      description: emptyLocalizedText(),
+      icon: "server",
+    },
+    source: {},
+    trust: {},
+    compatibility: {
+      operatingSystems: ["linux"],
+      architectures: ["amd64"],
+      leafCapabilities: [
+        "dynamic-ports",
+        "oci",
+        "persistent-storage",
+        "resource-limits",
+      ],
+    },
+    components: [
+      {
+        id: "server",
+        role: "primary",
+        image: "",
+        imageUpdate: { reference: "" },
+        environment: {},
+        optionEnvironment: {},
+        agreementEnvironment: {},
+        secretEnvironment: {},
+        runtimeEnvironment: {},
+        volumeMounts: [
+          { volumeId: "data", target: "/data", readOnly: false },
+        ],
+        dependsOn: [],
+        health: { source: "running", startupGraceSeconds: 600 },
+      },
+    ],
+    volumes: [
+      { id: "data", role: "data", retention: "delete-with-server" },
+    ],
+    ports: [],
+    resources: {
+      defaultPresetId: "balanced",
+      presets: [
+        {
+          id: "balanced",
+          title: {
+            en: "Balanced",
+            nl: "Gebalanceerd",
+            de: "Ausgewogen",
+          },
+          description: {
+            en: "Review resources before proofing.",
+            nl: "Controleer de resources voordat je de Seed test.",
+            de: "Prüfe die Ressourcen vor dem Seed-Test.",
+          },
+          memoryMb: 4096,
+          diskMb: 20480,
+          cpuPercent: 200,
+        },
+      ],
+    },
+    storage: {
+      class: "bulk",
+      backupClass: "backup",
+      estimatedDownloadMb: 0,
+      estimatedInstallMb: 0,
+      estimatedMutableMb: 0,
+      backupPolicy: "recommended",
+    },
+    inputs: [],
+    secrets: [],
+    lifecycle: {
+      startOrder: ["server"],
+      stopOrder: ["server"],
+      stopTimeoutSeconds: 60,
+    },
+    capabilities: {
+      backup: false,
+      restore: false,
+      update: false,
+      console: false,
+    },
+    updatePolicy: {
+      discovery: "manual",
+      automaticCheck: false,
+      automaticInstall: false,
+      requiresBackup: false,
+      rollback: false,
+    },
+    proofPolicy: {
+      requiredChecks: [
+        "images-pinned",
+        "healthy",
+        "ports",
+        "backup-if-supported",
+        "graceful-stop",
+        "restart",
+        "persistence",
+        "cleanup",
+      ],
+      expiresAfterDays: 90,
+    },
+  };
+}
+
+function workingDocument(pod, seeds) {
+  return {
+    document: {
+      podJson: canonicalJson(pod),
+      seeds: seeds
+        .map((seed) => ({
+          clientKey: seed.id,
+          json: canonicalJson(seed),
+        }))
+        .sort((left, right) =>
+          left.clientKey < right.clientKey
+            ? -1
+            : left.clientKey > right.clientKey
+              ? 1
+              : 0,
+        ),
+    },
+  };
+}
+
+function localizedCopy(value) {
+  return { en: value, nl: value, de: value };
+}
+
+function emptyLocalizedText() {
+  return { en: "", nl: "", de: "" };
+}
+
 export function canonicalDocument(value) {
   const json = canonicalJson(value);
   return {
@@ -198,6 +433,8 @@ export function validateWorkspace({
   profile = "authoring",
   validationTime,
   meaningfulVariantSeedIds = [],
+  semanticImpact = null,
+  candidateNumber = 1,
 }) {
   if (
     ![
@@ -240,6 +477,34 @@ export function validateWorkspace({
       issues.push(issue("seed.id.duplicate", `/seeds/${index}/id`, { id: seed.id }));
     }
     proposalIds.add(seed.id);
+  }
+  for (let index = 0; index < seeds.length; index += 1) {
+    const seed = seeds[index];
+    if (!validSeeds.has(seed)) continue;
+    const baseSeed = baseSeeds.find((candidate) => candidate.id === seed.id);
+    if (
+      seed.trust.level === "official" &&
+      (!baseSeed || canonicalJson(baseSeed) !== canonicalJson(seed))
+    ) {
+      issues.push(
+        issue(
+          "seed.trust.official-source-unconfigured",
+          `/seeds/${index}/trust/level`,
+          { seedId: seed.id },
+        ),
+      );
+    }
+    if (profile !== "authoring") {
+      collectReleaseVersionIssues({
+        seed,
+        baseSeed,
+        semanticImpact,
+        candidateNumber,
+        allowEditableVersion: profile === "freeze",
+        jsonPointer: `/seeds/${index}`,
+        issues,
+      });
+    }
   }
   if (podValid) {
     const overlaySeeds = new Map(baseSeeds.map((seed) => [seed.id, seed]));
@@ -284,6 +549,13 @@ export function validateWorkspace({
           issue("pod.variants.meaningful-review", "/pod/id", {
             podId: pod.id,
             count: approvedRelated.length,
+          }),
+        );
+      } else if (!hasMeaningfulVariantPair(approvedRelated)) {
+        issues.push(
+          issue("pod.variants.meaningful-difference", "/pod/id", {
+            podId: pod.id,
+            seedIds: approvedRelated.map((seed) => seed.id).sort().join(","),
           }),
         );
       }
@@ -332,6 +604,235 @@ export function validateWorkspace({
     profile,
     valid: !issues.some((candidate) => candidate.severity === "error"),
     issues,
+  };
+}
+
+export function prepareSeedForFreeze({
+  seed,
+  baseSeed,
+  semanticImpact,
+  candidateNumber,
+}) {
+  const issues = [];
+  collectReleaseVersionIssues({
+    seed,
+    baseSeed,
+    semanticImpact,
+    candidateNumber,
+    allowEditableVersion: true,
+    jsonPointer: "/seed",
+    issues,
+  });
+  if (issues.length > 0) {
+    throw new Error(
+      `Seed release policy failed: ${issues.map((item) => item.code).join(", ")}.`,
+    );
+  }
+  if (semanticImpact === "reproof") return structuredClone(seed);
+  const stableVersion = expectedStableVersion(
+    baseSeed?.version ?? null,
+    semanticImpact,
+  );
+  return {
+    ...structuredClone(seed),
+    version: `${stableVersion}-rc.${candidateNumber}`,
+    status: "candidate",
+  };
+}
+
+export function expectedStableVersion(baseVersion, semanticImpact) {
+  if (baseVersion === null) return "1.0.0";
+  const match = /^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$/.exec(
+    baseVersion ?? "",
+  );
+  if (!match) {
+    throw new Error("The base Seed version is not stable semantic versioning.");
+  }
+  const major = Number(match[1]);
+  const minor = Number(match[2]);
+  const patch = Number(match[3]);
+  if (semanticImpact === "patch") return `${major}.${minor}.${patch + 1}`;
+  if (semanticImpact === "minor") return `${major}.${minor + 1}.0`;
+  if (semanticImpact === "major") return `${major + 1}.0.0`;
+  if (semanticImpact === "reproof") return baseVersion;
+  throw new Error("semanticImpact must be patch, minor, major, or reproof.");
+}
+
+function collectReleaseVersionIssues({
+  seed,
+  baseSeed,
+  semanticImpact,
+  candidateNumber,
+  allowEditableVersion = false,
+  jsonPointer,
+  issues,
+}) {
+  if (!Number.isSafeInteger(candidateNumber) || candidateNumber < 1) {
+    throw new Error("candidateNumber must be a positive integer.");
+  }
+  if (semanticImpact === null) {
+    if (!baseSeed && seed.version !== `1.0.0-rc.${candidateNumber}`) {
+      issues.push(
+        issue("seed.version.new-candidate", `${jsonPointer}/version`, {
+          seedId: seed.id,
+          expected: `1.0.0-rc.${candidateNumber}`,
+        }),
+      );
+    }
+    return;
+  }
+  if (!["patch", "minor", "major", "reproof"].includes(semanticImpact)) {
+    throw new Error("semanticImpact must be patch, minor, major, or reproof.");
+  }
+  if (semanticImpact === "reproof") {
+    if (!baseSeed || canonicalJson(baseSeed) !== canonicalJson(seed)) {
+      issues.push(
+        issue("seed.version.reproof-exact", jsonPointer, { seedId: seed.id }),
+      );
+    }
+    return;
+  }
+  const stableVersion = expectedStableVersion(
+    baseSeed?.version ?? null,
+    semanticImpact,
+  );
+  const expectedCandidate = `${stableVersion}-rc.${candidateNumber}`;
+  if (!allowEditableVersion && seed.version !== expectedCandidate) {
+    issues.push(
+      issue("seed.version.candidate-target", `${jsonPointer}/version`, {
+        seedId: seed.id,
+        expected: expectedCandidate,
+        semanticImpact,
+      }),
+    );
+  }
+}
+
+function hasMeaningfulVariantPair(seeds) {
+  const projections = seeds.map((seed) => meaningfulVariantProjection(seed));
+  for (let left = 0; left < projections.length; left += 1) {
+    for (let right = left + 1; right < projections.length; right += 1) {
+      if (canonicalJson(projections[left]) !== canonicalJson(projections[right])) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+function meaningfulVariantProjection(seed) {
+  const componentRoles = new Map(
+    seed.components.map((component) => [component.id, component.role]),
+  );
+  const volumeRoles = new Map(
+    seed.volumes.map((volume) => [volume.id, volume.role]),
+  );
+  const sorted = (values) =>
+    values
+      .map((value) => structuredClone(value))
+      .sort((left, right) =>
+        canonicalJson(left).localeCompare(canonicalJson(right)),
+      );
+  const components = sorted(
+    seed.components.map((component) => ({
+      role: component.role,
+      image: component.image,
+      imageUpdate: component.imageUpdate,
+      environment: component.environment,
+      optionEnvironment: component.optionEnvironment,
+      agreementEnvironment: component.agreementEnvironment,
+      secretEnvironment: component.secretEnvironment,
+      runtimeEnvironment: component.runtimeEnvironment,
+      volumeMounts: sorted(
+        component.volumeMounts.map((mount) => ({
+          volumeRole: volumeRoles.get(mount.volumeId) ?? "unknown",
+          target: mount.target,
+          readOnly: mount.readOnly,
+        })),
+      ),
+      dependsOnRoles: component.dependsOn
+        .map((id) => componentRoles.get(id) ?? "unknown")
+        .sort(),
+      health: component.health,
+    })),
+  );
+  const gameplayInputs = sorted(
+    seed.inputs.map((input) => {
+      const value = structuredClone(input);
+      delete value.label;
+      delete value.help;
+      if (Array.isArray(value.options)) {
+        value.options = value.options.map((option) => {
+          if (option === null || typeof option !== "object") return option;
+          const normalized = structuredClone(option);
+          delete normalized.label;
+          return normalized;
+        });
+      }
+      return value;
+    }),
+  );
+  const storage = structuredClone(seed.storage);
+  delete storage.estimatedDownloadMb;
+  delete storage.estimatedInstallMb;
+  delete storage.estimatedMutableMb;
+  return {
+    runtimeSource: {
+      source: seed.source,
+      images: components.map((component) => ({
+        role: component.role,
+        image: component.image,
+        imageUpdate: component.imageUpdate,
+      })),
+    },
+    gameplaySettings: {
+      inputs: gameplayInputs,
+      environments: components.map((component) => ({
+        role: component.role,
+        environment: component.environment,
+        optionEnvironment: component.optionEnvironment,
+        agreementEnvironment: component.agreementEnvironment,
+        secretEnvironment: component.secretEnvironment,
+        runtimeEnvironment: component.runtimeEnvironment,
+      })),
+    },
+    components: components.map((component) => ({
+      role: component.role,
+      dependsOnRoles: component.dependsOnRoles,
+      health: component.health,
+    })),
+    lifecycle: seed.lifecycle,
+    storage: {
+      policy: storage,
+      volumes: sorted(
+        seed.volumes.map((volume) => ({
+          role: volume.role,
+          retention: volume.retention,
+        })),
+      ),
+      mounts: components.map((component) => ({
+        role: component.role,
+        volumeMounts: component.volumeMounts,
+      })),
+    },
+    networking: sorted(
+      seed.ports.map((port) => ({
+        componentRole: componentRoles.get(port.componentId) ?? "unknown",
+        containerPort: port.containerPort,
+        containerPortMode: port.containerPortMode,
+        protocols: [...port.protocols].sort(),
+        exposure: port.exposure,
+        purpose: port.purpose,
+        primary: port.primary,
+        sharedHostPort: port.sharedHostPort,
+      })),
+    ),
+    supportedCapabilities: {
+      capabilities: seed.capabilities,
+      compatibility: seed.compatibility,
+      console: seed.console ?? null,
+      updatePolicy: seed.updatePolicy,
+    },
   };
 }
 
@@ -598,10 +1099,21 @@ function issue(code, jsonPointer, parameters = {}, severity = "error") {
 }
 
 function requireId(value, label) {
-  if (!idPattern.test(value ?? "")) {
-    throw new Error(`${label} must be a Dauva identifier.`);
+  if (!isDauvaId(value)) {
+    throw new Error(
+      `${label} must be a 2 through 80 character Dauva identifier.`,
+    );
   }
   return value;
+}
+
+function isDauvaId(value) {
+  return (
+    typeof value === "string" &&
+    value.length >= 2 &&
+    value.length <= 80 &&
+    idPattern.test(value)
+  );
 }
 
 function requireUuid(value, label) {
@@ -636,6 +1148,35 @@ function requireText(value, label) {
     throw new Error(`${label} is required.`);
   }
   return value;
+}
+
+function requireDisplayName(value, label) {
+  if (typeof value !== "string") {
+    throw new Error(`${label} must be text.`);
+  }
+  const normalized = value.trim();
+  if (
+    value !== normalized ||
+    value.length > 120 ||
+    normalized.length === 0 ||
+    normalized.length > 120 ||
+    /[\u0000-\u001f\u007f]/u.test(value)
+  ) {
+    throw new Error(
+      `${label} must contain 1 through 120 visible characters.`,
+    );
+  }
+  return normalized;
+}
+
+function requireExactKeys(value, required, optional, label) {
+  const allowed = new Set([...required, ...optional]);
+  const keys = Object.keys(value);
+  const missing = required.filter((key) => !Object.hasOwn(value, key));
+  const unexpected = keys.filter((key) => !allowed.has(key));
+  if (missing.length > 0 || unexpected.length > 0) {
+    throw new Error(`${label} has an invalid shape.`);
+  }
 }
 
 function requireFixture(fixtures, capability, seed) {

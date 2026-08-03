@@ -2,9 +2,9 @@
 
 Status: **approved normative specification**
 
-Specification version: **1.0.0**
+Specification version: **1.1.0**
 
-Approved and last updated: **2026-08-03**
+Approved and last updated: **2026-08-04**
 
 This document defines the first production release of Dauva's internal Seed
 Studio and the production-ready Seed Creator behind it. It is intentionally
@@ -361,10 +361,15 @@ kind or warning code, actor, decision, timestamp, and policy version. Source,
 trust, language, legal, security, meaningful-variant, and warning approvals
 are explicit records rather than inferred audit-log entries.
 
-A pre-freeze review binds to a server-computed candidate content digest and is
-copied into the immutable revision only when that exact digest freezes. Any
-edit makes the review stale. Proof-time agreement acceptance binds directly to
-the already frozen Seed revision and exact agreement revisions.
+A pre-freeze review binds to a server-computed editable candidate content
+digest. That approval record is immutable. At freeze, the canonical engine may
+change only the Pod `status` and Seed `version`/`status` lifecycle fields. The
+API verifies that exact restricted transformation, preserves the original
+approval, and creates a separate revision-bound approval copy for the frozen
+digest with an audit event that records both digests. Any other difference
+fails closed and any edit makes the review stale. Proof-time agreement
+acceptance binds directly to the already frozen Seed revision and exact
+agreement revisions.
 
 The server ignores any digest supplied by the client and recomputes it from
 canonical content.
@@ -472,6 +477,26 @@ The Studio **MUST** use full deep-linkable pages:
 
 It **MUST** appear beside Servers in the permission-filtered Admin navigation.
 It **MUST NOT** become a fifth member-facing primary navigation destination.
+
+Starting a workspace **MUST** use a short, adaptive journey comparable to
+sprouting a Seed elsewhere in the Portal:
+
+1. choose the goal: create, update, or re-prove;
+2. choose an existing game family from the complete searchable catalogue, or
+   create a new family by its human-readable name;
+3. choose an existing Seed for update/re-proof, or name the new variant; and
+4. review the resulting identities and source before creating the workspace.
+
+Search is an optional filter, never a prerequisite for seeing or selecting
+existing Pods and Seeds. Existing catalogue identities **MUST NOT** require
+manual ID entry. For new identities the UI derives a visible candidate ID from
+the human-readable name, permits an explicit correction before creation, and
+enforces the canonical ID rules. The engine, not Flutter, creates all document
+defaults and the initial release-candidate identity.
+
+The journey may collect only identity and intent. It **MUST NOT** duplicate the
+full editor, accept raw JSON, invent trust or review claims, or imply that a
+new family is release-ready with a single variant.
 
 ### 10.2 Authoring steps
 
@@ -780,7 +805,7 @@ Section 7.
 | --- | --- |
 | `GET /reference` | Schemas, policy/enums/limits, current Pods, and eligible Proof Leaves |
 | `GET /workspaces` | Paginated internal workspace summaries |
-| `POST /workspaces` | Create empty, imported-JSON, or cloned workspace |
+| `POST /workspaces` | Create empty, imported-JSON, cloned, or engine-guided workspace |
 | `GET /workspaces/{id}` | Working document, ETag, revisions, and current status |
 | `PUT /workspaces/{id}` | Full autosave with mandatory `If-Match` |
 | `POST /workspaces/{id}/rebase` | Refresh the server-owned Registry base with mandatory `If-Match` |

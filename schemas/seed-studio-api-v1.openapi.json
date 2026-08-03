@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Dauva internal Seed Studio API",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Admin-only authoring, validation, proof orchestration, and deterministic export. There is no publish endpoint."
   },
   "servers": [
@@ -1066,7 +1066,7 @@
         ],
         "properties": {
           "clientKey": {
-            "$ref": "#/components/schemas/Uuid"
+            "$ref": "./seed-v1.schema.json#/$defs/id"
           },
           "json": {
             "type": "string",
@@ -1084,21 +1084,96 @@
         ],
         "properties": {
           "podJson": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
             "maxLength": 262144
           },
           "seeds": {
             "type": "array",
-            "minItems": 1,
+            "minItems": 0,
             "maxItems": 32,
             "items": {
               "$ref": "#/components/schemas/WorkingSeedDocument"
             }
           }
         }
+      },
+      "GuidedDisplayName": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 120,
+        "pattern": "^\\S(?:[^\\u0000-\\u001F\\u007F]*\\S)?$"
+      },
+      "ExistingPodVariantStarter": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "podId",
+          "seedId",
+          "displayName"
+        ],
+        "properties": {
+          "kind": {
+            "const": "existing_pod_variant"
+          },
+          "podId": {
+            "$ref": "./pod-v1.schema.json#/$defs/id"
+          },
+          "seedId": {
+            "$ref": "./seed-v1.schema.json#/$defs/id"
+          },
+          "displayName": {
+            "$ref": "#/components/schemas/GuidedDisplayName"
+          },
+          "templateSeedId": {
+            "oneOf": [
+              {
+                "$ref": "./seed-v1.schema.json#/$defs/id"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "NewPodStarter": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "podId",
+          "podDisplayName",
+          "seedId",
+          "seedDisplayName"
+        ],
+        "properties": {
+          "kind": {
+            "const": "new_pod"
+          },
+          "podId": {
+            "$ref": "./pod-v1.schema.json#/$defs/id"
+          },
+          "podDisplayName": {
+            "$ref": "#/components/schemas/GuidedDisplayName"
+          },
+          "seedId": {
+            "$ref": "./seed-v1.schema.json#/$defs/id"
+          },
+          "seedDisplayName": {
+            "$ref": "#/components/schemas/GuidedDisplayName"
+          }
+        }
+      },
+      "GuidedWorkspaceStarter": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/ExistingPodVariantStarter"
+          },
+          {
+            "$ref": "#/components/schemas/NewPodStarter"
+          }
+        ]
       },
       "CreateWorkspaceRequest": {
         "oneOf": [
@@ -1115,6 +1190,15 @@
               },
               "source": {
                 "const": "empty"
+              },
+              "seedId": {
+                "type": "null"
+              },
+              "document": {
+                "type": "null"
+              },
+              "starter": {
+                "type": "null"
               }
             }
           },
@@ -1138,6 +1222,12 @@
               },
               "seedId": {
                 "$ref": "./seed-v1.schema.json#/$defs/id"
+              },
+              "document": {
+                "type": "null"
+              },
+              "starter": {
+                "type": "null"
               }
             }
           },
@@ -1151,13 +1241,48 @@
             ],
             "properties": {
               "mode": {
-                "const": "new"
+                "enum": [
+                  "new",
+                  "update"
+                ]
               },
               "source": {
                 "const": "json_import"
               },
               "document": {
                 "$ref": "#/components/schemas/WorkingDocument"
+              },
+              "seedId": {
+                "type": "null"
+              },
+              "starter": {
+                "type": "null"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "mode",
+              "source",
+              "starter"
+            ],
+            "properties": {
+              "mode": {
+                "const": "new"
+              },
+              "source": {
+                "const": "guided"
+              },
+              "starter": {
+                "$ref": "#/components/schemas/GuidedWorkspaceStarter"
+              },
+              "seedId": {
+                "type": "null"
+              },
+              "document": {
+                "type": "null"
               }
             }
           }
@@ -1613,7 +1738,8 @@
           "componentId": {
             "type": "string",
             "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
-            "maxLength": 120
+            "minLength": 2,
+            "maxLength": 80
           },
           "reference": {
             "type": "string",
