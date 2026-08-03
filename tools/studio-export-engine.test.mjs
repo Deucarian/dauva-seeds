@@ -121,6 +121,16 @@ test("stable reproof export is deterministic and never rewrites stable manifests
     "package.json",
     `proofs/minecraft-paper-1.0.0-amd64-${receiptPayload.proofId}.json`,
   ]);
-  assert.equal(first.semanticVersions[0].from, "0.12.0");
-  assert.equal(first.semanticVersions[0].to, "0.12.1");
+  assert.equal(first.semanticVersions[0].from, "0.13.0");
+  assert.equal(first.semanticVersions[0].to, "0.13.1");
+
+  await assert.rejects(
+    () =>
+      renderStudioExport({
+        ...request,
+        mode: "update",
+        semanticImpact: "patch",
+      }),
+    /required '1\.0\.1' release candidate/,
+  );
 });

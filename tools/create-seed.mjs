@@ -14,7 +14,6 @@ const seed = createSeedDraft({
   image: requiredOption("--image"),
   updateReference: requiredOption("--update-reference"),
   upstreamId: optionValue("--upstream-id"),
-  reviewedAt: requiredOption("--reviewed-at"),
 });
 
 const output = path.resolve(

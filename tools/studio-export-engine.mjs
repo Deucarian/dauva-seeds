@@ -9,18 +9,28 @@ import {
   repositoryRoot,
   sha256,
 } from "./registry-lib.mjs";
-import { validateProofReceipt } from "./creator-engine.mjs";
+import {
+  expectedStableVersion,
+  validateProofReceipt,
+} from "./creator-engine.mjs";
 
 const dayMs = 24 * 60 * 60 * 1000;
 
 export async function renderStudioExport({
   document,
   mode,
+  semanticImpact,
   baseRegistryDigest,
   validationTime,
   receipts,
 }) {
   if (!["new", "update", "reproof"].includes(mode)) throw new Error("Export mode is invalid.");
+  if (
+    mode !== "reproof" &&
+    !["patch", "minor", "major"].includes(semanticImpact)
+  ) {
+    throw new Error("Export semantic impact is invalid.");
+  }
   const now = requireTimestamp(validationTime, "validationTime");
   const [podEntries, seedEntries, proofEntries, historyEntries] = await Promise.all([
     readManifestDirectory("registry/pods"),
@@ -57,6 +67,22 @@ export async function renderStudioExport({
   }
   const promotedSeeds = [];
   for (const seed of candidateSeeds) {
+    const existing = baseSeeds.find((item) => item.id === seed.id) ?? null;
+    const expectedStable =
+      mode === "reproof"
+        ? existing?.version
+        : expectedStableVersion(existing?.version ?? null, semanticImpact);
+    if (
+      mode !== "reproof" &&
+      (seed.status !== "candidate" ||
+        !new RegExp(`^${escapeRegex(expectedStable)}-rc\\.[1-9][0-9]*$`).test(
+          seed.version,
+        ))
+    ) {
+      throw new Error(
+        `Seed '${seed.id}' is not the required '${expectedStable}' release candidate.`,
+      );
+    }
     const architectures = seed.compatibility.architectures;
     const matching = architectures.map((architecture) => {
       const receipt = receiptByTarget.get(`${seed.id}:${architecture}`);
@@ -87,6 +113,11 @@ export async function renderStudioExport({
     const stableVersion = matching[0].receiptPayload.seed.intendedStableVersion;
     if (matching.some((receipt) => receipt.receiptPayload.seed.intendedStableVersion !== stableVersion)) {
       throw new Error(`Seed '${seed.id}' receipts disagree on the stable version.`);
+    }
+    if (stableVersion !== expectedStable) {
+      throw new Error(
+        `Seed '${seed.id}' receipt does not target the semantic-impact version '${expectedStable}'.`,
+      );
     }
     promotedSeeds.push(mode === "reproof" ? seed : { ...seed, version: stableVersion, status: "stable" });
   }
@@ -192,6 +223,10 @@ function nextPatchVersion(version) {
   const match = /^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$/.exec(version ?? "");
   if (!match) throw new Error("Registry package version is not semantic.");
   return `${match[1]}.${match[2]}.${Number(match[3]) + 1}`;
+}
+
+function escapeRegex(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function requireTimestamp(value, label) {
