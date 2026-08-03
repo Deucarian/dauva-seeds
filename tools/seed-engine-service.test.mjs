@@ -2,9 +2,23 @@ import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import path from "node:path";
 import test from "node:test";
-import { repositoryRoot } from "./registry-lib.mjs";
+import Ajv2020 from "ajv/dist/2020.js";
+import addFormats from "ajv-formats";
+import { readJson, repositoryRoot } from "./registry-lib.mjs";
 
 const servicePath = path.join(repositoryRoot, "tools", "seed-engine-service.mjs");
+const schemaDirectory = path.join(repositoryRoot, "schemas");
+const seedSchema = await readJson(path.join(schemaDirectory, "seed-v1.schema.json"));
+const studioApi = await readJson(
+  path.join(schemaDirectory, "seed-studio-api-v1.openapi.json"),
+);
+const ajv = new Ajv2020({ allErrors: true, strict: true });
+addFormats(ajv);
+ajv.addSchema(seedSchema);
+const validateCatalogSeed = ajv.compile({
+  $id: "https://dauva.dev/schemas/seed-studio-catalog-seed.json",
+  ...studioApi.components.schemas.CatalogSeedSummary,
+});
 const revisionId = "123e4567-e89b-42d3-a456-426614174000";
 const groupId = "223e4567-e89b-42d3-a456-426614174001";
 
@@ -22,6 +36,33 @@ test("Seed engine service shares the exact Registry reference and clone bytes", 
 
   assert.match(reference.registryDigest, /^sha256:[a-f0-9]{64}$/);
   assert.equal(reference.pods.length, 9);
+  assert.equal(reference.seeds.length, 18);
+  assert.equal(reference.seeds.every((seed) => seed.status === "stable"), true);
+  assert.equal(
+    reference.seeds.every((seed) => validateCatalogSeed(seed)),
+    true,
+    JSON.stringify(validateCatalogSeed.errors),
+  );
+  assert.deepEqual(
+    Object.keys(reference.seeds[0]),
+    ["description", "id", "podId", "status", "title", "version"],
+  );
+  assert.deepEqual(reference.seeds.find((seed) => seed.id === "minecraft-paper"), {
+    id: "minecraft-paper",
+    podId: "minecraft",
+    version: "1.0.0",
+    status: "stable",
+    title: {
+      de: "Minecraft Paper",
+      en: "Minecraft Paper",
+      nl: "Minecraft Paper",
+    },
+    description: {
+      de: "Ein leistungsorientierter Minecraft-Paper-Server mit automatischen Backups.",
+      en: "A performance-focused Minecraft Paper Server with automatic backups.",
+      nl: "Een prestatiegerichte Minecraft Paper-Server met automatische back-ups.",
+    },
+  });
   assert.deepEqual(first, second);
   assert.match(first.digest, /^sha256:[a-f0-9]{64}$/);
 });

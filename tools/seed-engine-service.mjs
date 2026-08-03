@@ -66,6 +66,17 @@ async function reference() {
     policyVersion: creatorPolicyVersion,
     registryDigest: registry.registryDigest,
     pods: registry.pods,
+    seeds: registry.seeds
+      .filter((seed) => seed.status === "stable")
+      .map((seed) => ({
+        id: seed.id,
+        podId: seed.podId,
+        version: seed.version,
+        status: seed.status,
+        title: seed.metadata.title,
+        description: seed.metadata.description,
+      }))
+      .sort((left, right) => left.id < right.id ? -1 : left.id > right.id ? 1 : 0),
   };
 }
 
