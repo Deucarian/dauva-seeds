@@ -9,6 +9,7 @@ store live worlds, saves, secrets, backups, or large game installations.
 ## Start here
 
 - [Native server platform design](docs/architecture/dauva-native-server-platform.md)
+- [Internal Seed Studio specification](docs/architecture/internal-seed-studio.md)
 - [Registry layout](registry/README.md)
 
 ## Layout
@@ -31,7 +32,10 @@ The first vertical slice is live:
   place.
 - Every Pod represents one game family and can contain multiple Seed variants;
   cross-game discovery uses explicit Seed genres instead of genre-shaped Pods.
-- Every Pod names one proven recommended Seed. Dauva uses that recommendation
+- Every Pod names one recommended Seed. Seven of the eighteen stable Seeds
+  currently have legacy proof receipts; all Seeds need exact Studio-v2 proof,
+  including the five recommended Seeds that have no receipt today, before the
+  internal Seed Studio can enter production use. Dauva uses each recommendation
   in the beginner-friendly Sprout flow while keeping other variants available
   behind an optional choice.
 - All six existing Compose Server types have sanitized Seed manifests. Terraria,
@@ -48,9 +52,9 @@ The first vertical slice is live:
   26.2, a healthy primary container, dynamic port, persistent world, ordered
   restart, and two real RCON backups.
 - Terraria Vanilla, TShock, Project Zomboid Private and Community, and Garry's
-  Mod Construct and Flatgrass passed fresh disposable Leaf proofs. Their
-  receipts retain the exact release-candidate version and manifest digest that
-  was tested when the Seed is promoted to stable.
+  Mod Construct and Flatgrass passed fresh disposable Leaf proofs. Their v1
+  receipts are retained as legacy evidence, but are not authenticated or
+  sufficiently bound to satisfy the Seed Studio v2 release gates.
 - Dauva rejects mutable images, fixed secrets, saves, arbitrary host paths,
   privileged runtime access, and Docker socket mounts.
 - Disposable Factorio, Core Keeper Normal and Hard, Valheim, Satisfactory, and Enshrouded
@@ -73,14 +77,15 @@ patch-versioned release candidates when digests change.
 The same candidate batch increments the actual Seed Library package version;
 build metadata is never used as a substitute for that release number.
 
-Existing Servers never move automatically. A candidate must pass health, port,
-backup, stop, restart, persistence, and cleanup checks before
-`npm run seed:promote` accepts its matching proof receipt. Agreements stay
-unchecked: a required EULA or terms revision must have explicit acceptance in
-the proof receipt and in Dauva's server-side audit.
+Existing Servers never move automatically. Legacy v1 promotion is frozen while
+the authenticated proof-v2 contract is introduced. A candidate must pass its
+exact health, port, backup, stop, restart, persistence, cleanup, agreement, and
+signature gates before the replacement promotion path may emit stable output.
 
 `npm run seed:create` turns a curated OCI, SteamCMD, LinuxGSM, or Dauva source
-into a draft that still requires human review. `npm run seed:proof` asks an
-authenticated Leaf for a disposable lifecycle receipt. The Registry API makes
-Pods, Seeds, sources, trust, storage, update policy, and receipts available to
-the admin portal without exposing Docker or Pterodactyl details.
+into a private `.seed-studio/drafts/` document that still requires human
+review. It refuses output below `registry/`, `proofs/`, or `dist/`. The legacy
+synchronous `seed:proof` path remains historical tooling and cannot issue a
+proof-v2 receipt. The Registry API makes Pods, Seeds, sources, trust, storage,
+update policy, and receipts available without exposing Docker or Pterodactyl
+details.

@@ -1,3 +1,4 @@
 node_modules/
+.seed-studio/
 dist/update-report.json
 dist/candidate-proof-plan.json

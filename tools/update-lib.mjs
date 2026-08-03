@@ -115,10 +115,10 @@ export async function createUpdateReport(seedEntries, resolveDigest) {
   const reportSeeds = [];
 
   for (const entry of [...seedEntries].sort((left, right) =>
-    left.value.id.localeCompare(right.value.id),
+    left.value.id < right.value.id ? -1 : left.value.id > right.value.id ? 1 : 0,
   )) {
     const seed = entry.value;
-    if (seed.status === "draft") {
+    if (seed.status !== "stable") {
       continue;
     }
     const components = [];

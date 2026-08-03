@@ -3,10 +3,21 @@ import process from "node:process";
 import Ajv2020 from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
 import {
+  calculateProofContractDigest,
+  canonicalJson,
   readJson,
   readManifestDirectory,
+  releasedVersion,
   repositoryRoot,
+  proofReleasesVersion,
+  sha256,
 } from "./registry-lib.mjs";
+import {
+  apiStatementDigest,
+  proofApiDomain,
+  proofLeafDomain,
+  verifyAttestation,
+} from "./proof-crypto.mjs";
 
 const ajv = new Ajv2020({
   allErrors: true,
@@ -20,12 +31,37 @@ const podSchema = await readJson(
 const seedSchema = await readJson(
   path.join(repositoryRoot, "schemas", "seed-v1.schema.json"),
 );
-const proofSchema = await readJson(
+const proofV1Schema = await readJson(
   path.join(repositoryRoot, "schemas", "seed-proof-v1.schema.json"),
+);
+const proofPlanSchema = await readJson(
+  path.join(repositoryRoot, "schemas", "seed-proof-plan-v1.schema.json"),
+);
+const proofV2Schema = await readJson(
+  path.join(repositoryRoot, "schemas", "seed-proof-v2.schema.json"),
+);
+const releaseBundleSchema = await readJson(
+  path.join(repositoryRoot, "schemas", "seed-release-bundle-v1.schema.json"),
+);
+const verificationRootsSchema = await readJson(
+  path.join(
+    repositoryRoot,
+    "schemas",
+    "seed-studio-verification-roots-v1.schema.json",
+  ),
+);
+const verificationRoots = await readJson(
+  path.join(repositoryRoot, "trust", "seed-studio-verification-roots.json"),
 );
 const validatePod = ajv.compile(podSchema);
 const validateSeed = ajv.compile(seedSchema);
-const validateProof = ajv.compile(proofSchema);
+const validateProofV1 = ajv.compile(proofV1Schema);
+const validateProofPlan = ajv.compile(proofPlanSchema);
+const validateProofV2 = ajv.compile(proofV2Schema);
+const validateReleaseBundle = ajv.compile(releaseBundleSchema);
+const validateVerificationRoots = ajv.compile(verificationRootsSchema);
+void validateProofPlan;
+void validateReleaseBundle;
 const podFiles = await readManifestDirectory("registry/pods");
 const seedFiles = await readManifestDirectory("registry/seeds");
 const releaseFiles = await readManifestDirectory("registry/history", {
@@ -33,6 +69,17 @@ const releaseFiles = await readManifestDirectory("registry/history", {
 });
 const proofFiles = await readManifestDirectory("proofs");
 const errors = [];
+
+validateSchema(
+  {
+    name: "trust/seed-studio-verification-roots.json",
+    value: verificationRoots,
+  },
+  validateVerificationRoots,
+  "verification roots",
+  false,
+);
+validateVerificationRootKeys(verificationRoots);
 
 for (const entry of podFiles) {
   validateSchema(entry, validatePod, "Pod");
@@ -52,7 +99,11 @@ for (const entry of releaseFiles) {
   }
 }
 for (const entry of proofFiles) {
-  validateSchema(entry, validateProof, "Seed proof", false);
+  const validator =
+    entry.value.schemaVersion === "dauva.dev/seed-proof/v2"
+      ? validateProofV2
+      : validateProofV1;
+  validateSchema(entry, validator, "Seed proof", false);
 }
 
 validateUniqueIds(podFiles, "Pod");
@@ -67,7 +118,7 @@ for (const entry of releaseFiles) {
   validateSeedPolicy(entry, podIds);
 }
 validatePodMembership(podFiles, seedFiles);
-validateProofPolicy(proofFiles, seedFiles);
+validateProofPolicy(proofFiles, seedFiles, verificationRoots);
 
 if (errors.length > 0) {
   for (const error of errors) {
@@ -76,7 +127,7 @@ if (errors.length > 0) {
   process.exitCode = 1;
 } else {
   console.log(
-    `Validated ${podFiles.length} Pods, ${seedFiles.length} Seeds, ${releaseFiles.length} historical releases, and ${proofFiles.length} proof receipt${proofFiles.length === 1 ? "" : "s"} without policy violations.`,
+    `Validated ${podFiles.length} Pods, ${seedFiles.length} Seeds, ${releaseFiles.length} historical releases, and ${proofFiles.length} legacy proof receipt${proofFiles.length === 1 ? "" : "s"} without policy violations.`,
   );
 }
 
@@ -174,8 +225,8 @@ function validateSeedPolicy(entry, podIds) {
   }
 
   const primaryPorts = seed.ports.filter((port) => port.primary);
-  if (primaryPorts.length > 1) {
-    errors.push(`${entry.name}: at most one primary public port is allowed.`);
+  if (primaryPorts.length !== 1) {
+    errors.push(`${entry.name}: exactly one primary public port is required.`);
   }
   if (primaryPorts.some((port) => port.exposure !== "public")) {
     errors.push(`${entry.name}: the primary port must be public.`);
@@ -243,6 +294,36 @@ function validateSeedPolicy(entry, podIds) {
         errors.push(`${entry.name}: Docker socket mounts are forbidden.`);
       }
     }
+    const mountVolumes = new Set();
+    const mountTargets = new Set();
+    for (const mount of component.volumeMounts) {
+      if (mountVolumes.has(mount.volumeId)) {
+        errors.push(
+          `${entry.name}: ${component.id} mounts volume '${mount.volumeId}' more than once.`,
+        );
+      }
+      if (mountTargets.has(mount.target)) {
+        errors.push(
+          `${entry.name}: ${component.id} uses mount target '${mount.target}' more than once.`,
+        );
+      }
+      mountVolumes.add(mount.volumeId);
+      mountTargets.add(mount.target);
+    }
+    const environmentDestinations = [
+      ...Object.keys(component.environment),
+      ...Object.values(component.optionEnvironment),
+      ...Object.values(component.agreementEnvironment).map(
+        (mapping) => mapping.name,
+      ),
+      ...Object.values(component.secretEnvironment),
+      ...Object.values(component.runtimeEnvironment),
+    ];
+    for (const destination of duplicateValues(environmentDestinations)) {
+      errors.push(
+        `${entry.name}: ${component.id} environment destination '${destination}' has multiple sources.`,
+      );
+    }
     for (const dependency of component.dependsOn) {
       if (!componentIds.has(dependency) || dependency === component.id) {
         errors.push(
@@ -251,6 +332,8 @@ function validateSeedPolicy(entry, podIds) {
       }
     }
   }
+
+  validateDependencyGraph(entry.name, seed.components);
 
   for (const port of seed.ports) {
     if (!componentIds.has(port.componentId)) {
@@ -287,6 +370,15 @@ function validateSeedPolicy(entry, podIds) {
     }
   }
 
+  for (const volume of seed.volumes) {
+    const mounted = seed.components.some((component) =>
+      component.volumeMounts.some((mount) => mount.volumeId === volume.id),
+    );
+    if (!mounted) {
+      errors.push(`${entry.name}: volume '${volume.id}' is never mounted.`);
+    }
+  }
+
   for (const componentId of [
     ...seed.lifecycle.startOrder,
     ...seed.lifecycle.stopOrder,
@@ -303,6 +395,7 @@ function validateSeedPolicy(entry, podIds) {
   if (new Set(seed.lifecycle.stopOrder).size !== componentIds.size) {
     errors.push(`${entry.name}: stopOrder must include every component once.`);
   }
+  validateLifecycleDependencyOrder(entry.name, seed);
 
   if (!seed.resources.presets.some(
     (preset) => preset.id === seed.resources.defaultPresetId,
@@ -319,6 +412,18 @@ function validateSeedPolicy(entry, podIds) {
         errors.push(`${entry.name}: declared agreements must be required.`);
       }
     }
+    const mapped = seed.components.some((component) =>
+      Object.hasOwn(component.optionEnvironment, input.key),
+    );
+    if (input.type !== "agreement" && !mapped) {
+      errors.push(`${entry.name}: input '${input.key}' is never consumed.`);
+    }
+  }
+
+  if (seed.proofPolicy.expiresAfterDays < 14) {
+    errors.push(
+      `${entry.name}: proofPolicy.expiresAfterDays must be at least 14 for release readiness.`,
+    );
   }
 
   if (seed.trust.mutableRuntimeImagesAllowed !== false) {
@@ -375,20 +480,34 @@ function validateSeedPolicy(entry, podIds) {
   void portIds;
 }
 
-function validateProofPolicy(proofs, seeds) {
+function validateProofPolicy(proofs, seeds, roots) {
   const seedById = new Map(seeds.map((entry) => [entry.value.id, entry.value]));
-  const proofKeys = new Set();
+  const legacyProofKeys = new Set();
+  const proofIds = new Set();
 
   for (const entry of proofs) {
     const proof = entry.value;
+    if (proof.schemaVersion === "dauva.dev/seed-proof/v2") {
+      validateProofV2Policy(entry, seedById, roots, proofIds);
+      continue;
+    }
     const proofKey = `${proof.seedId}@${proof.seedVersion}`;
-    if (proofKeys.has(proofKey)) {
+    if (legacyProofKeys.has(proofKey)) {
       errors.push(`${entry.name}: duplicate proof receipt for '${proofKey}'.`);
     }
-    proofKeys.add(proofKey);
+    legacyProofKeys.add(proofKey);
 
     if (!seedById.has(proof.seedId)) {
       errors.push(`${entry.name}: Seed '${proof.seedId}' does not exist.`);
+    } else if (
+      !proofReleasesVersion(
+        proof.seedVersion,
+        seedById.get(proof.seedId).version,
+      )
+    ) {
+      errors.push(
+        `${entry.name}: proof version '${proof.seedVersion}' does not release current Seed '${proof.seedId}@${seedById.get(proof.seedId).version}'.`,
+      );
     }
     if (`${proof.seedId}-${proof.seedVersion}.json` !== entry.name) {
       errors.push(
@@ -396,7 +515,251 @@ function validateProofPolicy(proofs, seeds) {
       );
     }
   }
+}
 
+function validateProofV2Policy(entry, seedById, roots, proofIds) {
+  const proof = entry.value;
+  const payload = proof.receiptPayload;
+  if (!payload?.seed || !payload?.runner || !payload?.proofId) return;
+  const seed = seedById.get(payload.seed.id);
+  const proofIdentity = payload.proofId;
+  if (proofIds.has(proofIdentity)) {
+    errors.push(`${entry.name}: duplicate proofId '${proofIdentity}'.`);
+  }
+  proofIds.add(proofIdentity);
+
+  const expectedFileName = [
+    payload.seed.id,
+    payload.seed.testedVersion,
+    payload.runner.architecture,
+    `${payload.proofId}.json`,
+  ].join("-");
+  if (entry.name !== expectedFileName) {
+    errors.push(
+      `${entry.name}: proof-v2 filename must be '${expectedFileName}'.`,
+    );
+  }
+  if (!seed) {
+    errors.push(`${entry.name}: Seed '${payload.seed.id}' does not exist.`);
+    return;
+  }
+  if (!proofReleasesVersion(payload.seed.testedVersion, seed.version)) {
+    errors.push(
+      `${entry.name}: tested version '${payload.seed.testedVersion}' does not release current Seed '${seed.id}@${seed.version}'.`,
+    );
+  }
+  if (payload.seed.intendedStableVersion !== releasedVersion(seed.version)) {
+    errors.push(
+      `${entry.name}: intended stable version must be '${releasedVersion(seed.version)}'.`,
+    );
+  }
+  if (!seed.compatibility.architectures.includes(payload.runner.architecture)) {
+    errors.push(
+      `${entry.name}: architecture '${payload.runner.architecture}' is not declared by Seed '${seed.id}'.`,
+    );
+  }
+
+  const testedSeed = structuredClone(seed);
+  testedSeed.version = payload.seed.testedVersion;
+  if (payload.seed.testedVersion !== seed.version) testedSeed.status = "candidate";
+  const expectedManifestDigest = sha256(canonicalJson(testedSeed));
+  if (payload.seed.manifestDigest !== expectedManifestDigest) {
+    errors.push(
+      `${entry.name}: manifest digest does not match exact tested Seed bytes.`,
+    );
+  }
+  const expectedProofContractDigest = calculateProofContractDigest(testedSeed);
+  if (payload.seed.proofContractDigest !== expectedProofContractDigest) {
+    errors.push(
+      `${entry.name}: proof-contract digest does not match the tested Seed.`,
+    );
+  }
+  const expectedReceiptDigest = sha256(canonicalJson(payload));
+  if (proof.receiptDigest !== expectedReceiptDigest) {
+    errors.push(`${entry.name}: receiptDigest does not match receiptPayload.`);
+  }
+
+  validateProofChecks(entry.name, seed, payload.checks ?? []);
+  validateProofAgreements(entry.name, seed, payload.agreements ?? []);
+  validateProofTimes(entry.name, seed, payload);
+  validateProofSignatures(entry.name, proof, roots);
+}
+
+function validateProofChecks(fileName, seed, checks) {
+  const byCode = new Map();
+  for (const check of checks) {
+    if (byCode.has(check.code)) {
+      errors.push(`${fileName}: proof check '${check.code}' occurs more than once.`);
+    }
+    byCode.set(check.code, check);
+  }
+  const mandatory = [
+    "images-pinned",
+    "healthy",
+    "ports",
+    "graceful-stop",
+    "stopped-remains-stopped",
+    "restart",
+    "persistence",
+    "cleanup",
+  ];
+  for (const code of mandatory) {
+    if (byCode.get(code)?.status !== "passed") {
+      errors.push(`${fileName}: mandatory proof check '${code}' did not pass.`);
+    }
+  }
+  for (const [capability, code] of [
+    ["backup", "backup"],
+    ["restore", "restore"],
+    ["console", "console"],
+    ["update", "update"],
+  ]) {
+    const expected = seed.capabilities[capability] ? "passed" : "not_applicable";
+    if (byCode.get(code)?.status !== expected) {
+      errors.push(
+        `${fileName}: capability check '${code}' must be '${expected}'.`,
+      );
+    }
+  }
+}
+
+function validateProofAgreements(fileName, seed, agreements) {
+  const expected = seed.inputs.filter((input) => input.type === "agreement");
+  const byKey = new Map(agreements.map((agreement) => [agreement.key, agreement]));
+  if (byKey.size !== agreements.length) {
+    errors.push(`${fileName}: agreement keys must be unique.`);
+  }
+  for (const input of expected) {
+    const agreement = byKey.get(input.key);
+    if (
+      !agreement ||
+      agreement.url !== input.url ||
+      agreement.revision !== input.revision ||
+      agreement.accepted !== true
+    ) {
+      errors.push(
+        `${fileName}: agreement '${input.key}' is missing or does not match its exact URL/revision.`,
+      );
+    }
+  }
+  for (const agreement of agreements) {
+    if (!expected.some((input) => input.key === agreement.key)) {
+      errors.push(`${fileName}: unexpected agreement '${agreement.key}'.`);
+    }
+  }
+}
+
+function validateProofTimes(fileName, seed, payload) {
+  const startedAt = Date.parse(payload.startedAt);
+  const completedAt = Date.parse(payload.completedAt);
+  const expiresAt = Date.parse(payload.expiresAt);
+  if (!(startedAt <= completedAt)) {
+    errors.push(`${fileName}: completedAt precedes startedAt.`);
+  }
+  const expectedExpiry =
+    completedAt + seed.proofPolicy.expiresAfterDays * 24 * 60 * 60 * 1000;
+  if (expiresAt !== expectedExpiry) {
+    errors.push(
+      `${fileName}: expiresAt must equal completedAt plus ${seed.proofPolicy.expiresAfterDays} days.`,
+    );
+  }
+}
+
+function validateProofSignatures(fileName, proof, roots) {
+  const leafKey = findActiveVerificationKey(
+    roots,
+    "proof_leaf",
+    proof.leafAttestation?.keyId,
+    proof.receiptPayload.runner.leafId,
+  );
+  if (!leafKey) {
+    errors.push(`${fileName}: Leaf attestation key is unknown, revoked, or unbound.`);
+    return;
+  }
+  if (proof.receiptPayload.runner.leafKeyId !== proof.leafAttestation.keyId) {
+    errors.push(`${fileName}: runner leafKeyId does not match Leaf attestation.`);
+  }
+  if (
+    !safeVerifyAttestation(
+      proofLeafDomain,
+      proof.receiptDigest,
+      proof.leafAttestation,
+      leafKey.publicKey,
+    )
+  ) {
+    errors.push(`${fileName}: Leaf attestation signature is invalid.`);
+  }
+
+  const apiKey = findActiveVerificationKey(
+    roots,
+    "proof_api",
+    proof.apiAttestation?.keyId,
+  );
+  if (!apiKey) {
+    errors.push(`${fileName}: API attestation key is unknown or revoked.`);
+    return;
+  }
+  const statementDigest = apiStatementDigest(
+    proof.receiptDigest,
+    proof.leafAttestation,
+  );
+  if (
+    !safeVerifyAttestation(
+      proofApiDomain,
+      statementDigest,
+      proof.apiAttestation,
+      apiKey.publicKey,
+    )
+  ) {
+    errors.push(`${fileName}: API attestation signature is invalid.`);
+  }
+}
+
+function validateVerificationRootKeys(roots) {
+  const keyIds = new Set();
+  for (const key of roots.keys ?? []) {
+    if (keyIds.has(key.keyId)) {
+      errors.push(`verification roots: duplicate keyId '${key.keyId}'.`);
+    }
+    keyIds.add(key.keyId);
+    try {
+      const publicKey = Buffer.from(key.publicKey, "base64url");
+      if (sha256(publicKey) !== key.keyId) {
+        errors.push(`verification roots: keyId '${key.keyId}' does not match publicKey.`);
+      }
+    } catch {
+      errors.push(`verification roots: public key '${key.keyId}' is invalid.`);
+    }
+    if (key.status === "active" && key.revokedAt !== null) {
+      errors.push(`verification roots: active key '${key.keyId}' has revokedAt.`);
+    }
+    if (key.status === "revoked" && key.revokedAt === null) {
+      errors.push(`verification roots: revoked key '${key.keyId}' lacks revokedAt.`);
+    }
+  }
+}
+
+function findActiveVerificationKey(roots, purpose, keyId, subject) {
+  return (roots.keys ?? []).find(
+    (key) =>
+      key.purpose === purpose &&
+      key.keyId === keyId &&
+      key.status === "active" &&
+      (subject == null || key.subjects.includes(subject)),
+  );
+}
+
+function safeVerifyAttestation(domain, digest, attestation, publicKey) {
+  try {
+    return verifyAttestation({
+      domain,
+      digest,
+      attestation,
+      publicKey: Buffer.from(publicKey, "base64url"),
+    });
+  } catch {
+    return false;
+  }
 }
 
 function uniqueIds(fileName, kind, items, key = "id") {
@@ -433,4 +796,71 @@ function findForbiddenKeys(value, currentPath = "") {
     forbidden.push(...findForbiddenKeys(nested, keyPath));
   }
   return forbidden;
+}
+
+function duplicateValues(values) {
+  const seen = new Set();
+  const duplicates = new Set();
+  for (const value of values) {
+    if (seen.has(value)) duplicates.add(value);
+    seen.add(value);
+  }
+  return duplicates;
+}
+
+function validateDependencyGraph(fileName, components) {
+  const byId = new Map(components.map((component) => [component.id, component]));
+  const visiting = new Set();
+  const visited = new Set();
+
+  const visit = (componentId, path) => {
+    if (visiting.has(componentId)) {
+      errors.push(
+        `${fileName}: component dependency cycle '${[...path, componentId].join(" -> ")}'.`,
+      );
+      return;
+    }
+    if (visited.has(componentId)) return;
+    const component = byId.get(componentId);
+    if (!component) return;
+    visiting.add(componentId);
+    for (const dependency of component.dependsOn) {
+      if (byId.has(dependency)) visit(dependency, [...path, componentId]);
+    }
+    visiting.delete(componentId);
+    visited.add(componentId);
+  };
+
+  for (const component of components) visit(component.id, []);
+}
+
+function validateLifecycleDependencyOrder(fileName, seed) {
+  const startIndex = new Map(
+    seed.lifecycle.startOrder.map((componentId, index) => [componentId, index]),
+  );
+  const stopIndex = new Map(
+    seed.lifecycle.stopOrder.map((componentId, index) => [componentId, index]),
+  );
+  for (const component of seed.components) {
+    for (const dependency of component.dependsOn) {
+      if (
+        startIndex.has(component.id) &&
+        startIndex.has(dependency) &&
+        startIndex.get(dependency) > startIndex.get(component.id)
+      ) {
+        errors.push(
+          `${fileName}: '${dependency}' must start before dependent '${component.id}'.`,
+        );
+      }
+      if (
+        stopIndex.has(component.id) &&
+        stopIndex.has(dependency) &&
+        stopIndex.get(component.id) > stopIndex.get(dependency)
+      ) {
+        errors.push(
+          `${fileName}: dependent '${component.id}' must stop before '${dependency}'.`,
+        );
+      }
+    }
+  }
 }

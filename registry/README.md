@@ -39,6 +39,11 @@ Project Zomboid Private and Community, and Garry's Mod Construct and Flatgrass
 also passed the complete disposable Leaf lifecycle. All eighteen current Seeds
 are stable.
 
+These seven committed receipts use the legacy proof-v1 format. They document
+useful lifecycle evidence but are neither authenticated nor sufficiently bound
+for Seed Studio release or runtime availability. Every offered stable Seed must
+be re-proofed under proof-v2 before the Studio is enabled.
+
 Each component also declares one mutable OCI tag under `imageUpdate`. The tag
 is discovery metadata only: Servers always run the digest-pinned `image`.
 Scheduled checks prepare reviewable patch-versioned candidates, never mutate
