@@ -2,7 +2,7 @@
 
 Status: **Phase 5 complete; Phase 6 Leaf delivery implemented and end-to-end acceptance in progress**
 
-Last updated: 2026-07-29
+Last updated: 2026-08-04
 
 This document is the canonical product and architecture design for Dauva's
 native game-server platform. Keep it current when the Seed format, registry,
@@ -296,6 +296,52 @@ Long-running operations additionally follow the canonical
 contract. The API persists an immutable operation timeline, groups sanitized
 incident occurrences, preserves precise Leaf failure stages, and correlates
 Portal/API/Leaf traces without depending on a telemetry vendor.
+
+#### Durable asynchronous operation invariant
+
+Any state-changing operation whose completion depends on a Leaf, provider,
+installer, or another external runtime is a durable asynchronous operation,
+even when it usually completes quickly. This includes Leaf installation and
+pairing, Sprouting, lifecycle commands, backup, restore, update, migration,
+adoption, and deletion.
+
+Before the first request, every initiating mutation has either an already-known
+resource identity or a client-stable idempotency key. The control plane uses it
+to persist the intended mutation and returns a stable resource or operation
+identity before background work continues. This makes a lost initiating
+response recoverable without repeating the mutation. Once accepted, that
+mutation is authoritative. A client, HTTP, reverse-proxy, polling, or
+observation timeout is transport uncertainty; it is never proof that the
+accepted operation failed.
+
+Clients follow the exact identity through server-owned state, polling or
+subscription, and resume after refresh, reconnect, process restart, or a lost
+response. They never wait for a full Garden refresh or a complete observation
+of unrelated resources before acknowledging acceptance. One slow or
+unreachable Leaf or Server cannot block observation of healthy siblings.
+
+Retry and resume reuse the same identity and idempotency boundary. They never
+blindly repeat a state-changing create or command. Before acceptance, an
+explicit authoritative validation, authorization, or conflict rejection may
+be reported immediately; a timeout remains unknown. **Accepted** or **Queued**
+may be reported as soon as the mutation is durable. After acceptance, only an
+explicit, durable terminal state from the authoritative control plane may
+establish final completion/readiness, failure, cancellation, or expiry. Late
+or stale observations cannot move confirmed progress backwards.
+
+Transport requests retain short bounded timeouts. Those timeouts bound one
+delivery or observation attempt, not the lifetime or outcome of the underlying
+operation. Business deadlines are explicit, persisted, operation-specific,
+and reconciled by the control plane.
+
+With controllable clocks and request deadlines, acceptance tests for every
+durable operation cross every configured transport boundary. They retain 10-,
+20-, and 100-second boundaries as named regression cases without requiring real
+waits, and also cover loss of the initiating response after acceptance;
+refresh and reconnect; service restart; repeated clicks; and stale
+out-of-order responses. The proof must show that exactly one mutation is
+created, the same identity remains recoverable, and unrelated Garden state
+stays responsive.
 
 ### Dauva Seed Registry
 
