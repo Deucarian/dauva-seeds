@@ -626,12 +626,25 @@ when Dauva observes that Leaf as ready:
    reachability, and Dauva's observed-ready state. It then returns the browser
    to that Leaf in Dauva.
 
+After Leaf 0.7.0 has been installed once, the Garden may reconnect it without
+rerunning the installer. It invokes the fixed `dauva-leaf://connect` Windows
+activation, which contains no origin, account, intent, pairing code, session
+identity, or credential. The installed GUI helper can ask only `connect` or
+`status` on a separate local pipe; the LocalSystem Service supplies the HTTPS
+Garden origin pinned by the MSI. An already-paired Agent returns its exact Leaf
+identity, while an unpaired Agent resumes the same PKCE handoff described above.
+The helper accepts only a same-origin Garden URL. Starting a new Garden, choosing
+an arbitrary origin, and lifecycle commands are outside this local surface.
+Uninstall removes both the helper and the protocol registration.
+
 The raw pairing code, PKCE verifier, or Leaf bearer credential must never
 appear in the installer filename, download URL, process arguments, browser
-history, registry, logs, crash reports, or ordinary files. Installation sessions are short-lived,
-single-use, bound to the machine public key, PKCE challenge, and pending Leaf,
-and safe against replay. The public browser correlation ID is not
-authorization. The existing manual local setup page, headless Linux variables,
+history, registry, logs, crash reports, or ordinary files. Installation sessions
+are short-lived, single-use, bound to the machine public key, PKCE challenge,
+and pending Leaf, and safe against replay. Creating one is idempotent for the
+exact public-key/challenge attempt: a lost response returns the existing session
+and original expiry, and changed machine details are rejected. The public
+browser correlation ID is not authorization. The existing manual local setup page, headless Linux variables,
 direct private HTTP transport, lifecycle payloads, and bearer authentication
 remain compatible. Installer handoff and reverse transport are additive,
 versioned capabilities behind the same enrollment, endpoint-source, and Branch
