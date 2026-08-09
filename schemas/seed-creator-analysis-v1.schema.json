@@ -1,0 +1,390 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dauva.dev/schemas/seed-creator-analysis-v1.schema.json",
+  "title": "Dauva Seed Creator analysis v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "candidateId",
+    "candidateName",
+    "sourceKind",
+    "runtimeState",
+    "recommendedAction",
+    "components",
+    "ports",
+    "data",
+    "suggestedOptions",
+    "reviewQuestions",
+    "warnings",
+    "observedAtUtc"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "dauva.dev/seed-creator-analysis/v1"
+    },
+    "candidateId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "candidateName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "sourceKind": {
+      "enum": [
+        "docker-compose",
+        "offline-retained-data"
+      ]
+    },
+    "runtimeState": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 40
+    },
+    "recommendedAction": {
+      "enum": [
+        "adopt-existing",
+        "resolve-adoption-blockers",
+        "create-draft"
+      ]
+    },
+    "existingSeed": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/existingSeed"
+        }
+      ]
+    },
+    "components": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "$ref": "#/$defs/component"
+      }
+    },
+    "ports": {
+      "type": "array",
+      "maxItems": 48,
+      "items": {
+        "$ref": "#/$defs/port"
+      }
+    },
+    "data": {
+      "type": "array",
+      "maxItems": 32,
+      "items": {
+        "$ref": "#/$defs/data"
+      }
+    },
+    "suggestedOptions": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/key"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "maxLength": 1000
+      }
+    },
+    "reviewQuestions": {
+      "$ref": "#/$defs/messages"
+    },
+    "warnings": {
+      "$ref": "#/$defs/messages"
+    },
+    "observedAtUtc": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "key": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "messages": {
+      "type": "array",
+      "maxItems": 64,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 1000
+      }
+    },
+    "existingSeed": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "seedId",
+        "seedVersion",
+        "seedManifestDigest",
+        "podId",
+        "canAdopt",
+        "checks"
+      ],
+      "properties": {
+        "seedId": {
+          "$ref": "#/$defs/id"
+        },
+        "seedVersion": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$"
+        },
+        "seedManifestDigest": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "podId": {
+          "$ref": "#/$defs/id"
+        },
+        "canAdopt": {
+          "type": "boolean"
+        },
+        "checks": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "$ref": "#/$defs/check"
+          }
+        }
+      }
+    },
+    "check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "key",
+        "status",
+        "message"
+      ],
+      "properties": {
+        "key": {
+          "$ref": "#/$defs/key"
+        },
+        "status": {
+          "enum": [
+            "passed",
+            "blocked"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        }
+      }
+    },
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "role",
+        "image",
+        "environment",
+        "mounts"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "role": {
+          "$ref": "#/$defs/id"
+        },
+        "image": {
+          "$ref": "#/$defs/image"
+        },
+        "environment": {
+          "type": "array",
+          "maxItems": 256,
+          "items": {
+            "$ref": "#/$defs/environmentKey"
+          }
+        },
+        "mounts": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "$ref": "#/$defs/mount"
+          }
+        }
+      }
+    },
+    "image": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reference",
+        "immutable"
+      ],
+      "properties": {
+        "reference": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "localImageId": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^sha256:[a-f0-9]{64}$"
+            }
+          ]
+        },
+        "immutable": {
+          "type": "boolean"
+        }
+      }
+    },
+    "environmentKey": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "key",
+        "classification"
+      ],
+      "properties": {
+        "key": {
+          "$ref": "#/$defs/key"
+        },
+        "classification": {
+          "enum": [
+            "agreement",
+            "constant",
+            "review",
+            "runtime",
+            "secret",
+            "setting"
+          ]
+        }
+      }
+    },
+    "mount": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "sourceKind",
+        "readOnly"
+      ],
+      "properties": {
+        "target": {
+          "type": "string",
+          "pattern": "^/(?!.*\\.\\.)[A-Za-z0-9._/-]+$",
+          "maxLength": 512
+        },
+        "sourceKind": {
+          "enum": [
+            "bind",
+            "volume",
+            "offline-read-only"
+          ]
+        },
+        "readOnly": {
+          "type": "boolean"
+        }
+      }
+    },
+    "port": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "componentId",
+        "containerPort",
+        "protocol"
+      ],
+      "properties": {
+        "componentId": {
+          "$ref": "#/$defs/id"
+        },
+        "containerPort": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535
+        },
+        "publicPort": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 65535
+            }
+          ]
+        },
+        "protocol": {
+          "enum": [
+            "tcp",
+            "udp"
+          ]
+        }
+      }
+    },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "volumeId",
+        "role",
+        "target",
+        "sourceKind",
+        "sizeBytes",
+        "fileCount",
+        "included",
+        "message"
+      ],
+      "properties": {
+        "volumeId": {
+          "$ref": "#/$defs/id"
+        },
+        "role": {
+          "$ref": "#/$defs/id"
+        },
+        "target": {
+          "type": "string",
+          "maxLength": 512
+        },
+        "sourceKind": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "sizeBytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "fileCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "included": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        }
+      }
+    }
+  }
+}

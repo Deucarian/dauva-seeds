@@ -1,6 +1,6 @@
 {
   "name": "@deucarian/dauva-seeds",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "private": true,
   "type": "module",
   "description": "Validation and compilation tooling for the Dauva Seed Registry.",
@@ -13,7 +13,9 @@
     "updates:prepare": "node tools/prepare-seed-candidates.mjs",
     "seed:promote": "node tools/promote-seed.mjs",
     "seed:proof": "node tools/run-leaf-proof.mjs",
-    "seed:create": "node tools/create-seed.mjs"
+    "seed:create": "node tools/create-seed.mjs",
+    "creator:generate": "node tools/create-pod-seed.mjs",
+    "creator:analyze-compose": "node tools/analyze-compose.mjs"
   },
   "dependencies": {
     "ajv": "8.20.0",

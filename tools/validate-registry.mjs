@@ -18,6 +18,7 @@ import {
   proofLeafDomain,
   verifyAttestation,
 } from "./proof-crypto.mjs";
+import { proofCheckPolicyIssues } from "./proof-check-policy.mjs";
 
 const ajv = new Ajv2020({
   allErrors: true,
@@ -440,6 +441,54 @@ function validateSeedPolicy(entry, podIds) {
       `${entry.name}: update requires a backup but the Seed has no backup capability.`,
     );
   }
+  if (seed.capabilities.update) {
+    if (
+      !seed.compatibility.leafCapabilities.includes(
+        "managed-game-updates-v1",
+      )
+    ) {
+      errors.push(
+        `${entry.name}: managed updates require Leaf capability 'managed-game-updates-v1'.`,
+      );
+    }
+    if (!seed.runtimeVersion) {
+      errors.push(
+        `${entry.name}: managed updates require a runtime version detector.`,
+      );
+    }
+    if (!seed.capabilities.backup || !seed.capabilities.restore) {
+      errors.push(
+        `${entry.name}: managed updates require backup and restore capabilities.`,
+      );
+    }
+    if (!seed.updatePolicy.requiresBackup || !seed.updatePolicy.rollback) {
+      errors.push(
+        `${entry.name}: managed updates must require a backup and rollback.`,
+      );
+    }
+    if (!seed.updatePolicy.strategy) {
+      errors.push(
+        `${entry.name}: managed updates require a trusted update strategy.`,
+      );
+    }
+    for (const requiredCheck of [
+      "runtime-version",
+      "managed-update",
+      "rollback",
+    ]) {
+      if (!seed.proofPolicy.requiredChecks.includes(requiredCheck)) {
+        errors.push(
+          `${entry.name}: managed updates require proof check '${requiredCheck}'.`,
+        );
+      }
+    }
+  } else if (seed.updatePolicy.strategy) {
+    errors.push(
+      `${entry.name}: an update strategy requires the update capability.`,
+    );
+  }
+  validateRuntimeVersionContract(entry, componentIds, volumeIds);
+  validateManagedUpdateContract(entry, componentIds, volumeIds);
   if (seed.capabilities.console !== Boolean(seed.console)) {
     errors.push(
       `${entry.name}: console capability and console contract must be enabled together.`,
@@ -480,6 +529,153 @@ function validateSeedPolicy(entry, podIds) {
   void portIds;
 }
 
+function validateRuntimeVersionContract(entry, componentIds, volumeIds) {
+  const seed = entry.value;
+  const detector = seed.runtimeVersion;
+  if (!detector) {
+    return;
+  }
+  if (!componentIds.has(detector.componentId)) {
+    errors.push(
+      `${entry.name}: runtime version detector references unknown component '${detector.componentId}'.`,
+    );
+    return;
+  }
+  if (!volumeIds.has(detector.volumeId)) {
+    errors.push(
+      `${entry.name}: runtime version detector references unknown volume '${detector.volumeId}'.`,
+    );
+    return;
+  }
+  const component = seed.components.find(
+    (candidate) => candidate.id === detector.componentId,
+  );
+  if (!component.volumeMounts.some(
+    (mount) => mount.volumeId === detector.volumeId,
+  )) {
+    errors.push(
+      `${entry.name}: runtime version detector volume '${detector.volumeId}' is not mounted by '${detector.componentId}'.`,
+    );
+  }
+  if (detector.strategy === "steam-app-manifest") {
+    if (seed.source.kind !== "steamcmd" || !seed.source.upstreamId) {
+      errors.push(
+        `${entry.name}: Steam manifest detection requires a SteamCMD source with an upstream app id.`,
+      );
+    } else if (
+      !detector.path.endsWith(
+        `appmanifest_${seed.source.upstreamId}.acf`,
+      )
+    ) {
+      errors.push(
+        `${entry.name}: Steam manifest path must identify app '${seed.source.upstreamId}'.`,
+      );
+    }
+  }
+}
+
+function validateManagedUpdateContract(entry, componentIds, volumeIds) {
+  const seed = entry.value;
+  const policy = seed.updatePolicy;
+  if (!policy.strategy) {
+    return;
+  }
+  if (!componentIds.has(policy.componentId)) {
+    errors.push(
+      `${entry.name}: update strategy references unknown component '${policy.componentId}'.`,
+    );
+    return;
+  }
+  if (!volumeIds.has(policy.volumeId)) {
+    errors.push(
+      `${entry.name}: update strategy references unknown volume '${policy.volumeId}'.`,
+    );
+    return;
+  }
+  const component = seed.components.find(
+    (candidate) => candidate.id === policy.componentId,
+  );
+  const mount = component.volumeMounts.find(
+    (candidate) => candidate.volumeId === policy.volumeId,
+  );
+  if (!mount) {
+    errors.push(
+      `${entry.name}: update volume '${policy.volumeId}' is not mounted by '${policy.componentId}'.`,
+    );
+  } else if (
+    policy.installDirectory !== mount.target &&
+    !policy.installDirectory.startsWith(`${mount.target}/`)
+  ) {
+    errors.push(
+      `${entry.name}: update install directory must stay inside the declared '${policy.volumeId}' mount.`,
+    );
+  }
+  if (policy.strategy === "steamcmd") {
+    if (!isBoundedAbsoluteContainerPath(policy.executable)) {
+      errors.push(
+        `${entry.name}: SteamCMD executable must be a bounded absolute container path.`,
+      );
+    }
+    if (!isBoundedAbsoluteContainerPath(policy.homeDirectory)) {
+      errors.push(
+        `${entry.name}: SteamCMD home directory must be a bounded absolute container path.`,
+      );
+    }
+    const userMatch =
+      typeof policy.user === "string"
+        ? policy.user.match(/^([1-9][0-9]*):([1-9][0-9]*)$/)
+        : null;
+    if (
+      !userMatch ||
+      BigInt(userMatch[1]) > 2147483647n ||
+      BigInt(userMatch[2]) > 2147483647n
+    ) {
+      errors.push(
+        `${entry.name}: SteamCMD update user must be an unprivileged numeric uid:gid.`,
+      );
+    }
+    if (
+      seed.source.kind !== "steamcmd" ||
+      seed.source.upstreamId !== policy.appId
+    ) {
+      errors.push(
+        `${entry.name}: SteamCMD update app id must match the Seed source.`,
+      );
+    }
+    if (component.environment.SKIPUPDATE !== "true") {
+      errors.push(
+        `${entry.name}: managed SteamCMD updates require silent restart updates to be disabled.`,
+      );
+    }
+    if (
+      seed.runtimeVersion?.componentId !== policy.componentId ||
+      seed.runtimeVersion?.volumeId !== policy.volumeId
+    ) {
+      errors.push(
+        `${entry.name}: managed update and runtime version contracts must use the same component and volume.`,
+      );
+    }
+    const expectedBranch =
+      seed.runtimeVersion?.channel === "experimental"
+        ? "experimental"
+        : "public";
+    if (policy.branch !== expectedBranch) {
+      errors.push(
+        `${entry.name}: SteamCMD branch '${policy.branch}' does not match runtime channel '${seed.runtimeVersion?.channel}'.`,
+      );
+    }
+  }
+}
+
+function isBoundedAbsoluteContainerPath(value) {
+  return (
+    typeof value === "string" &&
+    value.length >= 2 &&
+    value.length <= 512 &&
+    /^\/(?!.*\.\.)[A-Za-z0-9._/-]+$/.test(value)
+  );
+}
+
 function validateProofPolicy(proofs, seeds, roots) {
   const seedById = new Map(seeds.map((entry) => [entry.value.id, entry.value]));
   const legacyProofKeys = new Set();
@@ -513,6 +709,23 @@ function validateProofPolicy(proofs, seeds, roots) {
       errors.push(
         `${entry.name}: proof filename must identify '${proof.seedId}-${proof.seedVersion}.json'.`,
       );
+    }
+    const seed = seedById.get(proof.seedId);
+    if (
+      seed?.capabilities.update &&
+      proofReleasesSeedVersion(proof.seedVersion, seed.version)
+    ) {
+      for (const check of [
+        "runtimeVersion",
+        "managedUpdate",
+        "rollback",
+      ]) {
+        if (proof.checks[check] !== true) {
+          errors.push(
+            `${entry.name}: update-capable Seed proof must pass '${check}'.`,
+          );
+        }
+      }
     }
   }
 }
@@ -586,40 +799,8 @@ function validateProofV2Policy(entry, seedById, roots, proofIds) {
 }
 
 function validateProofChecks(fileName, seed, checks) {
-  const byCode = new Map();
-  for (const check of checks) {
-    if (byCode.has(check.code)) {
-      errors.push(`${fileName}: proof check '${check.code}' occurs more than once.`);
-    }
-    byCode.set(check.code, check);
-  }
-  const mandatory = [
-    "images-pinned",
-    "healthy",
-    "ports",
-    "graceful-stop",
-    "stopped-remains-stopped",
-    "restart",
-    "persistence",
-    "cleanup",
-  ];
-  for (const code of mandatory) {
-    if (byCode.get(code)?.status !== "passed") {
-      errors.push(`${fileName}: mandatory proof check '${code}' did not pass.`);
-    }
-  }
-  for (const [capability, code] of [
-    ["backup", "backup"],
-    ["restore", "restore"],
-    ["console", "console"],
-    ["update", "update"],
-  ]) {
-    const expected = seed.capabilities[capability] ? "passed" : "not_applicable";
-    if (byCode.get(code)?.status !== expected) {
-      errors.push(
-        `${fileName}: capability check '${code}' must be '${expected}'.`,
-      );
-    }
+  for (const issue of proofCheckPolicyIssues(seed, checks)) {
+    errors.push(`${fileName}: ${issue}.`);
   }
 }
 
@@ -760,6 +941,14 @@ function safeVerifyAttestation(domain, digest, attestation, publicKey) {
   } catch {
     return false;
   }
+}
+
+function proofReleasesSeedVersion(proofVersion, seedVersion) {
+  if (proofVersion === seedVersion) {
+    return true;
+  }
+  return proofVersion.replace(/-rc\.[1-9][0-9]*$/, "") ===
+    seedVersion.replace(/-rc\.[1-9][0-9]*$/, "");
 }
 
 function uniqueIds(fileName, kind, items, key = "id") {

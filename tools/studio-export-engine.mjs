@@ -89,6 +89,9 @@ export async function renderStudioExport({
       if (!receipt) throw new Error(`Seed '${seed.id}' lacks an exact '${architecture}' receipt.`);
       return receipt;
     });
+    for (const receipt of matching) {
+      validateProofReceipt(receipt, seed);
+    }
     if (matching.some((receipt) =>
       receipt.receiptPayload.seed.testedVersion !== seed.version ||
       receipt.receiptPayload.seed.manifestDigest !== sha256(canonicalJson(seed)) ||

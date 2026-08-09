@@ -32,18 +32,21 @@ The first vertical slice is live:
   place.
 - Every Pod represents one game family and can contain multiple Seed variants;
   cross-game discovery uses explicit Seed genres instead of genre-shaped Pods.
-- Every Pod names one recommended Seed. Seven of the eighteen stable Seeds
-  currently have legacy proof receipts; all Seeds need exact Studio-v2 proof,
-  including the five recommended Seeds that have no receipt today, before the
-  internal Seed Studio can enter production use. Dauva uses each recommendation
-  in the beginner-friendly Sprout flow while keeping other variants available
-  behind an optional choice.
+- Every Pod names one recommended Seed. Fourteen of the eighteen stable Seeds
+  currently have legacy proof-v1 receipts; Factorio Stable, Minecraft Fabric,
+  Satisfactory Experimental, and Valheim BepInEx have no receipt. All eighteen
+  Seeds, including all nine recommendations, still need exact Studio-v2 proof
+  before the internal Seed Studio can enter production use. Dauva uses each
+  recommendation in the beginner-friendly Sprout flow while keeping other
+  variants available behind an optional choice.
 - All six existing Compose Server types have sanitized Seed manifests. Terraria,
   Project Zomboid, and Garry's Mod have now joined them, giving the Registry
-  nine Pods and eighteen stable Seeds with two meaningful variants per Pod.
-- Factorio Stable, Valheim BepInEx, both Satisfactory branches, and both
-  Enshrouded runtimes passed disposable native lifecycle proofs. Together with
-  the original proven Seeds, they are stable `1.0.x` recipes.
+  nine Pods and eighteen Seed recipes with two meaningful variants per Pod.
+- Factorio Latest, Valheim Vanilla, and both Enshrouded runtimes passed
+  disposable native lifecycle proofs. Satisfactory Stable `1.0.1` additionally
+  passed its exact runtime-version,
+  backup-first managed-update, forced-failure rollback, persistence, and
+  cleanup proof; immutable `1.0.0` remains in release history.
 - Enshrouded Wine is recommended because its roughly 9 GB game install,
   saves, logs, and local backups all live on explicit data-disk storage.
   Enshrouded Proton persists saves but revalidates its large install on cold
@@ -81,6 +84,12 @@ Existing Servers never move automatically. Legacy v1 promotion is frozen while
 the authenticated proof-v2 contract is introduced. A candidate must pass its
 exact health, port, backup, stop, restart, persistence, cleanup, agreement, and
 signature gates before the replacement promotion path may emit stable output.
+
+Seed versions identify Dauva recipes, not game releases. A managed Server may
+therefore report Satisfactory 1.2 while using Satisfactory Stable Seed 1.0.1.
+The Seed's runtime-version contract reports the actual Steam build and Stable
+channel separately. Ordinary restarts do not install updates; update-capable
+Seeds require an explicit backup-first update and verified rollback path.
 
 `npm run seed:create` turns a curated OCI, SteamCMD, LinuxGSM, or Dauva source
 into a private `.seed-studio/drafts/` document that still requires human

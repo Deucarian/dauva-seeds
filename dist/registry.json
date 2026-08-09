@@ -180,7 +180,7 @@
     {
       "schemaVersion": "dauva.dev/seed/v1",
       "id": "core-keeper",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "status": "stable",
       "podId": "core-keeper",
       "genres": [
@@ -226,6 +226,7 @@
           "stopSignal": "SIGINT",
           "environment": {
             "MODS_ENABLED": "false",
+            "TINI_KILL_PROCESS_GROUP": "1",
             "WORLD_INDEX": "0",
             "WORLD_MODE": "0"
           },
@@ -454,9 +455,16 @@
         ],
         "expiresAfterDays": 90
       },
-      "manifestDigest": "sha256:36c1369e1f60d11049f6419090f64df8b993f7d937e616d3c1b667369af632eb",
+      "manifestDigest": "sha256:5c6fd177d82c3038bb2baf67ea26d480202d089936cfc6b6c14d30ba497a2ac7",
       "proof": {
-        "state": "unproven",
+        "state": "legacy",
+        "schemaVersion": "dauva.dev/seed-proof/v1",
+        "binding": "legacy-unverified",
+        "provedAt": "2026-07-30T23:21:43.9296733+00:00",
+        "expiresAt": "2026-10-28T23:21:43.929Z",
+        "leaf": "proof-core-keeper-102rc1",
+        "provedVersion": "1.0.2-rc.1",
+        "receiptDigest": "sha256:f496cf2adb1fcdb635150ec719980dba6ef93ad90fbe551d4054693cb5eb54ef",
         "missingArchitectures": [
           "amd64"
         ]
@@ -465,7 +473,7 @@
     {
       "schemaVersion": "dauva.dev/seed/v1",
       "id": "core-keeper-hard",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "status": "stable",
       "podId": "core-keeper",
       "genres": [
@@ -511,6 +519,7 @@
           "stopSignal": "SIGINT",
           "environment": {
             "MODS_ENABLED": "false",
+            "TINI_KILL_PROCESS_GROUP": "1",
             "WORLD_INDEX": "0",
             "WORLD_MODE": "1"
           },
@@ -739,9 +748,16 @@
         ],
         "expiresAfterDays": 90
       },
-      "manifestDigest": "sha256:85a967589129bb49b0865557f2d945444bb5c557c5ffbc4f896301b4541e86c1",
+      "manifestDigest": "sha256:9a5cab3342cf3d17273483d340d7add91b5a4d28b3b856c2f06fc06615fafbbb",
       "proof": {
-        "state": "unproven",
+        "state": "legacy",
+        "schemaVersion": "dauva.dev/seed-proof/v1",
+        "binding": "legacy-unverified",
+        "provedAt": "2026-07-30T23:22:30.5074181+00:00",
+        "expiresAt": "2026-10-28T23:22:30.507Z",
+        "leaf": "proof-core-keeper-102rc1",
+        "provedVersion": "1.0.1-rc.1",
+        "receiptDigest": "sha256:07d83fca8200943dcc40f2544f9c39d6e36c2657014408bee5b1605c3f243195",
         "missingArchitectures": [
           "amd64"
         ]
@@ -981,7 +997,14 @@
       },
       "manifestDigest": "sha256:bd635359b943fff47470430241a3626aa824dd5b4fd5045004e5e255c8dcac33",
       "proof": {
-        "state": "unproven",
+        "state": "legacy",
+        "schemaVersion": "dauva.dev/seed-proof/v1",
+        "binding": "legacy-unverified",
+        "provedAt": "2026-07-30T23:40:44.8566232+00:00",
+        "expiresAt": "2026-10-28T23:40:44.856Z",
+        "leaf": "primary-leaf",
+        "provedVersion": "1.0.0",
+        "receiptDigest": "sha256:52c734b3d7884f6f5a969a95c1770907269921364ffd41c5c1e310075b128248",
         "missingArchitectures": [
           "amd64"
         ]
@@ -1233,7 +1256,14 @@
       },
       "manifestDigest": "sha256:b95e8b6320df36563fbe8af5028144830143f18037d303c34d6ff617f1b46813",
       "proof": {
-        "state": "unproven",
+        "state": "legacy",
+        "schemaVersion": "dauva.dev/seed-proof/v1",
+        "binding": "legacy-unverified",
+        "provedAt": "2026-07-30T23:26:07.8521358+00:00",
+        "expiresAt": "2026-10-28T23:26:07.852Z",
+        "leaf": "primary-leaf",
+        "provedVersion": "1.0.0",
+        "receiptDigest": "sha256:f1ab3d4ac2b881d1513120bb03af48262c4ed843e0baad7682a2a93b34d42061",
         "missingArchitectures": [
           "amd64"
         ]
@@ -1466,7 +1496,14 @@
       },
       "manifestDigest": "sha256:08f45c8a532550030a3e579fb535f8fa43103f270aaafb0dca4637e8d4121148",
       "proof": {
-        "state": "unproven",
+        "state": "legacy",
+        "schemaVersion": "dauva.dev/seed-proof/v1",
+        "binding": "legacy-unverified",
+        "provedAt": "2026-07-30T23:24:57.2534464+00:00",
+        "expiresAt": "2026-10-28T23:24:57.253Z",
+        "leaf": "primary-leaf",
+        "provedVersion": "1.0.1",
+        "receiptDigest": "sha256:7aea326026c2945bf0512043b4fbf303258782fc3f26cec87b01d8acb2d8643c",
         "missingArchitectures": [
           "amd64"
         ]
@@ -3763,7 +3800,7 @@
     {
       "schemaVersion": "dauva.dev/seed/v1",
       "id": "satisfactory",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "status": "stable",
       "podId": "satisfactory",
       "genres": [
@@ -3792,11 +3829,19 @@
         ],
         "leafCapabilities": [
           "dynamic-ports",
+          "managed-game-updates-v1",
           "multi-port",
           "oci",
           "persistent-storage",
           "resource-limits"
         ]
+      },
+      "runtimeVersion": {
+        "strategy": "steam-app-manifest",
+        "componentId": "server",
+        "volumeId": "config",
+        "path": "gamefiles/steamapps/appmanifest_1690800.acf",
+        "channel": "stable"
       },
       "components": [
         {
@@ -3810,7 +3855,7 @@
             "AUTOSAVENUM": "10",
             "DISABLESEASONALEVENTS": "false",
             "ROOTLESS": "false",
-            "SKIPUPDATE": "false",
+            "SKIPUPDATE": "true",
             "STEAMBETA": "false"
           },
           "optionEnvironment": {
@@ -3963,22 +4008,23 @@
         "stopTimeoutSeconds": 180
       },
       "capabilities": {
-        "backup": false,
-        "restore": false,
-        "update": false,
+        "backup": true,
+        "restore": true,
+        "update": true,
         "console": false
       },
       "source": {
-        "kind": "oci",
+        "kind": "steamcmd",
         "homepage": "https://www.satisfactorygame.com/",
         "repository": "https://github.com/wolveix/satisfactory-server",
         "imageRegistries": [
           "docker.io"
-        ]
+        ],
+        "upstreamId": "1690800"
       },
       "trust": {
         "level": "curated",
-        "reviewedAt": "2026-07-26",
+        "reviewedAt": "2026-07-30",
         "mutableRuntimeImagesAllowed": false
       },
       "storage": {
@@ -3990,11 +4036,21 @@
         "backupPolicy": "optional"
       },
       "updatePolicy": {
-        "discovery": "oci-tag",
+        "discovery": "steamcmd",
         "automaticCheck": true,
         "automaticInstall": false,
-        "requiresBackup": false,
-        "rollback": true
+        "requiresBackup": true,
+        "rollback": true,
+        "strategy": "steamcmd",
+        "executable": "/usr/games/steamcmd",
+        "homeDirectory": "/home/steam",
+        "user": "1000:1000",
+        "componentId": "server",
+        "volumeId": "config",
+        "installDirectory": "/config/gamefiles",
+        "appId": "1690800",
+        "branch": "public",
+        "validate": true
       },
       "proofPolicy": {
         "requiredChecks": [
@@ -4002,6 +4058,9 @@
           "healthy",
           "ports",
           "backup-if-supported",
+          "runtime-version",
+          "managed-update",
+          "rollback",
           "graceful-stop",
           "restart",
           "persistence",
@@ -4009,9 +4068,16 @@
         ],
         "expiresAfterDays": 90
       },
-      "manifestDigest": "sha256:5281035469f673818a789032776ca91aa1ea27d98b1d7e6a2b01e3e41b7a34b3",
+      "manifestDigest": "sha256:eece939e3fb8aa5d3c844d4d860dff52d879ec2d0129f17cea9668611228adf4",
       "proof": {
-        "state": "unproven",
+        "state": "legacy",
+        "schemaVersion": "dauva.dev/seed-proof/v1",
+        "binding": "legacy-unverified",
+        "provedAt": "2026-07-30T19:49:14.4266036+00:00",
+        "expiresAt": "2026-10-28T19:49:14.426Z",
+        "leaf": "proof-satisfactory-101rc1",
+        "provedVersion": "1.0.1-rc.1",
+        "receiptDigest": "sha256:f218d8f98a918547025ca77ec4cbaf9e869b1443b49fa6ec06b9fe4fa759cfca",
         "missingArchitectures": [
           "amd64"
         ]
@@ -5245,7 +5311,14 @@
       },
       "manifestDigest": "sha256:eb31f49db9a7dda23665d2f28623563a64c0934f61eec29ba3234d776f50e823",
       "proof": {
-        "state": "unproven",
+        "state": "legacy",
+        "schemaVersion": "dauva.dev/seed-proof/v1",
+        "binding": "legacy-unverified",
+        "provedAt": "2026-07-30T23:24:14.4331067+00:00",
+        "expiresAt": "2026-10-28T23:24:14.433Z",
+        "leaf": "primary-leaf",
+        "provedVersion": "1.0.1",
+        "receiptDigest": "sha256:c85caace3b1558cd9bdb6f3a0a0cba9a94ad72fef2d7af933cfb45e49700da1a",
         "missingArchitectures": [
           "amd64"
         ]
@@ -5564,8 +5637,457 @@
       }
     }
   ],
-  "releases": [],
+  "releases": [
+    {
+      "schemaVersion": "dauva.dev/seed/v1",
+      "id": "satisfactory",
+      "version": "1.0.0",
+      "status": "stable",
+      "podId": "satisfactory",
+      "genres": [
+        "automation",
+        "simulation"
+      ],
+      "metadata": {
+        "title": {
+          "en": "Satisfactory Stable",
+          "nl": "Satisfactory Stable",
+          "de": "Satisfactory Stable"
+        },
+        "description": {
+          "en": "A persistent Satisfactory Server that follows the stable Steam branch.",
+          "nl": "Een blijvende Satisfactory-Server die de stabiele Steam-tak volgt.",
+          "de": "Ein persistenter Satisfactory-Server auf dem stabilen Steam-Zweig."
+        },
+        "icon": "settings"
+      },
+      "compatibility": {
+        "operatingSystems": [
+          "linux"
+        ],
+        "architectures": [
+          "amd64"
+        ],
+        "leafCapabilities": [
+          "dynamic-ports",
+          "multi-port",
+          "oci",
+          "persistent-storage",
+          "resource-limits"
+        ]
+      },
+      "components": [
+        {
+          "id": "server",
+          "role": "primary",
+          "image": "docker.io/wolveix/satisfactory-server@sha256:e103700ae6ae4c50f19dac80eadb2a805c5b885e179ae2a40850e967bf189efd",
+          "imageUpdate": {
+            "reference": "docker.io/wolveix/satisfactory-server:latest"
+          },
+          "environment": {
+            "AUTOSAVENUM": "10",
+            "DISABLESEASONALEVENTS": "false",
+            "ROOTLESS": "false",
+            "SKIPUPDATE": "false",
+            "STEAMBETA": "false"
+          },
+          "optionEnvironment": {
+            "max-players": "MAXPLAYERS",
+            "max-tick-rate": "MAXTICKRATE"
+          },
+          "agreementEnvironment": {},
+          "secretEnvironment": {},
+          "runtimeEnvironment": {
+            "primaryPort": "SERVERGAMEPORT",
+            "timezone": "TZ"
+          },
+          "volumeMounts": [
+            {
+              "volumeId": "config",
+              "target": "/config",
+              "readOnly": false
+            }
+          ],
+          "dependsOn": [],
+          "health": {
+            "source": "container",
+            "startupGraceSeconds": 1200
+          }
+        }
+      ],
+      "volumes": [
+        {
+          "id": "config",
+          "role": "data",
+          "retention": "delete-with-server"
+        }
+      ],
+      "ports": [
+        {
+          "id": "game",
+          "componentId": "server",
+          "containerPort": 7777,
+          "containerPortMode": "allocated",
+          "protocols": [
+            "tcp",
+            "udp"
+          ],
+          "exposure": "public",
+          "purpose": "game",
+          "primary": true,
+          "sharedHostPort": true,
+          "environment": "SERVERGAMEPORT"
+        },
+        {
+          "id": "messaging",
+          "componentId": "server",
+          "containerPort": 8888,
+          "containerPortMode": "allocated",
+          "protocols": [
+            "tcp"
+          ],
+          "exposure": "public",
+          "purpose": "messaging",
+          "primary": false,
+          "sharedHostPort": true,
+          "environment": "SERVERMESSAGINGPORT"
+        }
+      ],
+      "resources": {
+        "defaultPresetId": "balanced",
+        "presets": [
+          {
+            "id": "balanced",
+            "title": {
+              "en": "Balanced",
+              "nl": "Gebalanceerd",
+              "de": "Ausgewogen"
+            },
+            "description": {
+              "en": "Minimum practical resources for a small factory.",
+              "nl": "Minimaal praktische resources voor een kleine fabriek.",
+              "de": "Praktische Mindestressourcen für eine kleine Fabrik."
+            },
+            "memoryMb": 8192,
+            "diskMb": 30720,
+            "cpuPercent": 250
+          }
+        ]
+      },
+      "inputs": [
+        {
+          "key": "accept-steam-agreement",
+          "type": "agreement",
+          "label": {
+            "en": "Steam Subscriber Agreement",
+            "nl": "Steam Subscriber Agreement",
+            "de": "Steam-Nutzungsvertrag"
+          },
+          "help": {
+            "en": "I have read and accept the Steam Subscriber Agreement and the applicable Satisfactory terms.",
+            "nl": "Ik heb de Steam Subscriber Agreement en de toepasselijke Satisfactory-voorwaarden gelezen en accepteer deze.",
+            "de": "Ich habe den Steam-Nutzungsvertrag und die anwendbaren Satisfactory-Bedingungen gelesen und akzeptiert."
+          },
+          "required": true,
+          "defaultValue": "false",
+          "url": "https://store.steampowered.com/subscriber_agreement/",
+          "revision": "official-current"
+        },
+        {
+          "key": "max-players",
+          "type": "integer",
+          "label": {
+            "en": "Maximum players",
+            "nl": "Maximumaantal spelers",
+            "de": "Maximale Spielerzahl"
+          },
+          "help": {
+            "en": "Maximum simultaneous players.",
+            "nl": "Maximaal aantal gelijktijdige spelers.",
+            "de": "Maximale Anzahl gleichzeitiger Spieler."
+          },
+          "required": true,
+          "defaultValue": "8",
+          "minLength": 1,
+          "maxLength": 2
+        },
+        {
+          "key": "max-tick-rate",
+          "type": "integer",
+          "label": {
+            "en": "Maximum tick rate",
+            "nl": "Maximale tickrate",
+            "de": "Maximale Tickrate"
+          },
+          "help": {
+            "en": "Upper simulation tick-rate limit.",
+            "nl": "Bovengrens voor de simulatietickrate.",
+            "de": "Obergrenze für die Simulations-Tickrate."
+          },
+          "required": true,
+          "defaultValue": "30",
+          "minLength": 1,
+          "maxLength": 3
+        }
+      ],
+      "secrets": [],
+      "lifecycle": {
+        "startOrder": [
+          "server"
+        ],
+        "stopOrder": [
+          "server"
+        ],
+        "stopTimeoutSeconds": 180
+      },
+      "capabilities": {
+        "backup": false,
+        "restore": false,
+        "update": false,
+        "console": false
+      },
+      "source": {
+        "kind": "oci",
+        "homepage": "https://www.satisfactorygame.com/",
+        "repository": "https://github.com/wolveix/satisfactory-server",
+        "imageRegistries": [
+          "docker.io"
+        ]
+      },
+      "trust": {
+        "level": "curated",
+        "reviewedAt": "2026-07-26",
+        "mutableRuntimeImagesAllowed": false
+      },
+      "storage": {
+        "class": "bulk",
+        "backupClass": "backup",
+        "estimatedDownloadMb": 15000,
+        "estimatedInstallMb": 26000,
+        "estimatedMutableMb": 12288,
+        "backupPolicy": "optional"
+      },
+      "updatePolicy": {
+        "discovery": "oci-tag",
+        "automaticCheck": true,
+        "automaticInstall": false,
+        "requiresBackup": false,
+        "rollback": true
+      },
+      "proofPolicy": {
+        "requiredChecks": [
+          "images-pinned",
+          "healthy",
+          "ports",
+          "backup-if-supported",
+          "graceful-stop",
+          "restart",
+          "persistence",
+          "cleanup"
+        ],
+        "expiresAfterDays": 90
+      },
+      "manifestDigest": "sha256:5281035469f673818a789032776ca91aa1ea27d98b1d7e6a2b01e3e41b7a34b3",
+      "proof": {
+        "state": "unproven",
+        "missingArchitectures": [
+          "amd64"
+        ]
+      }
+    }
+  ],
   "proofs": [
+    {
+      "schemaVersion": "dauva.dev/seed-proof/v1",
+      "seedId": "core-keeper-hard",
+      "seedVersion": "1.0.1-rc.1",
+      "result": "passed",
+      "provedAt": "2026-07-30T23:22:30.5074181+00:00",
+      "leaf": "proof-core-keeper-102rc1",
+      "checks": {
+        "imagesPinned": true,
+        "healthy": true,
+        "ports": true,
+        "backup": true,
+        "gracefulStop": true,
+        "restart": true,
+        "persistence": true,
+        "cleanup": true
+      },
+      "agreements": [
+        {
+          "key": "accept-steam-agreement",
+          "url": "https://store.steampowered.com/subscriber_agreement/",
+          "revision": "official-current",
+          "accepted": true
+        }
+      ],
+      "evidence": {
+        "seedManifest": "sha256:db3a986734e7d156670878be7a705ea9cf90978f7f4c14f3c7563942b3cf1515",
+        "registry": "sha256:c7e362d510d2807a5b6a903930ffd1b5743c6866dbdd598a177b43a6ffea787f",
+        "agent": "0.12.1",
+        "sprout": "The Server was Sprouted on Dauva's native Docker Branch.",
+        "initialHealth": "The Server completed its health checks and is ready.",
+        "stabilitySeconds": "20",
+        "persistenceVolume": "data",
+        "restart": "The Server completed its health checks and is ready.",
+        "cleanup": "The Server, its components, and its native Dauva storage were permanently deleted. Backups removed: True."
+      },
+      "receiptDigest": "sha256:07d83fca8200943dcc40f2544f9c39d6e36c2657014408bee5b1605c3f243195"
+    },
+    {
+      "schemaVersion": "dauva.dev/seed-proof/v1",
+      "seedId": "core-keeper",
+      "seedVersion": "1.0.2-rc.1",
+      "result": "passed",
+      "provedAt": "2026-07-30T23:21:43.9296733+00:00",
+      "leaf": "proof-core-keeper-102rc1",
+      "checks": {
+        "imagesPinned": true,
+        "healthy": true,
+        "ports": true,
+        "backup": true,
+        "gracefulStop": true,
+        "restart": true,
+        "persistence": true,
+        "cleanup": true
+      },
+      "agreements": [
+        {
+          "key": "accept-steam-agreement",
+          "url": "https://store.steampowered.com/subscriber_agreement/",
+          "revision": "official-current",
+          "accepted": true
+        }
+      ],
+      "evidence": {
+        "seedManifest": "sha256:c4b29dc5e5cdbc7377fabf88895e73a394271bb431f5b8564addbaad543e866c",
+        "registry": "sha256:c7e362d510d2807a5b6a903930ffd1b5743c6866dbdd598a177b43a6ffea787f",
+        "agent": "0.12.1",
+        "sprout": "The Server was Sprouted on Dauva's native Docker Branch.",
+        "initialHealth": "The Server completed its health checks and is ready.",
+        "stabilitySeconds": "20",
+        "persistenceVolume": "data",
+        "restart": "The Server completed its health checks and is ready.",
+        "cleanup": "The Server, its components, and its native Dauva storage were permanently deleted. Backups removed: True."
+      },
+      "receiptDigest": "sha256:f496cf2adb1fcdb635150ec719980dba6ef93ad90fbe551d4054693cb5eb54ef"
+    },
+    {
+      "schemaVersion": "dauva.dev/seed-proof/v1",
+      "seedId": "enshrouded-wine",
+      "seedVersion": "1.0.0",
+      "result": "passed",
+      "provedAt": "2026-07-30T23:26:07.8521358+00:00",
+      "leaf": "primary-leaf",
+      "checks": {
+        "imagesPinned": true,
+        "healthy": true,
+        "ports": true,
+        "backup": true,
+        "gracefulStop": true,
+        "restart": true,
+        "persistence": true,
+        "cleanup": true
+      },
+      "agreements": [
+        {
+          "key": "accept-steam-agreement",
+          "url": "https://store.steampowered.com/subscriber_agreement/",
+          "revision": "official-current",
+          "accepted": true
+        }
+      ],
+      "evidence": {
+        "seedManifest": "sha256:b95e8b6320df36563fbe8af5028144830143f18037d303c34d6ff617f1b46813",
+        "registry": "sha256:7607e48e03f0ad0b075f4b46507bdfa636eedfa5af64bce9264b43fb5b123776",
+        "agent": "0.12.1",
+        "sprout": "The Server was Sprouted on Dauva's native Docker Branch.",
+        "initialHealth": "The Server completed its health checks and is ready.",
+        "stabilitySeconds": "20",
+        "backup": "The Leaf created a durable backup.",
+        "persistenceVolume": "data",
+        "restart": "The Server completed its health checks and is ready.",
+        "cleanup": "The Server, its components, and its native Dauva storage were permanently deleted. Backups removed: True."
+      },
+      "receiptDigest": "sha256:f1ab3d4ac2b881d1513120bb03af48262c4ed843e0baad7682a2a93b34d42061"
+    },
+    {
+      "schemaVersion": "dauva.dev/seed-proof/v1",
+      "seedId": "enshrouded",
+      "seedVersion": "1.0.0",
+      "result": "passed",
+      "provedAt": "2026-07-30T23:40:44.8566232+00:00",
+      "leaf": "primary-leaf",
+      "checks": {
+        "imagesPinned": true,
+        "healthy": true,
+        "ports": true,
+        "backup": true,
+        "gracefulStop": true,
+        "restart": true,
+        "persistence": true,
+        "cleanup": true
+      },
+      "agreements": [
+        {
+          "key": "accept-steam-agreement",
+          "url": "https://store.steampowered.com/subscriber_agreement/",
+          "revision": "official-current",
+          "accepted": true
+        }
+      ],
+      "evidence": {
+        "seedManifest": "sha256:bd635359b943fff47470430241a3626aa824dd5b4fd5045004e5e255c8dcac33",
+        "registry": "sha256:7607e48e03f0ad0b075f4b46507bdfa636eedfa5af64bce9264b43fb5b123776",
+        "agent": "0.12.1",
+        "sprout": "The Server was Sprouted on Dauva's native Docker Branch.",
+        "initialHealth": "The Server completed its health checks and is ready.",
+        "stabilitySeconds": "20",
+        "persistenceVolume": "saves",
+        "restart": "The Server completed its health checks and is ready.",
+        "cleanup": "The Server, its components, and its native Dauva storage were permanently deleted. Backups removed: True."
+      },
+      "receiptDigest": "sha256:52c734b3d7884f6f5a969a95c1770907269921364ffd41c5c1e310075b128248"
+    },
+    {
+      "schemaVersion": "dauva.dev/seed-proof/v1",
+      "seedId": "factorio",
+      "seedVersion": "1.0.1",
+      "result": "passed",
+      "provedAt": "2026-07-30T23:24:57.2534464+00:00",
+      "leaf": "primary-leaf",
+      "checks": {
+        "imagesPinned": true,
+        "healthy": true,
+        "ports": true,
+        "backup": true,
+        "gracefulStop": true,
+        "restart": true,
+        "persistence": true,
+        "cleanup": true
+      },
+      "agreements": [
+        {
+          "key": "accept-factorio-terms",
+          "url": "https://www.factorio.com/terms-of-service",
+          "revision": "2024-10-10",
+          "accepted": true
+        }
+      ],
+      "evidence": {
+        "seedManifest": "sha256:08f45c8a532550030a3e579fb535f8fa43103f270aaafb0dca4637e8d4121148",
+        "registry": "sha256:7607e48e03f0ad0b075f4b46507bdfa636eedfa5af64bce9264b43fb5b123776",
+        "agent": "0.12.1",
+        "sprout": "The Server was Sprouted on Dauva's native Docker Branch.",
+        "initialHealth": "The Server completed its health checks and is ready.",
+        "stabilitySeconds": "20",
+        "persistenceVolume": "data",
+        "restart": "The Server completed its health checks and is ready.",
+        "cleanup": "The Server, its components, and its native Dauva storage were permanently deleted. Backups removed: True."
+      },
+      "receiptDigest": "sha256:7aea326026c2945bf0512043b4fbf303258782fc3f26cec87b01d8acb2d8643c"
+    },
     {
       "schemaVersion": "dauva.dev/seed-proof/v1",
       "seedId": "garrys-mod-construct",
@@ -5756,6 +6278,61 @@
     },
     {
       "schemaVersion": "dauva.dev/seed-proof/v1",
+      "seedId": "satisfactory",
+      "seedVersion": "1.0.1-rc.1",
+      "result": "passed",
+      "provedAt": "2026-07-30T19:49:14.4266036+00:00",
+      "leaf": "proof-satisfactory-101rc1",
+      "checks": {
+        "imagesPinned": true,
+        "healthy": true,
+        "ports": true,
+        "backup": true,
+        "gracefulStop": true,
+        "restart": true,
+        "persistence": true,
+        "cleanup": true,
+        "runtimeVersion": true,
+        "managedUpdate": true,
+        "rollback": true
+      },
+      "agreements": [
+        {
+          "key": "accept-steam-agreement",
+          "url": "https://store.steampowered.com/subscriber_agreement/",
+          "revision": "official-current",
+          "accepted": true
+        }
+      ],
+      "evidence": {
+        "seedManifest": "sha256:c5a2390802f50d3d24b4d474c412e68a9d6d5173a6a7be394db0a38fb314a51e",
+        "registry": "sha256:a479b4489078789f19bfd1ef611422f18aaaaae41cb5b133765bf3d2131d8283",
+        "agent": "0.11.0",
+        "sprout": "The Server was Sprouted on Dauva's native Docker Branch.",
+        "initialHealth": "The Server completed its health checks and is ready.",
+        "stabilitySeconds": "20",
+        "runtimeDetection": "detected",
+        "runtimeChannel": "stable",
+        "runtimeGameVersion": "1.2.0",
+        "runtimeUpstreamBuild": "23855705",
+        "runtimeSource": "steam-app-manifest+satisfactory-container-log",
+        "backup": "The Leaf created a local restore point. It is not disaster-safe because it shares the active-data filesystem.",
+        "persistenceVolume": "config",
+        "normalRestartUpdatePolicy": "SKIPUPDATE=true",
+        "normalRestartBuild": "23855705",
+        "restart": "The Server completed its health checks and is ready.",
+        "managedUpdate": "already-current: The Server was verified on game build 23855705; it was already current.",
+        "managedUpdateOperation": "cfb9eeff-d72f-4c1b-bedd-85f27671641a",
+        "managedUpdateBuild": "23855705",
+        "rollback": "proof-health-failed: The disposable proof deliberately rejected the healthy post-update runtime so Dauva could prove automatic rollback. Dauva restored the safety backup and the previous Server state.",
+        "rollbackOperation": "73f0b267-724a-41a8-ac24-43dee011ffb4",
+        "rollbackBuild": "23855705",
+        "cleanup": "The Server, its components, and its native Dauva storage were permanently deleted. Backups removed: True."
+      },
+      "receiptDigest": "sha256:f218d8f98a918547025ca77ec4cbaf9e869b1443b49fa6ec06b9fe4fa759cfca"
+    },
+    {
+      "schemaVersion": "dauva.dev/seed-proof/v1",
       "seedId": "terraria-tshock",
       "seedVersion": "1.0.0-rc.1",
       "result": "passed",
@@ -5829,6 +6406,45 @@
         "cleanup": "The Server, its components, and its native Dauva storage were permanently deleted."
       },
       "receiptDigest": "sha256:baccde5c1959225cba741d9fc2dc889aed1526cd589b21018db58540ef17b800"
+    },
+    {
+      "schemaVersion": "dauva.dev/seed-proof/v1",
+      "seedId": "valheim",
+      "seedVersion": "1.0.1",
+      "result": "passed",
+      "provedAt": "2026-07-30T23:24:14.4331067+00:00",
+      "leaf": "primary-leaf",
+      "checks": {
+        "imagesPinned": true,
+        "healthy": true,
+        "ports": true,
+        "backup": true,
+        "gracefulStop": true,
+        "restart": true,
+        "persistence": true,
+        "cleanup": true
+      },
+      "agreements": [
+        {
+          "key": "accept-steam-agreement",
+          "url": "https://store.steampowered.com/subscriber_agreement/",
+          "revision": "official-current",
+          "accepted": true
+        }
+      ],
+      "evidence": {
+        "seedManifest": "sha256:eb31f49db9a7dda23665d2f28623563a64c0934f61eec29ba3234d776f50e823",
+        "registry": "sha256:7607e48e03f0ad0b075f4b46507bdfa636eedfa5af64bce9264b43fb5b123776",
+        "agent": "0.12.1",
+        "sprout": "The Server was Sprouted on Dauva's native Docker Branch.",
+        "initialHealth": "The Server completed its health checks and is ready.",
+        "stabilitySeconds": "20",
+        "backup": "The Leaf created a durable backup.",
+        "persistenceVolume": "game",
+        "restart": "The Server completed its health checks and is ready.",
+        "cleanup": "The Server, its components, and its native Dauva storage were permanently deleted. Backups removed: True."
+      },
+      "receiptDigest": "sha256:c85caace3b1558cd9bdb6f3a0a0cba9a94ad72fef2d7af933cfb45e49700da1a"
     }
   ],
   "sources": [
@@ -5913,7 +6529,16 @@
       "imageRegistries": [
         "docker.io"
       ]
+    },
+    {
+      "kind": "steamcmd",
+      "homepage": "https://www.satisfactorygame.com/",
+      "repository": "https://github.com/wolveix/satisfactory-server",
+      "imageRegistries": [
+        "docker.io"
+      ],
+      "upstreamId": "1690800"
     }
   ],
-  "registryDigest": "sha256:1dc461ebad8eac1b4a5d38ec223e4811b65b5fbaed26edc22d42c87ae12fba54"
+  "registryDigest": "sha256:9d46054b4f33f9b6e6cb452d341e5b2f18d48834a318f8470b2d804c32aee403"
 }

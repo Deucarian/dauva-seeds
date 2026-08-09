@@ -1,8 +1,8 @@
 # Dauva native server platform
 
-Status: **Phase 5 complete; Phase 6 Leaf delivery implemented and end-to-end acceptance in progress**
+Status: **Phase 5 complete; Phase 4 adoption complete with retirement burn-in active; Phase 6 Leaf delivery acceptance in progress**
 
-Last updated: 2026-08-04
+Last updated: 2026-08-09
 
 This document is the canonical product and architecture design for Dauva's
 native game-server platform. Keep it current when the Seed format, registry,
@@ -236,15 +236,16 @@ the Server, Seed, agreement, accepting user, URL, revision, and timestamp.
 
 Seed v1 is implemented as JSON Schema plus stricter policy validation. The
 registry contains nine game-family Pods and eighteen sanitized Seeds: two
-meaningful variants per Pod. Factorio Stable, Valheim BepInEx, both
-Satisfactory branches, and both Enshrouded runtimes passed fresh native
-lifecycle proofs and joined the original stable Seeds. Minecraft Paper then
-passed its EULA-gated Paper 26.2 lifecycle proof with persistent world data,
-ordered restart, and native RCON backups. All twelve original Seeds are stable.
-Terraria, Project Zomboid, and Garry's Mod add six stable Seeds. All six passed
-fresh disposable lifecycle proofs on the Debian Leaf; their exact
-release-candidate versions, manifest digests, agreement revisions, checks, and
-proof expiry are retained in committed receipts.
+meaningful variants per Pod. Factorio Latest, Valheim Vanilla, Satisfactory
+Stable, and both Enshrouded runtimes passed native lifecycle proofs. Minecraft
+Paper then passed its EULA-gated Paper 26.2 lifecycle proof with persistent
+world data, ordered restart, and native RCON backups. Core Keeper Normal and
+Hard also carry lifecycle receipts. All twelve original Seeds are stable, but
+Minecraft Fabric, Factorio Stable, Satisfactory Experimental, and Valheim
+BepInEx have no receipt. Terraria, Project Zomboid, and Garry's Mod add six
+stable Seeds, all with disposable Debian Leaf lifecycle receipts. The fourteen
+receipts are legacy proof-v1 evidence; none satisfies the authenticated,
+exactly bound proof-v2 gate.
 
 The separately deployable Leaf Agent now owns every privileged host operation.
 The API has no Docker socket and Pterodactyl is removed. Newly Sprouted Servers
@@ -356,10 +357,21 @@ Servers from being managed.
 The registry can later be distributed as signed OCI artifacts and support
 multiple trusted sources. The Seed Library remains the user-facing name.
 
-The control plane exposes read-only administrator routes for the compiled
-Registry, individual Pods, and individual Seeds. Registry mutation remains a
-reviewed Git workflow: a portal request cannot silently rewrite trusted Seed
-material.
+The control plane exposes lossless read-only administrator routes for the
+compiled Registry, individual Pods, and individual Seeds. Management views
+must be able to display the complete official Pod and Seed detail, including
+the exact version, manifest digest, proof state and evidence summary, and
+immutable release history. A friendly Garden view may progressively disclose
+that detail, but the API must not discard it or substitute a reduced parallel
+catalog model.
+
+Official Registry mutation has one governed path: **Seed Studio workspace →
+validation and proof → deterministic signed export → protected Registry
+review**. The reviewed export is applied through the protected Git workflow
+and compiled into the immutable Registry. There is deliberately no direct
+CRUD endpoint that edits or deletes a stable Pod, Seed, proof receipt, or
+historical release in place; a portal request cannot silently rewrite trusted
+Seed material.
 
 Every Seed records:
 
@@ -375,6 +387,62 @@ Every Seed records:
 OCI, SteamCMD, and LinuxGSM source adapters normalize upstream metadata into a
 draft Seed. They do not bypass curation, digest pinning, agreement review, or
 proof promotion.
+
+### Guided Pod and Seed creation
+
+Dauva provides a guided **Pod and Seed Creator** contract for administrators
+and Registry maintainers. It is a curation workflow, not an
+arbitrary-container launcher. The first production slice is deliberately
+split between the Leaf and the Git-backed Registry:
+
+- the Leaf performs authenticated, read-only source analysis and emits
+  `dauva.dev/seed-creator-analysis/v1`;
+- the analysis contains container targets, public port mappings, immutable
+  image evidence, environment-key names and classifications, but never host
+  paths or environment values;
+- the Registry validates that evidence and either recognizes an existing
+  proven Seed without creating a duplicate, or emits a draft Pod, draft Seed,
+  review report, and disposable proof plan;
+- draft output stays outside the official Registry until a maintainer reviews
+  every unresolved choice and submits the normal Git change.
+
+If the runtime container no longer exists, maintainers can stream a resolved
+Docker Compose definition into the same analysis schema. The Compose adapter
+discards environment values, bind sources, secrets, and generated identifiers
+before producing evidence. It can recover recipe structure, but it cannot
+claim live-data ownership or adoption readiness.
+
+The Creator:
+
+1. identifies an official game or trusted upstream runtime;
+2. proposes a Pod or adds a variant to an existing Pod;
+3. discovers candidate images, ports, persistent data, settings, secrets,
+   agreements, resources, update strategy, and health signals;
+4. separates reusable recipe material from instance saves, mods, player data,
+   credentials, logs, generated identifiers, and backups;
+5. emits a versioned draft Seed and a review summary;
+6. runs the draft on a disposable Leaf;
+7. requires the Seed's complete proof policy, including persistence and
+   cleanup, before promotion;
+8. submits the reviewed change to the official Git-backed Registry with
+   provenance and proof receipts.
+
+The non-technical path asks ordinary game questions and derives infrastructure
+choices. Advanced maintainers can inspect the generated technical contract,
+but the Creator never permits privileged mode, Docker socket mounts, arbitrary
+host paths, mutable production images, embedded secrets, or preaccepted
+agreements. A generated draft has no production trust until review, digest
+pinning, agreement verification, and proof promotion all succeed.
+
+The same source-analysis contract powers both the Creator and migration:
+discovering ports, storage roles, settings, runtime versions, and health from a
+known Server should produce suggestions, never silently grant trust.
+
+Existing proven Seeds are also reconstruction fixtures. A Creator
+reconstruction must match the observed image repositories, container targets,
+and ports before it may be considered ready for proof. This tests Creator
+evolution without deleting Registry history or replacing signed proof
+receipts.
 
 ### Dauva Leaf Agent
 
@@ -424,6 +492,34 @@ The control plane provides one Server lifecycle model:
 - migration discovery plus backup-first adoption for trusted, explicitly
   labelled legacy candidates; unrelated containers remain invisible and
   immutable.
+
+Migration uses a provider-neutral **adoption source** contract. A source can
+be:
+
+- an explicitly labelled live or stopped Compose workload;
+- retained game data whose original workload no longer exists;
+- a verified backup archive;
+- later, a compatible Server on another Leaf or hosting provider.
+
+Every adapter produces the same sanitized inventory: source identity, suggested
+Seed, mapped Seed volumes, public port assignments, recoverable settings,
+byte/file counts, consistency requirements, and rollback capability. The
+Portal never receives host paths or secret values.
+
+An offline-data source is explicitly registered and scoped to one stable Seed.
+The Leaf accepts only absolute existing paths under administrator-configured
+import roots, maps each path to an exact Seed volume, rejects symlinks, special
+files, duplicate/nested sources, cache/backup data presented as active data,
+and all paths outside the configured boundary. Ports and options must validate
+against the Seed. The source is immutable after a restore point is created.
+The Leaf reads it through a restricted, read-only archive helper; it does not
+gain a broad host-filesystem mount and it never starts a reconstructed game
+container.
+
+Offline data is treated as already stopped and therefore consistent. Its
+original directories remain untouched as the rollback source after successful
+adoption. A failed native health check removes only the exact Dauva-owned
+destination and retains the registered source and its restore point.
 
 Backups are stored outside the active Server tree through the
 `ILeafBackupStorage` contract. The first adapter uses a filesystem root; a
@@ -588,12 +684,25 @@ when Dauva observes that Leaf as ready:
    reachability, and Dauva's observed-ready state. It then returns the browser
    to that Leaf in Dauva.
 
+After Leaf 0.7.0 has been installed once, the Garden may reconnect it without
+rerunning the installer. It invokes the fixed `dauva-leaf://connect` Windows
+activation, which contains no origin, account, intent, pairing code, session
+identity, or credential. The installed GUI helper can ask only `connect` or
+`status` on a separate local pipe; the LocalSystem Service supplies the HTTPS
+Garden origin pinned by the MSI. An already-paired Agent returns its exact Leaf
+identity, while an unpaired Agent resumes the same PKCE handoff described above.
+The helper accepts only a same-origin Garden URL. Starting a new Garden, choosing
+an arbitrary origin, and lifecycle commands are outside this local surface.
+Uninstall removes both the helper and the protocol registration.
+
 The raw pairing code, PKCE verifier, or Leaf bearer credential must never
 appear in the installer filename, download URL, process arguments, browser
-history, registry, logs, crash reports, or ordinary files. Installation sessions are short-lived,
-single-use, bound to the machine public key, PKCE challenge, and pending Leaf,
-and safe against replay. The public browser correlation ID is not
-authorization. The existing manual local setup page, headless Linux variables,
+history, registry, logs, crash reports, or ordinary files. Installation sessions
+are short-lived, single-use, bound to the machine public key, PKCE challenge,
+and pending Leaf, and safe against replay. Creating one is idempotent for the
+exact public-key/challenge attempt: a lost response returns the existing session
+and original expiry, and changed machine details are rejected. The public
+browser correlation ID is not authorization. The existing manual local setup page, headless Linux variables,
 direct private HTTP transport, lifecycle payloads, and bearer authentication
 remain compatible. Installer handoff and reverse transport are additive,
 versioned capabilities behind the same enrollment, endpoint-source, and Branch
@@ -850,6 +959,20 @@ The Leaf Agent allocates ports atomically from configured pools and persists
 the complete allocation before starting components. Partial allocation failure
 must leave no leaked reservations.
 
+`containerPortMode: allocated` is a 1:1 allocation contract, not ordinary
+Docker NAT remapping. The allocated public number is also used as the
+container's listening port and is supplied through the declared environment
+input. When TCP and UDP share one logical port, both protocols receive that
+same number. This matters for games that advertise their listening port or
+reject redirected traffic.
+
+Satisfactory Stable therefore declares one allocated game port for TCP and UDP
+with fallback `7777`, plus one allocated reliable-messaging TCP port with
+fallback `8888`. `SERVERGAMEPORT` and `SERVERMESSAGINGPORT` receive those exact
+allocated numbers. A Leaf must never map public `7777` to an internally
+configured `26002`, for example; preserving an existing public port requires
+reserving and configuring that same number internally.
+
 The native Docker Branch now supports single dynamic ports and contiguous
 paired allocations. Valheim proved a two-port public UDP pair, while Factorio
 proved that a private administration port is not published to the host.
@@ -917,6 +1040,48 @@ Automatic checks are allowed. Automatic installation into an existing Server
 is not. Existing Servers receive an update offer and remain pinned until an
 administrator explicitly requests an update. A new image digest is never
 silently substituted at container start.
+
+Seed version, game version, upstream build, and channel are distinct:
+
+- the Seed version identifies the immutable Dauva recipe;
+- the game version is the human release actually running;
+- the upstream build identifies the exact Steam or vendor payload;
+- the channel identifies a moving line such as Stable or Experimental.
+
+An optional `runtimeVersion` contract lets the Leaf inspect a bounded,
+Seed-owned file through a declared component volume. The
+`steam-app-manifest` strategy reads the Steam build from an app manifest;
+trusted game-specific enrichment may derive the human version only from
+bounded component logs. Seeds never contain a host path, shell command, or
+arbitrary regular expression for version discovery.
+
+Satisfactory Stable uses Steam app `1690800`, branch `public`, and channel
+`stable`. Its ordinary component environment sets `SKIPUPDATE=true`, so a
+restart cannot silently replace the game. Its trusted `steamcmd` update
+strategy is a fixed operation over the declared `/config` volume, not Seed
+supplied code:
+
+1. create and verify a restore point;
+2. stop the Server cleanly;
+3. run `/usr/games/steamcmd` from the pinned runtime image as the explicitly
+   declared unprivileged user `1000:1000`, with `HOME` fixed to the
+   declarative `/home/steam` container directory and the fixed app ID, branch,
+   install directory, and validation mode;
+4. read the new runtime build;
+5. start the Server and pass its normal health check;
+6. retain the new build only after success, otherwise restore the verified
+   checkpoint and previous running state.
+
+An update-capable Seed must declare backup, restore, and update capabilities,
+require backup and rollback, and pass explicit runtime-version,
+managed-update, and rollback proof checks. It also requires the
+`managed-game-updates-v1` Leaf capability so a Leaf that only understands the
+older lifecycle contract cannot accept it. Satisfactory Stable `1.0.1` is the
+current stable Registry recipe and its exact managed-update lifecycle is
+retained in a legacy proof-v1 receipt. It remains unavailable to proof-v2-gated
+Studio release and new Sprouts until an authenticated, exactly bound proof-v2
+reproof is stored. The observed live Satisfactory 1.2 runtime remains useful
+baseline evidence, not a substitute for that proof-v2 receipt.
 
 Proof credentials and required administrator secrets are supplied only for the
 disposable request. They are neither written to the Seed nor copied into the
@@ -1121,43 +1286,58 @@ Live acceptance evidence:
 - extracted authenticated Leaf Agent and Registry read API (implemented);
 - Terraria, Project Zomboid, and Garry's Mod Pods and six proven Seeds
   (implemented);
-- continuously refreshed logs and Seed-gated console (implemented);
+- continuously refreshed logs, bounded downloadable log snapshots, and
+  Seed-gated console (implemented);
 - dedicated deep-linkable Server care page with live/pauseable logs and
   non-technical controls (implemented);
 - adapter-backed backup, restore, retention, storage classification, and UI
   (filesystem adapter implemented);
 - installed-Server update and trusted-history rollback (implemented);
+- backup-first editing of Seed-declared Server settings with exact-name
+  confirmation, protected secret handling, restart, and automatic rollback
+  (implemented);
+- Minecraft Fabric mod discovery and lifecycle through version- and
+  loader-compatible Modrinth releases, required dependency resolution,
+  exact SHA-512 verification, a safety backup, and automatic rollback
+  (implemented);
+- arbitrary file uploads and arbitrary download URLs remain intentionally
+  unsupported; Dauva exposes unmanaged existing mods without claiming
+  ownership of them;
 - scheduled tasks (implemented);
 - registry signing and trusted sources;
 - Leaf capacity reporting and placement (implemented);
 - protected API-side option storage (implemented);
 - remove direct Docker access from the API (implemented).
 
-### Phase 4: migration and retirement — in progress
+### Phase 4: migration and retirement — adoption complete, retirement in burn-in
 
-- Minecraft Fabric is the first backup-first adoption pilot. Other games stay
-  discovery-only until their storage mapping and health proof are reviewed.
-- Adopt existing Compose Servers one at a time through a dry-run, restore
+- Minecraft Fabric, Satisfactory Stable, Core Keeper, Factorio, Valheim, and
+  Enshrouded completed backup-first adoption with their active saves and
+  configuration, native ownership receipts, and retained rollback sources.
+- Adoption completion does not authorize legacy deletion. Every old Compose
+  source remains stopped and intact while its native Server burns in.
+- Adopt existing Servers one at a time through a dry-run, restore
   point, typed confirmation, fresh cutover snapshot, native health check, and
   durable Portal record.
-- The dry-run inventories only Docker-declared bind/volume sources, maps them
-  to Seed volume IDs, counts bytes and files, checks free space, confirms the
-  stable Seed and trusted labels, and never returns host source paths to the
-  Portal. Capacity accounting reserves the native copy plus both snapshots
-  when backup storage shares the active disk; a separate backup target must
+- The dry-run inventories adapter-declared sources, maps them to Seed volume
+  IDs, counts bytes and files, checks free space, confirms the stable Seed and
+  trusted source receipt, and never returns host source paths to the Portal.
+  Capacity accounting reserves the native copy plus both snapshots when
+  backup storage shares the active disk; a separate backup target must
   independently have room for both snapshots.
-- Legacy data is read through Docker's authenticated container-archive
-  interface. The Leaf validates the underlying mount boundary but does not
-  require or receive a broad host-filesystem mount merely to see legacy bind
-  paths. Archive paths, links, devices, and traversal attempts are rejected
-  before a restore point can be accepted.
+- Compose data is read through Docker's authenticated container-archive
+  interface. Retained offline data uses the restricted read-only archive
+  helper described above. In both cases the Leaf validates the underlying
+  source boundary without receiving a broad host-filesystem mount. Archive
+  paths, links, devices, and traversal attempts are rejected before a restore
+  point can be accepted.
 - Active worlds, mods, plugins, and configuration move into a new
   Dauva-owned Server root. Historic backup/cache volumes remain with the old
   source and are not duplicated into active storage; native backups start a
   fresh retention history.
-- Creating a restore point briefly stops the complete Compose workload for a
+- Creating a restore point briefly stops a live Compose workload for a
   consistent archive and then resumes exactly the components that were
-  running.
+  running. An offline source is already immutable and is never started.
 - Restore-point creation and final adoption are server-side operations, not
   long-lived browser requests. The Portal starts an idempotent operation,
   polls its short status endpoint, and can reconnect to the same operation
@@ -1200,6 +1380,72 @@ Live acceptance evidence:
   it.
 - Multi-Leaf configuration, health, and placement are implemented; enrolling a
   second physical Leaf remains an operator action.
+
+#### Burn-in and legacy-retirement gate
+
+Legacy cleanup is a separate, explicit administrator operation and never a
+side effect of adoption, a Seed update, or retention. A retained source becomes
+eligible for cleanup only when all of these are true:
+
+1. the native Server has remained healthy through at least fourteen days of
+   ordinary use;
+2. at least three scheduled backup cycles completed and their archives passed
+   verification;
+3. the relevant storage class passed a restore drill into a disposable target,
+   including a post-restore health or join check;
+4. logs, power control, editable settings where supported, Seed update or
+   rollback, and game-specific operations have been observed without an
+   unresolved Withered operation;
+5. the ownership receipt, active storage root, and retained legacy source map
+   to the intended Server; and
+6. an administrator explicitly confirms cleanup after Dauva shows exactly
+   which stopped containers and storage would be removed.
+
+Until this gate passes, Dauva may hide an adopted legacy source from ordinary
+Server lists, but it must keep the source and its rollback evidence intact.
+Pterodactyl has already left the runtime path; this gate concerns retained
+pre-adoption Compose sources and data, not a dependency on Pterodactyl.
+
+#### Recovery & Reliability v1 — implemented
+
+Dauva owns the minimum recovery policy for every ready native Server whose
+installed Seed declares at least one persistent, non-cache volume. This is a
+storage-safety invariant and does not depend on an older optional UI feature
+flag. The policy is additive to user-created schedules and consists of:
+
+- one protected daily backup schedule, staggered between 03:30 and 05:29 in
+  the Leaf's Amsterdam operating window;
+- one protected weekly disposable restore-check schedule, staggered by day
+  and between 06:00 and 07:59;
+- durable restore-check operations in the control plane, so a closed Portal,
+  lost HTTP response, API restart, or browser timeout cannot erase the known
+  outcome;
+- restore into a unique temporary native Server, the installed Seed's normal
+  startup and health checks, and verified removal of only that temporary
+  Server; the live Server and backup are never modified by a drill;
+- persistent counters and evidence for scheduled backups, restore checks,
+  logs, power, settings, Seed changes, game-specific operations, ownership,
+  and the retained-source mapping;
+- an admin-only recovery alert when a scheduled backup fails or becomes stale,
+  a restore check cannot start, or a restore check fails; and
+- a plain-language Recovery protection surface in Server care, including the
+  next automatic backup, protected schedules, active drill progress, and every
+  retirement-gate condition.
+
+The daily backup and weekly restore-check schedules are control-plane policy:
+they are visibly marked as protected and cannot be deleted through the normal
+schedule API. Operators can still add their own schedules. Three retained
+backups remain the default per-Server storage policy.
+
+Passing every automated condition only marks a retained legacy source as
+eligible for a separate cleanup review. Recovery & Reliability v1 contains no
+automatic legacy-container, legacy-volume, or rollback-source deletion.
+
+The compatibility boundary is Leaf Agent `0.15`, Dauva Hosting `1.14`, Portal
+API `2.18.1`, and Portal `2.14`. Direct Leaves expose additive
+`restore-drills-v1` and `recovery-receipts-v1` capabilities. Outbound Leaf v1
+continues to refuse restore drills explicitly until that protocol gains an
+equivalent durable operation contract.
 
 ### Phase 5: portal-owned Leaf enrollment — complete
 
