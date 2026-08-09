@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "dauva.dev/seed-proof-plan/v1",
+  "seedId": "satisfactory",
+  "candidateVersion": "1.0.1-rc.1",
+  "result": "passed",
+  "completedAt": "2026-07-30T19:49:14.4266036+00:00",
+  "receipt": "../satisfactory-1.0.1-rc.1.json",
+  "proofEvidence": {
+    "candidateManifest": "sha256:c5a2390802f50d3d24b4d474c412e68a9d6d5173a6a7be394db0a38fb314a51e",
+    "registry": "sha256:a479b4489078789f19bfd1ef611422f18aaaaae41cb5b133765bf3d2131d8283",
+    "agent": "0.11.0",
+    "runtimeGameVersion": "1.2.0",
+    "runtimeUpstreamBuild": "23855705",
+    "managedUpdateOperation": "cfb9eeff-d72f-4c1b-bedd-85f27671641a",
+    "rollbackOperation": "73f0b267-724a-41a8-ac24-43dee011ffb4"
+  },
+  "baselineEvidence": {
+    "serverState": "The adopted native Satisfactory Stable Server was observed running and healthy.",
+    "gameVersion": "1.2.3.1",
+    "gameBuild": "495413",
+    "steamBuildId": "23855705",
+    "image": "docker.io/wolveix/satisfactory-server@sha256:e103700ae6ae4c50f19dac80eadb2a805c5b885e179ae2a40850e967bf189efd",
+    "imageVersion": "v1.9.10",
+    "manifest": "/config/gamefiles/steamapps/appmanifest_1690800.acf",
+    "limitation": "This proves the current runtime identity and healthy baseline only. It is not a managed-update or rollback proof."
+  },
+  "requiredChecks": [
+    "images-pinned",
+    "healthy",
+    "ports",
+    "backup-if-supported",
+    "runtime-version",
+    "managed-update",
+    "rollback",
+    "graceful-stop",
+    "restart",
+    "persistence",
+    "cleanup"
+  ],
+  "acceptance": [
+    "The selected Leaf advertises managed-game-updates-v1 before Dauva assigns the candidate.",
+    "A normal stop and restart with SKIPUPDATE=true leaves the installed Steam build unchanged.",
+    "The Leaf reports Stable as the channel, Steam buildid from the owned app manifest, and the bounded Satisfactory game version and changelist without reading an arbitrary host path.",
+    "The game port is published on one identical internal and public number for TCP and UDP; reliable messaging uses one identical internal and public TCP number.",
+    "An explicit update cannot begin until a local restore point is written and verified.",
+    "The update runs /usr/games/steamcmd from the pinned image as uid 1000:gid 1000 with HOME fixed to the declared /home/steam container directory, the declared config volume, and the fixed SteamCMD app 1690800 public-branch validation operation.",
+    "The Server starts healthy after the update and retains its saves and configuration.",
+    "A deliberately failed post-update health check restores the verified checkpoint and the previous running state.",
+    "The disposable proof Server, volumes, network, restore point, and proof-only allocations are removed after evidence is captured."
+  ],
+  "agreements": [
+    {
+      "key": "accept-steam-agreement",
+      "url": "https://store.steampowered.com/subscriber_agreement/",
+      "revision": "official-current",
+      "acceptanceRequired": true
+    }
+  ]
+}

@@ -1,0 +1,353 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dauva.dev/schemas/seed-creator-request-v1.schema.json",
+  "title": "Dauva Seed Creator request v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "podId",
+    "title",
+    "description",
+    "icon",
+    "genres",
+    "reviewedAt",
+    "source",
+    "images",
+    "environment",
+    "resources",
+    "storage",
+    "relatedSeedCount"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "dauva.dev/seed-creator-request/v1"
+    },
+    "id": {
+      "$ref": "#/$defs/id"
+    },
+    "podId": {
+      "$ref": "#/$defs/id"
+    },
+    "title": {
+      "$ref": "#/$defs/text"
+    },
+    "description": {
+      "$ref": "#/$defs/text"
+    },
+    "podDescription": {
+      "$ref": "#/$defs/text"
+    },
+    "icon": {
+      "$ref": "#/$defs/id"
+    },
+    "genres": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 12,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/id"
+      }
+    },
+    "reviewedAt": {
+      "type": "string",
+      "format": "date"
+    },
+    "source": {
+      "$ref": "#/$defs/source"
+    },
+    "architectures": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "amd64",
+          "arm64"
+        ]
+      }
+    },
+    "images": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/id"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/image"
+      }
+    },
+    "environment": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/id"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "propertyNames": {
+          "$ref": "#/$defs/environmentName"
+        },
+        "additionalProperties": {
+          "$ref": "#/$defs/environmentDecision"
+        }
+      }
+    },
+    "volumeIds": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/id"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#/$defs/id"
+        }
+      }
+    },
+    "resources": {
+      "$ref": "#/$defs/resources"
+    },
+    "storage": {
+      "$ref": "#/$defs/storage"
+    },
+    "stopTimeoutSeconds": {
+      "type": "integer",
+      "minimum": 10,
+      "maximum": 900
+    },
+    "relatedSeedCount": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 64
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "minLength": 2,
+      "maxLength": 100
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "environmentName": {
+      "type": "string",
+      "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "homepage",
+        "repository",
+        "imageRegistries"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "oci",
+            "steamcmd",
+            "linuxgsm",
+            "dauva"
+          ]
+        },
+        "homepage": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "repository": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "imageRegistries": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9.-]+(?::[0-9]+)?$",
+            "maxLength": 253
+          }
+        },
+        "upstreamId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9._-]+$",
+          "maxLength": 120
+        }
+      }
+    },
+    "image": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "updateReference"
+      ],
+      "properties": {
+        "pinned": {
+          "type": "string",
+          "pattern": "^[a-z0-9.-]+(?::[0-9]+)?/[^@\\s]+@sha256:[a-f0-9]{64}$",
+          "maxLength": 500
+        },
+        "updateReference": {
+          "type": "string",
+          "pattern": "^[a-z0-9.-]+(?::[0-9]+)?/[^@\\s]+:[^@\\s]+$",
+          "maxLength": 500
+        }
+      }
+    },
+    "environmentDecision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "classification"
+      ],
+      "properties": {
+        "classification": {
+          "enum": [
+            "agreement",
+            "constant",
+            "ignore",
+            "runtime",
+            "secret",
+            "setting"
+          ]
+        },
+        "key": {
+          "$ref": "#/$defs/id"
+        },
+        "value": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "acceptedValue": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "label": {
+          "$ref": "#/$defs/text"
+        },
+        "help": {
+          "$ref": "#/$defs/text"
+        },
+        "type": {
+          "enum": [
+            "string",
+            "integer",
+            "boolean"
+          ]
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "defaultValue": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "minLength": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100000
+        },
+        "maxLength": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100000
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "revision": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        }
+      }
+    },
+    "resources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "memoryMb",
+        "diskMb",
+        "cpuPercent"
+      ],
+      "properties": {
+        "memoryMb": {
+          "type": "integer",
+          "minimum": 256,
+          "maximum": 1048576
+        },
+        "diskMb": {
+          "type": "integer",
+          "minimum": 256,
+          "maximum": 1073741824
+        },
+        "cpuPercent": {
+          "type": "integer",
+          "minimum": 10,
+          "maximum": 25600
+        }
+      }
+    },
+    "storage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "estimatedDownloadMb",
+        "estimatedInstallMb",
+        "estimatedMutableMb"
+      ],
+      "properties": {
+        "class": {
+          "enum": [
+            "bulk",
+            "fast"
+          ]
+        },
+        "backupClass": {
+          "enum": [
+            "backup",
+            "bulk",
+            "fast"
+          ]
+        },
+        "estimatedDownloadMb": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1073741824
+        },
+        "estimatedInstallMb": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1073741824
+        },
+        "estimatedMutableMb": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1073741824
+        },
+        "backupPolicy": {
+          "enum": [
+            "none",
+            "optional",
+            "recommended",
+            "required"
+          ]
+        }
+      }
+    }
+  }
+}

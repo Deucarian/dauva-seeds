@@ -17,7 +17,7 @@ import {
   steamCmdDescriptor,
 } from "./source-adapters.mjs";
 
-export const creatorEngineVersion = "0.13.0";
+export const creatorEngineVersion = "0.14.0";
 export const creatorPolicyVersion = "1.1.0";
 
 const idPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
