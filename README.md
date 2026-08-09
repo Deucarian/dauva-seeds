@@ -32,18 +32,19 @@ The first vertical slice is live:
   place.
 - Every Pod represents one game family and can contain multiple Seed variants;
   cross-game discovery uses explicit Seed genres instead of genre-shaped Pods.
-- Every Pod names one recommended Seed. Seven of the eighteen stable Seeds
-  currently have legacy proof receipts; all Seeds need exact Studio-v2 proof,
-  including the five recommended Seeds that have no receipt today, before the
-  internal Seed Studio can enter production use. Dauva uses each recommendation
-  in the beginner-friendly Sprout flow while keeping other variants available
-  behind an optional choice.
+- Every Pod names one recommended Seed. Fourteen of the eighteen stable Seeds
+  currently have legacy proof-v1 receipts; Factorio Stable, Minecraft Fabric,
+  Satisfactory Experimental, and Valheim BepInEx have no receipt. All eighteen
+  Seeds, including all nine recommendations, still need exact Studio-v2 proof
+  before the internal Seed Studio can enter production use. Dauva uses each
+  recommendation in the beginner-friendly Sprout flow while keeping other
+  variants available behind an optional choice.
 - All six existing Compose Server types have sanitized Seed manifests. Terraria,
   Project Zomboid, and Garry's Mod have now joined them, giving the Registry
   nine Pods and eighteen Seed recipes with two meaningful variants per Pod.
-- Factorio Stable, Valheim BepInEx, Satisfactory Experimental, and both
-  Enshrouded runtimes passed disposable native lifecycle proofs.
-  Satisfactory Stable `1.0.1` additionally passed its exact runtime-version,
+- Factorio Latest, Valheim Vanilla, and both Enshrouded runtimes passed
+  disposable native lifecycle proofs. Satisfactory Stable `1.0.1` additionally
+  passed its exact runtime-version,
   backup-first managed-update, forced-failure rollback, persistence, and
   cleanup proof; immutable `1.0.0` remains in release history.
 - Enshrouded Wine is recommended because its roughly 9 GB game install,

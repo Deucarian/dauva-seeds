@@ -16,6 +16,7 @@ import {
   sourceRuntimeDefaults,
   steamCmdDescriptor,
 } from "./source-adapters.mjs";
+import { proofCheckPolicyIssues } from "./proof-check-policy.mjs";
 
 export const creatorEngineVersion = "0.14.0";
 export const creatorPolicyVersion = "1.1.0";
@@ -50,8 +51,14 @@ const validateProofPlanSchema = ajv.compile(proofPlanSchema);
 const validateProofBundleSchema = ajv.compile(proofBundleSchema);
 const validateProofV2Schema = ajv.compile(proofV2Schema);
 
-export function validateProofReceipt(receipt) {
+export function validateProofReceipt(receipt, seed = null) {
   assertSchema(validateProofV2Schema, receipt, "proof-v2 receipt");
+  if (seed) {
+    const issues = proofCheckPolicyIssues(seed, receipt.receiptPayload.checks);
+    if (issues.length > 0) {
+      throw new Error(`Proof-v2 receipt does not satisfy the Seed proof policy: ${issues.join("; ")}.`);
+    }
+  }
   return { valid: true };
 }
 
@@ -924,6 +931,12 @@ export function createProofPlan({
         fixtureId: requireFixture(fixtures, capability, seed),
       });
     }
+  }
+  const plannedKinds = new Set(checks.map((check) => check.kind));
+  for (const requiredCheck of seed.proofPolicy.requiredChecks) {
+    if (plannedKinds.has(requiredCheck)) continue;
+    checks.splice(checks.length - 1, 0, { kind: requiredCheck });
+    plannedKinds.add(requiredCheck);
   }
   const plan = {
     schemaVersion: "dauva.dev/seed-proof-plan/v1",

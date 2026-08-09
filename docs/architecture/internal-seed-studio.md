@@ -120,11 +120,14 @@ it must receive its own specification and threat model.
 
 ## 5. Current baseline and mandatory hardening
 
-As of 2026-08-02, the compiled Registry contains eighteen stable Seeds but only
-seven are associated with a proof receipt. Eleven stable Seeds are reported as
-`unproven`, including five of the nine recommended Seeds. The present validator
-allows that state, and current promotion is not bound to an exact manifest
-digest.
+As of 2026-08-09, the compiled Registry contains eighteen stable Seeds.
+Fourteen carry legacy proof-v1 receipts; Factorio Stable, Minecraft Fabric,
+Satisfactory Experimental, and Valheim BepInEx are reported as `unproven` and
+have no receipt. Legacy receipts are reported as `legacy`, not `proven`, because
+they are neither authenticated nor exactly bound under proof-v2. Consequently
+all eighteen Seeds and all nine recommended Seeds still lack a current exact
+Studio-v2 proof. The present validator allows that migration state; none of the
+legacy evidence authorizes Studio release or runtime availability.
 
 The Studio **MUST NOT** enter general internal use until all of the following
 are true:

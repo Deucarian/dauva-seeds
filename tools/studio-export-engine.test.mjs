@@ -8,6 +8,7 @@ import {
   sha256,
 } from "./registry-lib.mjs";
 import { renderStudioExport } from "./studio-export-engine.mjs";
+import { expectedProofCheckStatuses } from "./proof-check-policy.mjs";
 import path from "node:path";
 
 const digest = (character) => `sha256:${character.repeat(64)}`;
@@ -29,9 +30,9 @@ test("stable reproof export is deterministic and never rewrites stable manifests
       accepted: true,
       acceptedAt: timestamp,
     }));
-  const check = (code) => ({
+  const check = (code, status = "passed") => ({
     code,
-    status: "passed",
+    status,
     startedAt: timestamp,
     completedAt,
     evidenceDigests: [],
@@ -66,16 +67,9 @@ test("stable reproof export is deterministic and never rewrites stable manifests
     completedAt,
     expiresAt: "2026-09-02T12:10:00.000Z",
     result: "passed",
-    checks: [
-      "images-pinned",
-      "healthy",
-      "ports",
-      "graceful-stop",
-      "stopped-remains-stopped",
-      "restart",
-      "persistence",
-      "cleanup",
-    ].map(check),
+    checks: [...expectedProofCheckStatuses(seed)].map(([code, status]) =>
+      check(code, status),
+    ),
     agreements,
     evidence: [],
     cleanup: {

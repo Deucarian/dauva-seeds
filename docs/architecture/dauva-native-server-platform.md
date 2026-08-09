@@ -236,15 +236,16 @@ the Server, Seed, agreement, accepting user, URL, revision, and timestamp.
 
 Seed v1 is implemented as JSON Schema plus stricter policy validation. The
 registry contains nine game-family Pods and eighteen sanitized Seeds: two
-meaningful variants per Pod. Factorio Stable, Valheim BepInEx, both
-Satisfactory branches, and both Enshrouded runtimes passed fresh native
-lifecycle proofs and joined the original stable Seeds. Minecraft Paper then
-passed its EULA-gated Paper 26.2 lifecycle proof with persistent world data,
-ordered restart, and native RCON backups. All twelve original Seeds are stable.
-Terraria, Project Zomboid, and Garry's Mod add six stable Seeds. All six passed
-fresh disposable lifecycle proofs on the Debian Leaf; their exact
-release-candidate versions, manifest digests, agreement revisions, checks, and
-proof expiry are retained in committed receipts.
+meaningful variants per Pod. Factorio Latest, Valheim Vanilla, Satisfactory
+Stable, and both Enshrouded runtimes passed native lifecycle proofs. Minecraft
+Paper then passed its EULA-gated Paper 26.2 lifecycle proof with persistent
+world data, ordered restart, and native RCON backups. Core Keeper Normal and
+Hard also carry lifecycle receipts. All twelve original Seeds are stable, but
+Minecraft Fabric, Factorio Stable, Satisfactory Experimental, and Valheim
+BepInEx have no receipt. Terraria, Project Zomboid, and Garry's Mod add six
+stable Seeds, all with disposable Debian Leaf lifecycle receipts. The fourteen
+receipts are legacy proof-v1 evidence; none satisfies the authenticated,
+exactly bound proof-v2 gate.
 
 The separately deployable Leaf Agent now owns every privileged host operation.
 The API has no Docker socket and Pterodactyl is removed. Newly Sprouted Servers
@@ -1075,10 +1076,12 @@ An update-capable Seed must declare backup, restore, and update capabilities,
 require backup and rollback, and pass explicit runtime-version,
 managed-update, and rollback proof checks. It also requires the
 `managed-game-updates-v1` Leaf capability so a Leaf that only understands the
-older lifecycle contract cannot accept it. The Satisfactory Stable `1.0.1`
-recipe remains a release candidate until that end-to-end proof is stored; the
-observed live Satisfactory 1.2 runtime is baseline evidence, not a substitute
-for the managed-update proof.
+older lifecycle contract cannot accept it. Satisfactory Stable `1.0.1` is the
+current stable Registry recipe and its exact managed-update lifecycle is
+retained in a legacy proof-v1 receipt. It remains unavailable to proof-v2-gated
+Studio release and new Sprouts until an authenticated, exactly bound proof-v2
+reproof is stored. The observed live Satisfactory 1.2 runtime remains useful
+baseline evidence, not a substitute for that proof-v2 receipt.
 
 Proof credentials and required administrator secrets are supplied only for the
 disposable request. They are neither written to the Seed nor copied into the

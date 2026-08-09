@@ -21,9 +21,9 @@ The current Compose-managed Servers were used as reference implementations
 for Minecraft, Valheim, Core Keeper, Satisfactory, Factorio, and Enshrouded.
 Terraria, Project Zomboid, and Garry's Mod were then added from curated public
 container sources. Each of the nine Pods contains two meaningful variants.
-Factorio Stable, Valheim BepInEx, Satisfactory Experimental, and both
-Enshrouded runtimes passed fresh install, port, stop, restart, persistence, and
-deletion proofs on the native Docker Branch. Satisfactory Stable `1.0.1`
+Factorio Latest, Valheim Vanilla, and both Enshrouded runtimes passed fresh
+install, port, stop, restart, persistence, and deletion proofs on the native
+Docker Branch. Satisfactory Stable `1.0.1`
 additionally passed its exact runtime-version, backup-first managed-update,
 forced-failure rollback, persistence, and cleanup proof. Its original `1.0.0`
 recipe remains immutable in release history. Enshrouded Wine keeps its roughly
@@ -42,10 +42,12 @@ Project Zomboid Private and Community, and Garry's Mod Construct and Flatgrass
 also passed the complete disposable Leaf lifecycle. All eighteen current Seeds
 are stable.
 
-These seven committed receipts use the legacy proof-v1 format. They document
-useful lifecycle evidence but are neither authenticated nor sufficiently bound
-for Seed Studio release or runtime availability. Every offered stable Seed must
-be re-proofed under proof-v2 before the Studio is enabled.
+Fourteen committed receipts use the legacy proof-v1 format. Factorio Stable,
+Minecraft Fabric, Satisfactory Experimental, and Valheim BepInEx have no
+receipt. The legacy receipts document useful lifecycle evidence but are neither
+authenticated nor sufficiently bound for Seed Studio release or runtime
+availability. Every offered stable Seed must be re-proofed under proof-v2
+before the Studio is enabled.
 
 Each component also declares one mutable OCI tag under `imageUpdate`. The tag
 is discovery metadata only: Servers always run the digest-pinned `image`.

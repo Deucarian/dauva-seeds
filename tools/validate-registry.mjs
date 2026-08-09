@@ -18,6 +18,7 @@ import {
   proofLeafDomain,
   verifyAttestation,
 } from "./proof-crypto.mjs";
+import { proofCheckPolicyIssues } from "./proof-check-policy.mjs";
 
 const ajv = new Ajv2020({
   allErrors: true,
@@ -798,40 +799,8 @@ function validateProofV2Policy(entry, seedById, roots, proofIds) {
 }
 
 function validateProofChecks(fileName, seed, checks) {
-  const byCode = new Map();
-  for (const check of checks) {
-    if (byCode.has(check.code)) {
-      errors.push(`${fileName}: proof check '${check.code}' occurs more than once.`);
-    }
-    byCode.set(check.code, check);
-  }
-  const mandatory = [
-    "images-pinned",
-    "healthy",
-    "ports",
-    "graceful-stop",
-    "stopped-remains-stopped",
-    "restart",
-    "persistence",
-    "cleanup",
-  ];
-  for (const code of mandatory) {
-    if (byCode.get(code)?.status !== "passed") {
-      errors.push(`${fileName}: mandatory proof check '${code}' did not pass.`);
-    }
-  }
-  for (const [capability, code] of [
-    ["backup", "backup"],
-    ["restore", "restore"],
-    ["console", "console"],
-    ["update", "update"],
-  ]) {
-    const expected = seed.capabilities[capability] ? "passed" : "not_applicable";
-    if (byCode.get(code)?.status !== expected) {
-      errors.push(
-        `${fileName}: capability check '${code}' must be '${expected}'.`,
-      );
-    }
+  for (const issue of proofCheckPolicyIssues(seed, checks)) {
+    errors.push(`${fileName}: ${issue}.`);
   }
 }
 

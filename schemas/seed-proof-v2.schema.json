@@ -166,6 +166,10 @@
             "persistence",
             "console",
             "update",
+            "backup-if-supported",
+            "runtime-version",
+            "managed-update",
+            "rollback",
             "cleanup"
           ]
         },
