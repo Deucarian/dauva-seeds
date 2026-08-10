@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 concurrency:
   group: seed-publication-production-${{ github.event.client_payload.publication_id }}

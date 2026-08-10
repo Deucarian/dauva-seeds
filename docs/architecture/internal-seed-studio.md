@@ -1388,17 +1388,17 @@ closed-unmerged PR is terminal `cancelled`; an unresolved
 external error is `blocked` and resumable; an explicit verified apply/check
 rejection is `failed`.
 
-### 19.4 Phase-1 activation boundary
+### 19.4 Environment activation boundary
 
-The 0.15.0 repository foundation is deliberately non-activating. Its reusable
-workflow skeletons have no repository-write, pull-request-write, deployment,
-or OIDC permission and invoke the precondition checker with the unconditional
-`foundation` lock. Activation requires a later reviewed change plus all of:
+The 0.16.0 publication route is activated one environment at a time. Develop
+may activate only after every condition below is proven. Production keeps the
+same code and contract but remains physically disabled until it separately
+passes the identical gate:
 
 - readable enforced protection on both `develop` and `main` with the controls
   in Section 19.2;
 - active environment-, repository-, target-, API-, and Proof-Leaf-scoped
-  verification roots (the current root set is empty);
+  verification roots;
 - the API publication store, GitHub App dispatch, OIDC verifier, callbacks,
   reconciler, and exact Registry identity health contract deployed separately
   in Develop and Production;
@@ -1406,11 +1406,21 @@ or OIDC permission and invoke the precondition checker with the unconditional
 - current exact proof-v2 coverage for every Seed that the official catalog may
   offer.
 
-If the GitHub plan cannot enforce/read required protection for the private
-repository, publication remains disabled. Making the repository public or
-buying a plan is a product/organization decision, never an implementation
-fallback. Export, verification, and local transactional apply remain usable
-without granting publication authority.
+The repository is public so GitHub can enforce the protected-review contract
+without a paid private-repository exception. Publication and proposal jobs run
+only on GitHub-hosted runners. Proposal writes use one repository-installed
+GitHub App token only after verification; the workflow can neither approve nor
+merge. Deployment runs on a separate self-hosted runner registration in a
+runner group that admits only the protected deployment workflow. Its service
+account has no Docker or host group membership and may elevate only to the
+root-owned Registry deploy command, which accepts the exact environment,
+merged commit, and signed base commit. No public SSH port or reusable
+interactive host credential is exposed. Missing activation variables, secrets,
+roots, protection, proof, or health evidence fail closed.
+
+Activation does not waive proof debt. A Pod or Seed becomes official only for
+the exact proof-v2-backed export that passes this route. Unproven Seeds remain
+unavailable to publication even while the Develop route itself is enabled.
 
 ## 20. Semantic versioning
 

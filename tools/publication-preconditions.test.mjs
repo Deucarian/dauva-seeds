@@ -99,3 +99,22 @@ test("missing review, status, admin, conversation, and immutable-ref controls fa
   assert.equal(result.ready, false);
   assert.ok(result.issues.length >= 6);
 });
+
+test("one domain-separated API key may serve proof and export purposes", () => {
+  const shared = root(
+    "studio_export",
+    ["env:develop", "repo:deucarian.dauva-seeds", "target:develop"],
+    9,
+  );
+  const result = inspectPublicationPreconditions({
+    ...valid,
+    verificationRoots: {
+      keys: [
+        shared,
+        { ...shared, purpose: "proof_api", subjects: ["env:develop"] },
+        root("proof_leaf", ["env:develop", "leaf:proof-1"], 3),
+      ],
+    },
+  });
+  assert.equal(result.ready, true);
+});

@@ -932,12 +932,15 @@ function validateProofSignatures(fileName, proof, roots) {
 }
 
 function validateVerificationRootKeys(roots) {
-  const keyIds = new Set();
+  const purposeKeyIds = new Set();
   for (const key of roots.keys ?? []) {
-    if (keyIds.has(key.keyId)) {
-      errors.push(`verification roots: duplicate keyId '${key.keyId}'.`);
+    const purposeKeyId = `${key.purpose}\n${key.keyId}`;
+    if (purposeKeyIds.has(purposeKeyId)) {
+      errors.push(
+        `verification roots: duplicate purpose/keyId '${key.purpose}/${key.keyId}'.`,
+      );
     }
-    keyIds.add(key.keyId);
+    purposeKeyIds.add(purposeKeyId);
     try {
       const publicKey = Buffer.from(key.publicKey, "base64url");
       if (sha256(publicKey) !== key.keyId) {

@@ -37,22 +37,26 @@ test("publication entry workflows are environment-fixed and API-dispatched", asy
   assert.match(production, /api_origin: https:\/\/jorishoef\.nl/);
 });
 
-test("reusable publication and deployment foundations cannot mutate or activate", async () => {
-  for (const name of [
-    "_seed-studio-publication.yml",
-    "_seed-registry-deploy.yml",
-  ]) {
-    const document = await workflow(name);
+test("reusable workflows activate only behind exact trust and OIDC boundaries", async () => {
+  const publication = await workflow("_seed-studio-publication.yml");
+  const deployment = await workflow("_seed-registry-deploy.yml");
+  for (const document of [publication, deployment]) {
     assert.match(document, /workflow_call:/);
-    assert.match(document, /--phase foundation/);
+    assert.match(document, /--phase activation/);
     assert.match(document, /publication-preconditions\.mjs/);
     assert.match(document, /branches\/\$branch\/protection/);
-    assert.doesNotMatch(document, /contents:\s*write/);
-    assert.doesNotMatch(document, /pull-requests:\s*write/);
-    assert.doesNotMatch(document, /id-token:\s*write/);
-    assert.doesNotMatch(document, /git\s+push/);
-    assert.doesNotMatch(document, /gh\s+pr\s+create/);
+    assert.match(document, /id-token:\s*write/);
+    assert.doesNotMatch(document, /--phase foundation/);
   }
+  assert.match(publication, /actions\/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1/);
+  assert.match(publication, /git push origin "HEAD:refs\/heads\/\$BRANCH"/);
+  assert.match(publication, /gh pr create/);
+  assert.doesNotMatch(publication, /gh pr (?:merge|review)/);
+  assert.match(deployment, /runs-on: \[self-hosted, Linux, X64, dauva-seed-deploy\]/);
+  assert.match(deployment, /sudo --non-interactive \/usr\/local\/sbin\/dauva-seed-registry-deploy/);
+  assert.doesNotMatch(deployment, /ssh|DEPLOY_SSH|KNOWN_HOSTS/);
+  assert.match(deployment, /publication-workflow-client\.mjs deployment/);
+  assert.doesNotMatch(deployment, /git\s+push|gh\s+pr\s+(?:create|merge|review)/);
 });
 
 test("reusable publication workflow masks and validates exact attempt correlation", async () => {
@@ -67,19 +71,24 @@ test("reusable publication workflow masks and validates exact attempt correlatio
     document.indexOf("    secrets:"),
   );
   assert.doesNotMatch(workflowCallInputs, /publication_attempt_token/);
-  assert.match(document, /echo "::add-mask::\$DAUVA_SEED_PUBLICATION_ATTEMPT_TOKEN"/);
-  assert.match(document, /publication-claim-contract\.mjs/);
+  assert.match(document, /publication-workflow-client\.mjs claim/);
   assert.match(document, /--publication-id "\$\{\{ inputs\.publication_id \}\}"/);
   assert.match(
     document,
     /--publication-attempt "\$\{\{ inputs\.publication_attempt \}\}"/,
   );
-  assert.match(document, /--run-id "\$GITHUB_RUN_ID"/);
-  assert.match(document, /--run-attempt "\$GITHUB_RUN_ATTEMPT"/);
-  assert.equal(
-    document.indexOf("::add-mask::") <
-      document.indexOf("publication-claim-contract.mjs"),
-    true,
-  );
-  assert.doesNotMatch(document, /id-token:\s*write/);
+  assert.match(document, /id-token:\s*write/);
+});
+
+test("deployment entry points never deploy ordinary merges", async () => {
+  for (const name of [
+    "seed-registry-deploy-develop.yml",
+    "seed-registry-deploy-production.yml",
+  ]) {
+    const document = await workflow(name);
+    assert.match(document, /resolve-publication-merge\.mjs/);
+    assert.match(document, /if: needs\.identify\.outputs\.publication_id != ''/);
+    assert.match(document, /cancel-in-progress: false/);
+    assert.match(document, /_seed-registry-deploy\.yml@main/);
+  }
 });

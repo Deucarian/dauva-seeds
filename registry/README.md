@@ -87,9 +87,11 @@ digest; a trusted workflow may apply it only to a proposal branch. It may not
 push `develop` or `main`, approve, merge, or report success. Success exists
 only after a protected human-reviewed merge and an authenticated deployment
 receipt proving that the matching environment API serves that exact commit and
-compiled Registry digest. The Phase-1 workflow files are intentionally locked
-and read-only until branch protection, scoped verification roots, GitHub App
-dispatch, OIDC callbacks, reconciliation, and deployment receipts exist.
+compiled Registry digest. Develop has this route only when branch protection,
+scoped verification roots, GitHub App dispatch, OIDC callbacks, reconciliation,
+and the forced deployment receipt path are all active. Production uses the same
+contract but remains disabled until its own environment gate is explicitly
+completed.
 
 For automation, pass `--analysis -` and stream the authenticated Leaf response
 over standard input. This keeps transient production analysis out of the
