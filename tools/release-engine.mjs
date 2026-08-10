@@ -5,6 +5,7 @@ import { readJson, repositoryRoot, sha256 } from "./registry-lib.mjs";
 import {
   createAttestation,
   exportDigest,
+  publicationStatementDomain,
   releaseBundleDomain,
   verifyAttestation,
 } from "./proof-crypto.mjs";
@@ -17,8 +18,12 @@ const seedSchema = await readJson(
 const bundleSchema = await readJson(
   path.join(repositoryRoot, "schemas", "seed-release-bundle-v1.schema.json"),
 );
+const publicationSchema = await readJson(
+  path.join(repositoryRoot, "schemas", "seed-studio-publication-v1.schema.json"),
+);
 ajv.addSchema(seedSchema);
 const validateBundleSchema = ajv.compile(bundleSchema);
+const validatePublicationSchema = ajv.compile(publicationSchema);
 
 const uuidPattern =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
@@ -26,10 +31,66 @@ const digestPattern = /^sha256:[a-f0-9]{64}$/;
 const allowedPathPattern =
   /^(?:registry\/(?:pods|seeds)\/[a-z0-9]+(?:-[a-z0-9]+)*\.json|registry\/history\/[a-z0-9]+(?:-[a-z0-9]+)*@[0-9]+\.[0-9]+\.[0-9]+\.json|proofs\/[a-z0-9]+(?:-[a-z0-9]+)*-[0-9]+\.[0-9]+\.[0-9]+(?:-rc\.[1-9][0-9]*)?-(?:amd64|arm64)-[0-9a-f-]{36}\.json|dist\/registry\.json|package\.json|package-lock\.json)$/;
 const dayMs = 24 * 60 * 60 * 1000;
+const maximumPublicationClaimMs = 60 * 60 * 1000;
 
 export function validateReleaseBundleEnvelope(bundle) {
   assertBundleSchema(bundle);
   return { valid: true };
+}
+
+export function createSignedPublicationStatement({
+  publicationPayload,
+  studioPrivateKey,
+  studioPublicKey,
+}) {
+  requireTimestamp(publicationPayload?.createdAtUtc, "createdAtUtc");
+  requireTimestamp(publicationPayload?.claimBeforeUtc, "claimBeforeUtc");
+  requirePublicationClaimWindow(publicationPayload);
+  const publicationDigest = exportDigest(publicationPayload);
+  const envelope = {
+    schemaVersion: "dauva.dev/seed-publication/v1",
+    publicationPayload,
+    publicationDigest,
+    studioAttestation: createAttestation({
+      domain: publicationStatementDomain,
+      digest: publicationDigest,
+      privateKey: studioPrivateKey,
+      publicKey: studioPublicKey,
+    }),
+  };
+  assertPublicationSchema(envelope);
+  return envelope;
+}
+
+export function verifySignedPublicationStatement({
+  statement,
+  studioPublicKey,
+  validationTime,
+}) {
+  assertPublicationSchema(statement);
+  requireTimestamp(validationTime, "validationTime");
+  const calculatedDigest = exportDigest(statement.publicationPayload);
+  if (calculatedDigest !== statement.publicationDigest) {
+    throw new Error("Publication digest does not match publicationPayload.");
+  }
+  if (
+    !verifyAttestation({
+      domain: publicationStatementDomain,
+      digest: statement.publicationDigest,
+      attestation: statement.studioAttestation,
+      publicKey: studioPublicKey,
+    })
+  ) {
+    throw new Error("Publication Studio attestation is invalid.");
+  }
+  requirePublicationClaimWindow(statement.publicationPayload);
+  if (Date.parse(statement.publicationPayload.createdAtUtc) > Date.parse(validationTime)) {
+    throw new Error("Publication was created after the validation time.");
+  }
+  if (Date.parse(statement.publicationPayload.claimBeforeUtc) <= Date.parse(validationTime)) {
+    throw new Error("Publication claim deadline has passed.");
+  }
+  return statement.publicationDigest;
 }
 
 export function createSignedReleaseBundle({
@@ -227,6 +288,14 @@ function assertBundleSchema(value) {
   throw new Error(`Release bundle is not canonical: ${details}`);
 }
 
+function assertPublicationSchema(value) {
+  if (validatePublicationSchema(value)) return;
+  const details = (validatePublicationSchema.errors ?? [])
+    .map((error) => `${error.instancePath || "/"} ${error.message}`)
+    .join("; ");
+  throw new Error(`Publication statement is not canonical: ${details}`);
+}
+
 function compareReceiptSummary(left, right) {
   return compareText(
     `${left.seedId}@${left.testedVersion}@${left.architecture}@${left.proofId}`,
@@ -247,6 +316,15 @@ function requireTimestamp(value, label) {
     !Number.isFinite(Date.parse(value))
   ) {
     throw new Error(`${label} must be a millisecond UTC timestamp.`);
+  }
+}
+
+function requirePublicationClaimWindow(payload) {
+  const lifetime = Date.parse(payload.claimBeforeUtc) - Date.parse(payload.createdAtUtc);
+  if (lifetime <= 0 || lifetime > maximumPublicationClaimMs) {
+    throw new Error(
+      "claimBeforeUtc must be after createdAtUtc and no more than one hour later.",
+    );
   }
 }
 

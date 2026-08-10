@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "dauva.dev/seed-publication-claim-test-vectors/v1",
+  "domain": "dauva.seed-publication-claim.v1",
+  "publicationId": "423e4567-e89b-42d3-a456-426614174003",
+  "tokenDerivation": {
+    "domain": "dauva.seed-publication-attempt-token.v1",
+    "environment": "develop",
+    "testKey": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8",
+    "keyId": "sha256:630dcd2966c4336691125448bbb25b4ff412a49c732db2c8abc1b8581bd710dd",
+    "context": {
+      "environment": "develop",
+      "publicationAttempt": 2,
+      "publicationId": "423e4567-e89b-42d3-a456-426614174003"
+    },
+    "canonicalContext": "{\"environment\":\"develop\",\"publicationAttempt\":2,\"publicationId\":\"423e4567-e89b-42d3-a456-426614174003\"}",
+    "attemptToken": "kVBBUKzqWHU85Vm_kH_eVx2InvpQ2zUg9g8ixy2e5y0",
+    "attemptTokenHash": "sha256:f99a4352aced880a6220f0139f8e17291bb75343c642d5289e32bad2b07e37df"
+  },
+  "durableAttempt": {
+    "publicationAttempt": 2,
+    "attemptTokenKeyId": "sha256:630dcd2966c4336691125448bbb25b4ff412a49c732db2c8abc1b8581bd710dd",
+    "attemptTokenHash": "sha256:f99a4352aced880a6220f0139f8e17291bb75343c642d5289e32bad2b07e37df"
+  },
+  "claims": {
+    "current": {
+      "request": {
+        "runId": 30826362679,
+        "runAttempt": 1,
+        "publicationAttempt": 2,
+        "attemptToken": "kVBBUKzqWHU85Vm_kH_eVx2InvpQ2zUg9g8ixy2e5y0"
+      },
+      "canonicalCorrelation": "{\"attemptToken\":\"kVBBUKzqWHU85Vm_kH_eVx2InvpQ2zUg9g8ixy2e5y0\",\"publicationAttempt\":2,\"publicationId\":\"423e4567-e89b-42d3-a456-426614174003\",\"runAttempt\":1,\"runId\":30826362679}",
+      "idempotencyKey": "seed-publication-claim.v1:abdf54a74e76cd6833821e2b040846be72b7a4133c344efd16c1e5ae5aa0150b",
+      "expectedResult": "accepted"
+    },
+    "exactReplay": {
+      "request": {
+        "runId": 30826362679,
+        "runAttempt": 1,
+        "publicationAttempt": 2,
+        "attemptToken": "kVBBUKzqWHU85Vm_kH_eVx2InvpQ2zUg9g8ixy2e5y0"
+      },
+      "idempotencyKey": "seed-publication-claim.v1:abdf54a74e76cd6833821e2b040846be72b7a4133c344efd16c1e5ae5aa0150b",
+      "expectedResult": "idempotent_replay"
+    },
+    "delayedPreviousAttempt": {
+      "request": {
+        "runId": 30826362678,
+        "runAttempt": 1,
+        "publicationAttempt": 1,
+        "attemptToken": "n9StiiJQGNGFiWvAzgFpeQd99WMG94zbh47SQCivxbE"
+      },
+      "idempotencyKey": "seed-publication-claim.v1:caacf26ce6e01312f8db25b69301d49b61f228e7af8a4617c1c6a52f9da05fe4",
+      "attemptTokenHash": "sha256:d21e2ff3230a2a3a88ca09e6fe30d8cd3aa767e517a8290f642784546f52f937",
+      "expectedResult": "publication.attempt_mismatch"
+    },
+    "wrongTokenForCurrentAttempt": {
+      "request": {
+        "runId": 30826362678,
+        "runAttempt": 1,
+        "publicationAttempt": 2,
+        "attemptToken": "n9StiiJQGNGFiWvAzgFpeQd99WMG94zbh47SQCivxbE"
+      },
+      "idempotencyKey": "seed-publication-claim.v1:053eb9fbb83d63bf613430e6bfa44616e5328fb28fdd42ba14a39bc9236806fa",
+      "expectedResult": "publication.attempt_token_mismatch"
+    }
+  },
+  "claimResponse": {
+    "schemaVersion": "dauva.dev/seed-publication-claim/v1",
+    "publicationId": "423e4567-e89b-42d3-a456-426614174003",
+    "publicationAttempt": 2,
+    "environment": "develop",
+    "targetRef": "refs/heads/develop",
+    "statementPath": "/api/internal/seed-publications/423e4567-e89b-42d3-a456-426614174003/statement",
+    "bundlePath": "/api/internal/seed-publications/423e4567-e89b-42d3-a456-426614174003/bundle",
+    "archiveDigest": "sha256:8888888888888888888888888888888888888888888888888888888888888888"
+  }
+}

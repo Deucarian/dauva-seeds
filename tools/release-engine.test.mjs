@@ -2,7 +2,9 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { ed25519PrivateKeyFromSeed, receiptDigest } from "./proof-crypto.mjs";
 import {
+  createSignedPublicationStatement,
   createSignedReleaseBundle,
+  verifySignedPublicationStatement,
   verifySignedReleaseBundle,
 } from "./release-engine.mjs";
 
@@ -71,6 +73,22 @@ const input = {
   studioPublicKey: publicKey,
 };
 
+const publicationPayload = {
+  publicationId: "423e4567-e89b-42d3-a456-426614174003",
+  exportId: input.bundleId,
+  exportDigest: digest("9"),
+  archiveDigest: digest("8"),
+  sourceEnvironment: "develop",
+  repositoryId: 1311366821,
+  repository: "Deucarian/dauva-seeds",
+  targetRef: "refs/heads/develop",
+  baseGitCommit: input.baseGitCommit,
+  baseRegistryDigest: input.baseRegistryDigest,
+  expectedRegistryDigest: digest("7"),
+  createdAtUtc: input.createdAt,
+  claimBeforeUtc: "2026-08-03T11:00:00.000Z",
+};
+
 test("signed release rendering and verification are byte deterministic", () => {
   const first = createSignedReleaseBundle(input);
   const second = createSignedReleaseBundle(input);
@@ -83,6 +101,70 @@ test("signed release rendering and verification are byte deterministic", () => {
       validationTime: input.validationTime,
     }),
     first.envelope.exportDigest,
+  );
+});
+
+test("publication statements are deterministic, target-bound, and expiring", () => {
+  const first = createSignedPublicationStatement({
+    publicationPayload,
+    studioPrivateKey: privateKey,
+    studioPublicKey: publicKey,
+  });
+  const second = createSignedPublicationStatement({
+    publicationPayload,
+    studioPrivateKey: privateKey,
+    studioPublicKey: publicKey,
+  });
+  assert.deepEqual(first, second);
+  assert.equal(
+    verifySignedPublicationStatement({
+      statement: first,
+      studioPublicKey: publicKey,
+      validationTime: "2026-08-03T10:30:00.000Z",
+    }),
+    first.publicationDigest,
+  );
+  assert.throws(
+    () =>
+      verifySignedPublicationStatement({
+        statement: first,
+        studioPublicKey: publicKey,
+        validationTime: "2026-08-03T11:00:00.000Z",
+      }),
+    /deadline has passed/,
+  );
+  assert.throws(
+    () =>
+      createSignedPublicationStatement({
+        publicationPayload: {
+          ...publicationPayload,
+          targetRef: "refs/heads/main",
+        },
+        studioPrivateKey: privateKey,
+        studioPublicKey: publicKey,
+      }),
+    /not canonical/,
+  );
+  assert.throws(
+    () =>
+      createSignedPublicationStatement({
+        publicationPayload: {
+          ...publicationPayload,
+          claimBeforeUtc: "2026-08-03T11:00:00.001Z",
+        },
+        studioPrivateKey: privateKey,
+        studioPublicKey: publicKey,
+      }),
+    /no more than one hour/,
+  );
+  assert.throws(
+    () =>
+      verifySignedPublicationStatement({
+        statement: first,
+        studioPublicKey: publicKey,
+        validationTime: "2026-08-03T09:59:59.999Z",
+      }),
+    /created after/,
   );
 });
 

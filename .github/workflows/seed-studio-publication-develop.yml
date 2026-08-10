@@ -1,0 +1,26 @@
+name: Seed Studio publication - Develop
+
+on:
+  repository_dispatch:
+    types:
+      - dauva-seed-publication-develop-v1
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: seed-publication-develop-${{ github.event.client_payload.publication_id }}
+  cancel-in-progress: false
+
+jobs:
+  foundation:
+    uses: Deucarian/dauva-seeds/.github/workflows/_seed-studio-publication.yml@main
+    with:
+      publication_id: ${{ github.event.client_payload.publication_id }}
+      publication_attempt: ${{ github.event.client_payload.publication_attempt }}
+      environment: develop
+      target_ref: refs/heads/develop
+      api_origin: https://develop.jorishoef.nl
+    secrets:
+      publication_attempt_token: ${{ github.event.client_payload.attempt_token }}
