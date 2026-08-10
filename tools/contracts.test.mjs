@@ -59,6 +59,14 @@ const validateWorkingSeedDocument = ajv.compile({
   $id: "https://dauva.dev/schemas/seed-studio-working-seed-test.json",
   ...resolveStudioComponent(studioApi, "WorkingSeedDocument"),
 });
+const validatePublicationClaimRequest = ajv.compile({
+  $id: "https://dauva.dev/schemas/seed-publication-claim-request-test.json",
+  ...resolveStudioComponent(publicationApi, "ClaimRequest"),
+});
+const validatePublicationClaimResponse = ajv.compile({
+  $id: "https://dauva.dev/schemas/seed-publication-claim-response-test.json",
+  ...resolveStudioComponent(publicationApi, "ClaimResponse"),
+});
 
 const uuid = "123e4567-e89b-42d3-a456-426614174000";
 const uuid2 = "223e4567-e89b-42d3-a456-426614174001";
@@ -272,6 +280,44 @@ test("publication and deployment contracts match the frozen signed vectors", asy
   const crossedEnvironment = structuredClone(vectors.statement);
   crossedEnvironment.publicationPayload.sourceEnvironment = "production";
   assert.equal(validatePublication(crossedEnvironment), false);
+});
+
+test("publication claim contract binds the durable attempt and never echoes its token", async () => {
+  const vectors = await readJson(
+    path.join(
+      repositoryRoot,
+      "test-vectors",
+      "seed-studio-publication-claim-v1.json",
+    ),
+  );
+  for (const claim of Object.values(vectors.claims)) {
+    assert.equal(
+      validatePublicationClaimRequest(claim.request),
+      true,
+      JSON.stringify(validatePublicationClaimRequest.errors),
+    );
+  }
+  assert.equal(
+    validatePublicationClaimResponse(vectors.claimResponse),
+    true,
+    JSON.stringify(validatePublicationClaimResponse.errors),
+  );
+  assert.equal("attemptToken" in vectors.claimResponse, false);
+
+  const legacyClaim = structuredClone(vectors.claims.current.request);
+  delete legacyClaim.publicationAttempt;
+  delete legacyClaim.attemptToken;
+  assert.equal(validatePublicationClaimRequest(legacyClaim), false);
+
+  const paddedToken = structuredClone(vectors.claims.current.request);
+  paddedToken.attemptToken += "=";
+  assert.equal(validatePublicationClaimRequest(paddedToken), false);
+
+  const echoedToken = {
+    ...vectors.claimResponse,
+    attemptToken: vectors.claims.current.request.attemptToken,
+  };
+  assert.equal(validatePublicationClaimResponse(echoedToken), false);
 });
 
 test("contract schemas reject commands, extension fields, and unsafe paths", () => {
@@ -497,7 +543,7 @@ test("OpenAPI contracts expose only the approved Studio and Leaf operations", as
     "/v2/seed-proof-runs/{runId}/attempts/{attemptId}/finalize",
   ]);
 
-  assert.equal(publicationApi.info.version, "1.0.0");
+  assert.equal(publicationApi.info.version, "1.1.0");
   assert.deepEqual(Object.keys(publicationApi.paths).sort(), [
     "/seed-publications/{publicationId}/bundle",
     "/seed-publications/{publicationId}/claim",
@@ -520,10 +566,14 @@ test("OpenAPI contracts expose only the approved Studio and Leaf operations", as
       const parameterReferences = (item[method].parameters ?? []).map(
         (parameter) => parameter.$ref,
       );
+      const expectedIdempotencyParameter =
+        item[method].operationId === "claimSeedPublication"
+          ? "#/components/parameters/ClaimIdempotencyKey"
+          : "#/components/parameters/IdempotencyKey";
       assert.equal(
-        parameterReferences.includes("#/components/parameters/IdempotencyKey"),
+        parameterReferences.includes(expectedIdempotencyParameter),
         true,
-        `Internal ${method.toUpperCase()} is missing Idempotency-Key`,
+        `Internal ${method.toUpperCase()} is missing its exact Idempotency-Key contract`,
       );
     }
   }

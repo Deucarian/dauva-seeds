@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Dauva Seed publication workflow API",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "GitHub-OIDC-only claim, material download, monotonic callback, and Registry deployment receipt boundary. Browser sessions are never accepted."
   },
   "servers": [
@@ -24,7 +24,7 @@
             "$ref": "#/components/parameters/PublicationId"
           },
           {
-            "$ref": "#/components/parameters/IdempotencyKey"
+            "$ref": "#/components/parameters/ClaimIdempotencyKey"
           }
         ],
         "requestBody": {
@@ -39,7 +39,7 @@
         },
         "responses": {
           "200": {
-            "description": "The exact run atomically owns this publication attempt.",
+            "description": "The exact workflow run atomically owns the exact durable publication attempt. The response never echoes its correlation token.",
             "content": {
               "application/json": {
                 "schema": {
@@ -52,7 +52,8 @@
             "$ref": "#/components/responses/Problem"
           },
           "409": {
-            "$ref": "#/components/responses/Problem"
+            "$ref": "#/components/responses/Problem",
+            "description": "The publication attempt or token is stale, mismatched, expired, or already owned by a different workflow run. No claim state changes."
           }
         }
       }
@@ -215,6 +216,18 @@
           "maxLength": 128,
           "pattern": "^[A-Za-z0-9._:-]+$"
         }
+      },
+      "ClaimIdempotencyKey": {
+        "name": "Idempotency-Key",
+        "in": "header",
+        "required": true,
+        "description": "Exactly seed-publication-claim.v1:<hex>, where <hex> is lowercase SHA-256 over UTF8(dauva.seed-publication-claim.v1), NUL, and RFC 8785 JCS of {attemptToken, publicationAttempt, publicationId, runAttempt, runId}. The raw token never appears in this header.",
+        "schema": {
+          "type": "string",
+          "minLength": 90,
+          "maxLength": 90,
+          "pattern": "^seed-publication-claim\\.v1:[a-f0-9]{64}$"
+        }
       }
     },
     "responses": {
@@ -243,7 +256,9 @@
         "additionalProperties": false,
         "required": [
           "runId",
-          "runAttempt"
+          "runAttempt",
+          "publicationAttempt",
+          "attemptToken"
         ],
         "properties": {
           "runId": {
@@ -255,6 +270,19 @@
             "type": "integer",
             "minimum": 1,
             "maximum": 1000
+          },
+          "publicationAttempt": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000,
+            "description": "The API-issued durable attempt number carried unchanged by repository_dispatch."
+          },
+          "attemptToken": {
+            "type": "string",
+            "minLength": 43,
+            "maxLength": 43,
+            "pattern": "^[A-Za-z0-9_-]{42}[AEIMQUYcgkosw048]$",
+            "description": "Opaque canonical unpadded RFC 4648 base64url encoding of 32 pseudorandom bytes. The API derives it with a dedicated environment-scoped 32-byte HMAC-SHA256 key over UTF8(dauva.seed-publication-attempt-token.v1), NUL, and RFC 8785 JCS of {environment, publicationAttempt, publicationId}. The durable attempt stores the immutable key ID (SHA-256 of the raw key) and SHA-256 of the decoded token, never raw key or token. Redispatch re-derives with that key ID; claim comparison uses only the stored token hash plus OIDC. It is correlation-only and never replaces GitHub OIDC authentication."
           }
         }
       },
@@ -264,6 +292,7 @@
         "required": [
           "schemaVersion",
           "publicationId",
+          "publicationAttempt",
           "environment",
           "targetRef",
           "statementPath",
@@ -276,6 +305,12 @@
           },
           "publicationId": {
             "$ref": "#/components/schemas/Uuid"
+          },
+          "publicationAttempt": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000,
+            "description": "The exact durable attempt that was atomically claimed."
           },
           "environment": {
             "enum": [

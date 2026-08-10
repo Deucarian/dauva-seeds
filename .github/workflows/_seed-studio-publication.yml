@@ -6,6 +6,9 @@ on:
       publication_id:
         required: true
         type: string
+      publication_attempt:
+        required: true
+        type: number
       environment:
         required: true
         type: string
@@ -15,6 +18,9 @@ on:
       api_origin:
         required: true
         type: string
+    secrets:
+      publication_attempt_token:
+        required: true
 
 permissions:
   contents: read
@@ -29,6 +35,18 @@ jobs:
         with:
           ref: main
           path: trusted
+      - name: Mask and validate the publication attempt correlation
+        id: publication-claim
+        env:
+          DAUVA_SEED_PUBLICATION_ATTEMPT_TOKEN: ${{ secrets.publication_attempt_token }}
+        shell: bash
+        run: |
+          echo "::add-mask::$DAUVA_SEED_PUBLICATION_ATTEMPT_TOKEN"
+          node trusted/tools/publication-claim-contract.mjs \
+            --publication-id "${{ inputs.publication_id }}" \
+            --publication-attempt "${{ inputs.publication_attempt }}" \
+            --run-id "$GITHUB_RUN_ID" \
+            --run-attempt "$GITHUB_RUN_ATTEMPT"
       - name: Read repository and target protection
         env:
           GH_TOKEN: ${{ github.token }}

@@ -15,7 +15,15 @@ test("publication entry workflows are environment-fixed and API-dispatched", asy
     assert.doesNotMatch(document, /pull-requests:\s*write/);
     assert.match(document, /concurrency:/);
     assert.match(document, /client_payload\.publication_id/);
+    assert.match(document, /client_payload\.publication_attempt/);
+    assert.match(document, /client_payload\.attempt_token/);
+    assert.match(document, /publication_attempt_token:\s*\$\{\{ github\.event\.client_payload\.attempt_token \}\}/);
     assert.match(document, /cancel-in-progress: false/);
+    assert.match(
+      document,
+      /group: seed-publication-(?:develop|production)-\$\{\{ github\.event\.client_payload\.publication_id \}\}/,
+    );
+    assert.doesNotMatch(document, /group:.*publication_attempt/);
     assert.match(
       document,
       /Deucarian\/dauva-seeds\/\.github\/workflows\/_seed-studio-publication\.yml@main/,
@@ -45,4 +53,33 @@ test("reusable publication and deployment foundations cannot mutate or activate"
     assert.doesNotMatch(document, /git\s+push/);
     assert.doesNotMatch(document, /gh\s+pr\s+create/);
   }
+});
+
+test("reusable publication workflow masks and validates exact attempt correlation", async () => {
+  const document = await workflow("_seed-studio-publication.yml");
+  assert.match(document, /publication_attempt:\s*\n\s*required: true\s*\n\s*type: number/);
+  assert.match(
+    document,
+    /secrets:\s*\n\s*publication_attempt_token:\s*\n\s*required: true/,
+  );
+  const workflowCallInputs = document.slice(
+    document.indexOf("    inputs:"),
+    document.indexOf("    secrets:"),
+  );
+  assert.doesNotMatch(workflowCallInputs, /publication_attempt_token/);
+  assert.match(document, /echo "::add-mask::\$DAUVA_SEED_PUBLICATION_ATTEMPT_TOKEN"/);
+  assert.match(document, /publication-claim-contract\.mjs/);
+  assert.match(document, /--publication-id "\$\{\{ inputs\.publication_id \}\}"/);
+  assert.match(
+    document,
+    /--publication-attempt "\$\{\{ inputs\.publication_attempt \}\}"/,
+  );
+  assert.match(document, /--run-id "\$GITHUB_RUN_ID"/);
+  assert.match(document, /--run-attempt "\$GITHUB_RUN_ATTEMPT"/);
+  assert.equal(
+    document.indexOf("::add-mask::") <
+      document.indexOf("publication-claim-contract.mjs"),
+    true,
+  );
+  assert.doesNotMatch(document, /id-token:\s*write/);
 });
