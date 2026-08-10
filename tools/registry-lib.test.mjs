@@ -4,10 +4,17 @@ import {
   assertRegistryDigest,
   canonicalJson,
   compiledRegistry,
+  normalizeTextLineEndings,
   parseJsonStrict,
   proofReleasesVersion,
+  seedReleasesForProof,
   verifyRegistryDigest,
 } from "./registry-lib.mjs";
+
+test("deterministic text checks accept platform line endings", () => {
+  assert.equal(normalizeTextLineEndings("Dauva\r\nSeed\r"), "Dauva\nSeed\n");
+  assert.equal(normalizeTextLineEndings("Dauva\nSeed\n"), "Dauva\nSeed\n");
+});
 
 test("strict JSON parsing rejects duplicate object members at every depth", () => {
   assert.deepEqual(parseJsonStrict('{"safe":{"value":1}}'), {
@@ -37,6 +44,29 @@ test("a release candidate proof follows its stable promotion", () => {
   assert.equal(proofReleasesVersion("1.0.0-rc.1", "1.0.0"), true);
   assert.equal(proofReleasesVersion("1.0.1-rc.1", "1.0.0"), false);
   assert.equal(proofReleasesVersion("1.0.0-beta.1", "1.0.0"), false);
+});
+
+test("proof receipts remain bound to an immutable historical Seed during an update", () => {
+  const current = { id: "example", version: "1.0.1-rc.1" };
+  const historical = { id: "example", version: "1.0.0" };
+
+  assert.deepEqual(
+    seedReleasesForProof(
+      "example",
+      "1.0.0-rc.1",
+      [current],
+      [historical],
+    ),
+    [historical],
+  );
+  assert.deepEqual(
+    seedReleasesForProof("example", "1.0.1-rc.1", [current], [historical]),
+    [current],
+  );
+  assert.deepEqual(
+    seedReleasesForProof("example", "2.0.0", [current], [historical]),
+    [],
+  );
 });
 
 test("legacy proof summaries remain visible without claiming exact binding", () => {

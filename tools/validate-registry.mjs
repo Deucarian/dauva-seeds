@@ -9,7 +9,7 @@ import {
   readManifestDirectory,
   releasedVersion,
   repositoryRoot,
-  proofReleasesVersion,
+  seedReleasesForProof,
   sha256,
 } from "./registry-lib.mjs";
 import {
@@ -119,7 +119,7 @@ for (const entry of releaseFiles) {
   validateSeedPolicy(entry, podIds);
 }
 validatePodMembership(podFiles, seedFiles);
-validateProofPolicy(proofFiles, seedFiles, verificationRoots);
+validateProofPolicy(proofFiles, seedFiles, releaseFiles, verificationRoots);
 
 if (errors.length > 0) {
   for (const error of errors) {
@@ -676,15 +676,25 @@ function isBoundedAbsoluteContainerPath(value) {
   );
 }
 
-function validateProofPolicy(proofs, seeds, roots) {
-  const seedById = new Map(seeds.map((entry) => [entry.value.id, entry.value]));
+function validateProofPolicy(proofs, seeds, releases, roots) {
+  const currentSeeds = seeds.map((entry) => entry.value);
+  const historicalReleases = releases.map((entry) => entry.value);
+  const knownSeedIds = new Set(
+    [...currentSeeds, ...historicalReleases].map((seed) => seed.id),
+  );
   const legacyProofKeys = new Set();
   const proofIds = new Set();
 
   for (const entry of proofs) {
     const proof = entry.value;
     if (proof.schemaVersion === "dauva.dev/seed-proof/v2") {
-      validateProofV2Policy(entry, seedById, roots, proofIds);
+      validateProofV2Policy(
+        entry,
+        currentSeeds,
+        historicalReleases,
+        roots,
+        proofIds,
+      );
       continue;
     }
     const proofKey = `${proof.seedId}@${proof.seedVersion}`;
@@ -693,16 +703,21 @@ function validateProofPolicy(proofs, seeds, roots) {
     }
     legacyProofKeys.add(proofKey);
 
-    if (!seedById.has(proof.seedId)) {
+    const matchingReleases = seedReleasesForProof(
+      proof.seedId,
+      proof.seedVersion,
+      currentSeeds,
+      historicalReleases,
+    );
+    if (!knownSeedIds.has(proof.seedId)) {
       errors.push(`${entry.name}: Seed '${proof.seedId}' does not exist.`);
-    } else if (
-      !proofReleasesVersion(
-        proof.seedVersion,
-        seedById.get(proof.seedId).version,
-      )
-    ) {
+    } else if (matchingReleases.length === 0) {
       errors.push(
-        `${entry.name}: proof version '${proof.seedVersion}' does not release current Seed '${proof.seedId}@${seedById.get(proof.seedId).version}'.`,
+        `${entry.name}: proof version '${proof.seedVersion}' does not release a current or historical Seed '${proof.seedId}'.`,
+      );
+    } else if (matchingReleases.length > 1) {
+      errors.push(
+        `${entry.name}: proof version '${proof.seedVersion}' ambiguously releases multiple Seed manifests '${proof.seedId}'.`,
       );
     }
     if (`${proof.seedId}-${proof.seedVersion}.json` !== entry.name) {
@@ -710,7 +725,7 @@ function validateProofPolicy(proofs, seeds, roots) {
         `${entry.name}: proof filename must identify '${proof.seedId}-${proof.seedVersion}.json'.`,
       );
     }
-    const seed = seedById.get(proof.seedId);
+    const seed = matchingReleases.length === 1 ? matchingReleases[0] : undefined;
     if (
       seed?.capabilities.update &&
       proofReleasesSeedVersion(proof.seedVersion, seed.version)
@@ -730,11 +745,23 @@ function validateProofPolicy(proofs, seeds, roots) {
   }
 }
 
-function validateProofV2Policy(entry, seedById, roots, proofIds) {
+function validateProofV2Policy(
+  entry,
+  currentSeeds,
+  historicalReleases,
+  roots,
+  proofIds,
+) {
   const proof = entry.value;
   const payload = proof.receiptPayload;
   if (!payload?.seed || !payload?.runner || !payload?.proofId) return;
-  const seed = seedById.get(payload.seed.id);
+  const matchingReleases = seedReleasesForProof(
+    payload.seed.id,
+    payload.seed.testedVersion,
+    currentSeeds,
+    historicalReleases,
+  );
+  const seed = matchingReleases.length === 1 ? matchingReleases[0] : undefined;
   const proofIdentity = payload.proofId;
   if (proofIds.has(proofIdentity)) {
     errors.push(`${entry.name}: duplicate proofId '${proofIdentity}'.`);
@@ -752,14 +779,22 @@ function validateProofV2Policy(entry, seedById, roots, proofIds) {
       `${entry.name}: proof-v2 filename must be '${expectedFileName}'.`,
     );
   }
-  if (!seed) {
-    errors.push(`${entry.name}: Seed '${payload.seed.id}' does not exist.`);
+  if (matchingReleases.length === 0) {
+    const knownSeed = [...currentSeeds, ...historicalReleases].some(
+      (candidate) => candidate.id === payload.seed.id,
+    );
+    errors.push(
+      knownSeed
+        ? `${entry.name}: tested version '${payload.seed.testedVersion}' does not release a current or historical Seed '${payload.seed.id}'.`
+        : `${entry.name}: Seed '${payload.seed.id}' does not exist.`,
+    );
     return;
   }
-  if (!proofReleasesVersion(payload.seed.testedVersion, seed.version)) {
+  if (matchingReleases.length > 1) {
     errors.push(
-      `${entry.name}: tested version '${payload.seed.testedVersion}' does not release current Seed '${seed.id}@${seed.version}'.`,
+      `${entry.name}: tested version '${payload.seed.testedVersion}' ambiguously releases multiple Seed manifests '${payload.seed.id}'.`,
     );
+    return;
   }
   if (payload.seed.intendedStableVersion !== releasedVersion(seed.version)) {
     errors.push(

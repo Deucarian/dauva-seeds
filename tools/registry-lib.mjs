@@ -45,6 +45,10 @@ export function canonicalJson(value) {
   return canonicalJsonValue(value, new Set());
 }
 
+export function normalizeTextLineEndings(value) {
+  return value.replace(/\r\n?/g, "\n");
+}
+
 function canonicalJsonValue(value, ancestors) {
   if (Array.isArray(value)) {
     assertNotCircular(value, ancestors);
@@ -273,6 +277,18 @@ export function proofReleasesVersion(proofVersion, seedVersion) {
     return false;
   }
   return proofVersion.replace(/-rc\.[1-9][0-9]*$/, "") === seedVersion;
+}
+
+export function seedReleasesForProof(
+  seedId,
+  proofVersion,
+  currentSeeds,
+  historicalReleases = [],
+) {
+  return [...currentSeeds, ...historicalReleases].filter(
+    (seed) =>
+      seed.id === seedId && proofReleasesVersion(proofVersion, seed.version),
+  );
 }
 
 export function releasedVersion(version) {
