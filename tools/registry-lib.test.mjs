@@ -4,11 +4,17 @@ import {
   assertRegistryDigest,
   canonicalJson,
   compiledRegistry,
+  normalizeTextLineEndings,
   parseJsonStrict,
   proofReleasesVersion,
   seedReleasesForProof,
   verifyRegistryDigest,
 } from "./registry-lib.mjs";
+
+test("deterministic text checks accept platform line endings", () => {
+  assert.equal(normalizeTextLineEndings("Dauva\r\nSeed\r"), "Dauva\nSeed\n");
+  assert.equal(normalizeTextLineEndings("Dauva\nSeed\n"), "Dauva\nSeed\n");
+});
 
 test("strict JSON parsing rejects duplicate object members at every depth", () => {
   assert.deepEqual(parseJsonStrict('{"safe":{"value":1}}'), {

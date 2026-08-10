@@ -45,6 +45,10 @@ export function canonicalJson(value) {
   return canonicalJsonValue(value, new Set());
 }
 
+export function normalizeTextLineEndings(value) {
+  return value.replace(/\r\n?/g, "\n");
+}
+
 function canonicalJsonValue(value, ancestors) {
   if (Array.isArray(value)) {
     assertNotCircular(value, ancestors);
