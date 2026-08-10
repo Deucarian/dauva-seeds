@@ -1,4 +1,4 @@
-name: Seed Studio publication foundation
+name: Seed Studio publication
 
 on:
   workflow_call:
@@ -26,45 +26,46 @@ permissions:
   contents: read
 
 jobs:
-  non-activating-preflight:
+  verify:
     environment: ${{ inputs.environment }}
-    runs-on: [self-hosted, Linux, X64, deucarian]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
-      - name: Check out trusted foundation from main
+      - name: Check out trusted publisher from protected main
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: main
           path: trusted
-      - name: Mask and validate the publication attempt correlation
-        id: publication-claim
-        env:
-          DAUVA_SEED_PUBLICATION_ATTEMPT_TOKEN: ${{ secrets.publication_attempt_token }}
-        shell: bash
-        run: |
-          echo "::add-mask::$DAUVA_SEED_PUBLICATION_ATTEMPT_TOKEN"
-          node trusted/tools/publication-claim-contract.mjs \
-            --publication-id "${{ inputs.publication_id }}" \
-            --publication-attempt "${{ inputs.publication_attempt }}" \
-            --run-id "$GITHUB_RUN_ID" \
-            --run-attempt "$GITHUB_RUN_ATTEMPT"
-      - name: Read repository and target protection
+          persist-credentials: false
+      - name: Use the pinned Node runtime
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: trusted/package-lock.json
+      - name: Install trusted publisher dependencies
+        working-directory: trusted
+        run: npm ci --ignore-scripts
+      - name: Read exact repository and target protection
         env:
           GH_TOKEN: ${{ github.token }}
           TARGET_REF: ${{ inputs.target_ref }}
         shell: bash
         run: |
+          set -euo pipefail
           test "${{ github.repository_id }}" = "1311366821"
           test "${{ github.repository }}" = "Deucarian/dauva-seeds"
           gh api "repos/${{ github.repository }}" > "$RUNNER_TEMP/repository.json"
           branch="${TARGET_REF#refs/heads/}"
-          gh api "repos/${{ github.repository }}/branches/$branch/protection" \
-            > "$RUNNER_TEMP/protection.json"
-      - name: Prove the foundation remains non-activating
+          gh api "repos/${{ github.repository }}/branches/$branch/protection" > "$RUNNER_TEMP/protection.json"
+      - name: Prove activation, target, review, and trust boundaries
         env:
           DAUVA_SEED_PUBLICATION_ACTIVATION: ${{ vars.DAUVA_SEED_PUBLICATION_ACTIVATION }}
         run: >-
           node trusted/tools/publication-preconditions.mjs
-          --phase foundation
+          --phase activation
           --environment "${{ inputs.environment }}"
           --target-ref "${{ inputs.target_ref }}"
           --api-origin "${{ inputs.api_origin }}"
@@ -72,3 +73,222 @@ jobs:
           --repository "$RUNNER_TEMP/repository.json"
           --protection "$RUNNER_TEMP/protection.json"
           --verification-roots trusted/trust/seed-studio-verification-roots.json
+      - name: Claim exact durable attempt and download immutable materials
+        id: claim
+        env:
+          DAUVA_SEED_PUBLICATION_ATTEMPT_TOKEN: ${{ secrets.publication_attempt_token }}
+        run: >-
+          node trusted/tools/publication-workflow-client.mjs claim
+          --publication-id "${{ inputs.publication_id }}"
+          --publication-attempt "${{ inputs.publication_attempt }}"
+          --environment "${{ inputs.environment }}"
+          --output-directory "$RUNNER_TEMP/materials"
+      - name: Check out the exact protected target
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.target_ref }}
+          path: target
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify bundle against target without mutation
+        id: verify-bundle
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          validation_time="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+          node trusted/tools/apply-release-bundle.mjs \
+            --archive "${{ steps.claim.outputs.archive-path }}" \
+            --statement "${{ steps.claim.outputs.statement-path }}" \
+            --repository "$GITHUB_WORKSPACE/target" \
+            --environment "${{ inputs.environment }}" \
+            --validation-time "$validation_time" \
+            --verification-roots "$GITHUB_WORKSPACE/trusted/trust/seed-studio-verification-roots.json" \
+            --verify-only
+      - name: Record verified bundle
+        if: steps.verify-bundle.outcome == 'success'
+        run: >-
+          node trusted/tools/publication-workflow-client.mjs event
+          --publication-id "${{ inputs.publication_id }}"
+          --environment "${{ inputs.environment }}"
+          --external-event-id "github.${{ github.run_id }}.${{ github.run_attempt }}.verify.succeeded"
+          --phase verifying_bundle --outcome succeeded
+          --code seed.publication.bundle.verified
+      - name: Record authoritative integrity failure
+        if: steps.verify-bundle.outcome != 'success'
+        run: >-
+          node trusted/tools/publication-workflow-client.mjs event
+          --publication-id "${{ inputs.publication_id }}"
+          --environment "${{ inputs.environment }}"
+          --external-event-id "github.${{ github.run_id }}.${{ github.run_attempt }}.verify.failed"
+          --phase verifying_bundle --outcome failed
+          --code seed.publication.integrity.failed
+      - name: Stop after failed verification
+        if: steps.verify-bundle.outcome != 'success'
+        run: exit 1
+
+  proposal:
+    needs: verify
+    environment: ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Check out trusted publisher from protected main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          path: trusted
+          persist-credentials: false
+      - name: Use the pinned Node runtime
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: trusted/package-lock.json
+      - name: Install trusted publisher dependencies
+        working-directory: trusted
+        run: npm ci --ignore-scripts
+      - name: Claim same durable attempt and material
+        id: claim
+        env:
+          DAUVA_SEED_PUBLICATION_ATTEMPT_TOKEN: ${{ secrets.publication_attempt_token }}
+        run: >-
+          node trusted/tools/publication-workflow-client.mjs claim
+          --publication-id "${{ inputs.publication_id }}"
+          --publication-attempt "${{ inputs.publication_attempt }}"
+          --environment "${{ inputs.environment }}"
+          --output-directory "$RUNNER_TEMP/materials"
+      - name: Check out exact target for transactional apply
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.target_ref }}
+          path: target
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Apply verified bundle transactionally
+        id: apply
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          validation_time="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+          node trusted/tools/apply-release-bundle.mjs \
+            --archive "${{ steps.claim.outputs.archive-path }}" \
+            --statement "${{ steps.claim.outputs.statement-path }}" \
+            --repository "$GITHUB_WORKSPACE/target" \
+            --environment "${{ inputs.environment }}" \
+            --validation-time "$validation_time" \
+            --verification-roots "$GITHUB_WORKSPACE/trusted/trust/seed-studio-verification-roots.json"
+      - name: Record apply failure
+        if: steps.apply.outcome != 'success'
+        run: >-
+          node trusted/tools/publication-workflow-client.mjs event
+          --publication-id "${{ inputs.publication_id }}"
+          --environment "${{ inputs.environment }}"
+          --external-event-id "github.${{ github.run_id }}.${{ github.run_attempt }}.apply.failed"
+          --phase verifying_bundle --outcome failed
+          --code seed.publication.integrity.failed
+      - name: Stop after failed apply
+        if: steps.apply.outcome != 'success'
+        run: exit 1
+      - name: Run complete Registry policy suite
+        id: policy
+        continue-on-error: true
+        working-directory: target
+        run: |
+          npm ci --ignore-scripts
+          npm run check
+      - name: Record policy failure
+        if: steps.policy.outcome != 'success'
+        run: >-
+          node trusted/tools/publication-workflow-client.mjs event
+          --publication-id "${{ inputs.publication_id }}"
+          --environment "${{ inputs.environment }}"
+          --external-event-id "github.${{ github.run_id }}.${{ github.run_attempt }}.policy.failed"
+          --phase checking --outcome failed
+          --code seed.publication.policy.failed
+      - name: Stop after failed policy
+        if: steps.policy.outcome != 'success'
+        run: exit 1
+      - name: Derive deterministic proposal identity
+        id: proposal
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import { appendFileSync, readFileSync } from 'node:fs';
+          const statement = JSON.parse(readFileSync(process.env.STATEMENT, 'utf8'));
+          const payload = statement.publicationPayload;
+          const digest = payload.exportDigest;
+          if (!/^sha256:[a-f0-9]{64}$/.test(digest)) throw new Error('Invalid export digest.');
+          appendFileSync(process.env.GITHUB_OUTPUT, `branch=automation/seed-publication/${process.env.ENVIRONMENT}/${digest.slice(7, 23)}\n`);
+          appendFileSync(process.env.GITHUB_OUTPUT, `created-at=${payload.createdAtUtc}\n`);
+          NODE
+        env:
+          STATEMENT: ${{ steps.claim.outputs.statement-path }}
+          ENVIRONMENT: ${{ inputs.environment }}
+      - name: Create narrow GitHub App token for proposal only
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          app-id: ${{ vars.DAUVA_SEED_PUBLISHER_APP_ID }}
+          private-key: ${{ secrets.DAUVA_SEED_PUBLISHER_APP_PRIVATE_KEY }}
+          owner: Deucarian
+          repositories: dauva-seeds
+      - name: Commit and push deterministic proposal branch
+        shell: bash
+        working-directory: target
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          BRANCH: ${{ steps.proposal.outputs.branch }}
+          CREATED_AT: ${{ steps.proposal.outputs.created-at }}
+        run: |
+          set -euo pipefail
+          git config user.name 'Dauva Seed Publisher'
+          git config user.email 'dauva-seed-publisher[bot]@users.noreply.github.com'
+          git add --all
+          git diff --cached --quiet && { echo 'No Registry change was produced.' >&2; exit 1; }
+          GIT_AUTHOR_DATE="$CREATED_AT" GIT_COMMITTER_DATE="$CREATED_AT" \
+            git commit -m "Publish Seed Registry ${{ inputs.publication_id }}"
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/Deucarian/dauva-seeds.git"
+          if git ls-remote --exit-code --heads origin "$BRANCH" > /dev/null 2>&1; then
+            git fetch origin "$BRANCH:refs/remotes/origin/publication-existing"
+            test "$(git rev-parse HEAD^{tree})" = "$(git rev-parse refs/remotes/origin/publication-existing^{tree})"
+            test "$(git rev-parse HEAD)" = "$(git rev-parse refs/remotes/origin/publication-existing)"
+          else
+            git push origin "HEAD:refs/heads/$BRANCH"
+          fi
+      - name: Open or resume the human-review proposal
+        shell: bash
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          BRANCH: ${{ steps.proposal.outputs.branch }}
+          BASE_BRANCH: ${{ inputs.target_ref }}
+        run: |
+          set -euo pipefail
+          base="${BASE_BRANCH#refs/heads/}"
+          marker='<!-- dauva-seed-publication:${{ inputs.publication_id }} -->'
+          existing="$(gh pr list --repo Deucarian/dauva-seeds --state all --head "$BRANCH" --base "$base" --json number,state,body --jq 'length')"
+          if [ "$existing" = 0 ]; then
+            gh pr create --repo Deucarian/dauva-seeds --head "$BRANCH" --base "$base" \
+              --title "Publish Seed Registry ${{ inputs.publication_id }}" \
+              --body "$marker
+
+          Generated from a cryptographically verified Dauva Seed Studio export. This proposal still requires the protected validation check and explicit human approval."
+          else
+            test "$existing" = 1
+            state="$(gh pr list --repo Deucarian/dauva-seeds --state all --head "$BRANCH" --base "$base" --json state --jq '.[0].state')"
+            body="$(gh pr list --repo Deucarian/dauva-seeds --state all --head "$BRANCH" --base "$base" --json body --jq '.[0].body')"
+            test "$state" = OPEN
+            grep -Fqx "$marker" <<< "$body"
+          fi
+      - name: Record review-ready proposal
+        run: >-
+          node trusted/tools/publication-workflow-client.mjs event
+          --publication-id "${{ inputs.publication_id }}"
+          --environment "${{ inputs.environment }}"
+          --external-event-id "github.${{ github.run_id }}.${{ github.run_attempt }}.review.ready"
+          --phase waiting_for_review --outcome succeeded
+          --code seed.publication.review.ready
