@@ -275,6 +275,18 @@ export function proofReleasesVersion(proofVersion, seedVersion) {
   return proofVersion.replace(/-rc\.[1-9][0-9]*$/, "") === seedVersion;
 }
 
+export function seedReleasesForProof(
+  seedId,
+  proofVersion,
+  currentSeeds,
+  historicalReleases = [],
+) {
+  return [...currentSeeds, ...historicalReleases].filter(
+    (seed) =>
+      seed.id === seedId && proofReleasesVersion(proofVersion, seed.version),
+  );
+}
+
 export function releasedVersion(version) {
   return version.replace(/-rc\.[1-9][0-9]*$/, "");
 }
