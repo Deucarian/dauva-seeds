@@ -3,6 +3,7 @@ import path from "node:path";
 import process from "node:process";
 import {
   compiledRegistry,
+  normalizeTextLineEndings,
   readManifestDirectory,
   repositoryRoot,
 } from "./registry-lib.mjs";
@@ -30,7 +31,7 @@ if (process.argv.includes("--check")) {
     console.error("dist/registry.json is missing; run npm run compile.");
     process.exitCode = 1;
   }
-  if (existing && existing !== rendered) {
+  if (existing && normalizeTextLineEndings(existing) !== rendered) {
     console.error("dist/registry.json is stale; run npm run compile.");
     process.exitCode = 1;
   }

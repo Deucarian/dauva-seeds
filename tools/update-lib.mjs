@@ -1,6 +1,7 @@
 import { spawnSync } from "node:child_process";
 
 const digestPattern = /^sha256:[a-f0-9]{64}$/;
+const registryRetryDelaysMs = [5_000, 20_000, 60_000];
 
 export function parsePinnedImage(image) {
   const separator = image.lastIndexOf("@");
@@ -178,7 +179,86 @@ export async function createUpdateReport(seedEntries, resolveDigest) {
   };
 }
 
-export function dockerDigestResolver(reference) {
+export async function dockerDigestResolver(
+  reference,
+  {
+    resolveDockerHub = dockerHubTagDigestResolver,
+    inspect = inspectDockerManifest,
+    sleep = (delayMs) => new Promise((resolve) => setTimeout(resolve, delayMs)),
+    retryDelaysMs = registryRetryDelaysMs,
+    onRetry = (delayMs) =>
+      console.warn(
+        `Registry lookup for '${reference}' was temporarily unavailable; retrying in ${delayMs} ms.`,
+      ),
+    onMetadataFallback = () =>
+      console.warn(
+        `Docker Hub tag metadata for '${reference}' was unavailable; falling back to OCI inspection.`,
+      ),
+  } = {},
+) {
+  try {
+    const dockerHubDigest = await resolveDockerHub(reference);
+    if (dockerHubDigest != null) {
+      if (!digestPattern.test(dockerHubDigest)) {
+        throw new Error(
+          `Docker Hub returned an invalid OCI digest for '${reference}'.`,
+        );
+      }
+      return dockerHubDigest;
+    }
+  } catch {
+    onMetadataFallback();
+  }
+
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      return await inspect(reference);
+    } catch (error) {
+      const retryDelay = retryDelaysMs[attempt];
+      if (retryDelay == null || !isTransientRegistryInspectionError(error)) {
+        throw error;
+      }
+      onRetry(retryDelay);
+      await sleep(retryDelay);
+    }
+  }
+}
+
+export async function dockerHubTagDigestResolver(
+  reference,
+  { request = globalThis.fetch } = {},
+) {
+  const { repository, tag } = parseUpdateReference(reference);
+  const dockerHubPrefix = "docker.io/";
+  if (!repository.startsWith(dockerHubPrefix)) {
+    return undefined;
+  }
+  let repositoryPath = repository.slice(dockerHubPrefix.length);
+  if (!repositoryPath.includes("/")) {
+    repositoryPath = `library/${repositoryPath}`;
+  }
+  const encodedRepository = repositoryPath
+    .split("/")
+    .map((segment) => encodeURIComponent(segment))
+    .join("/");
+  const url =
+    `https://hub.docker.com/v2/repositories/${encodedRepository}/tags/` +
+    encodeURIComponent(tag);
+  const response = await request(url, {
+    headers: { accept: "application/json" },
+    signal: AbortSignal.timeout(10_000),
+  });
+  if (!response.ok) {
+    throw new Error(`Docker Hub tag metadata returned HTTP ${response.status}.`);
+  }
+  const document = await response.json();
+  if (!digestPattern.test(document?.digest)) {
+    throw new Error("Docker Hub tag metadata contained no OCI digest.");
+  }
+  return document.digest;
+}
+
+function inspectDockerManifest(reference) {
   const result = spawnSync(
     "docker",
     [
@@ -216,6 +296,12 @@ export function dockerDigestResolver(reference) {
     throw new Error(`Docker returned no OCI digest for '${reference}'.`);
   }
   return manifest.digest;
+}
+
+function isTransientRegistryInspectionError(error) {
+  return /(?:\b429\b|too many requests|rate.?limit|temporar(?:y|ily)|timeout|timed out|connection (?:reset|refused|closed)|tls handshake|unexpected eof|\b5(?:00|02|03|04)\b)/i.test(
+    error instanceof Error ? error.message : String(error),
+  );
 }
 
 export function fixtureDigestResolver(fixture) {

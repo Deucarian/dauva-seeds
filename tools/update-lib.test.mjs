@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   createUpdateReport,
+  dockerDigestResolver,
+  dockerHubTagDigestResolver,
   fixtureDigestResolver,
   nextCandidateVersion,
   nextPatchVersion,
@@ -125,4 +127,106 @@ test("prepares a patch release candidate from a fresh report", () => {
   assert.equal(result.seed.components[0].image, availableImage);
   assert.deepEqual(result.updatedComponents, ["server"]);
   assert.equal(current.components[0].image, currentImage);
+});
+
+test("Docker registry lookup retries bounded temporary failures", async () => {
+  const attempts = [];
+  const delays = [];
+  const retries = [];
+  const digest = await dockerDigestResolver("docker.io/example/server:latest", {
+    resolveDockerHub: async () => undefined,
+    inspect: () => {
+      attempts.push(attempts.length + 1);
+      if (attempts.length === 1) {
+        throw new Error("429 Too Many Requests");
+      }
+      if (attempts.length === 2) {
+        throw new Error("503 Service Unavailable");
+      }
+      return digestB;
+    },
+    sleep: async (delayMs) => delays.push(delayMs),
+    onRetry: (delayMs) => retries.push(delayMs),
+  });
+
+  assert.equal(digest, digestB);
+  assert.deepEqual(attempts, [1, 2, 3]);
+  assert.deepEqual(delays, [5_000, 20_000]);
+  assert.deepEqual(retries, delays);
+});
+
+test("Docker registry lookup does not retry authoritative failures", async () => {
+  let attempts = 0;
+  await assert.rejects(
+    () =>
+      dockerDigestResolver("docker.io/example/server:missing", {
+        resolveDockerHub: async () => undefined,
+        inspect: () => {
+          attempts += 1;
+          throw new Error("manifest unknown");
+        },
+        sleep: async () => assert.fail("non-transient failure was retried"),
+        onRetry: () => assert.fail("non-transient failure was retried"),
+      }),
+    /manifest unknown/,
+  );
+  assert.equal(attempts, 1);
+});
+
+test("Docker Hub tag metadata resolves a public digest without a pull", async () => {
+  let requestedUrl;
+  const digest = await dockerHubTagDigestResolver(
+    "docker.io/example/server:stable channel",
+    {
+      request: async (url) => {
+        requestedUrl = url;
+        return {
+          ok: true,
+          json: async () => ({ digest: digestB }),
+        };
+      },
+    },
+  );
+
+  assert.equal(digest, digestB);
+  assert.equal(
+    requestedUrl,
+    "https://hub.docker.com/v2/repositories/example/server/tags/stable%20channel",
+  );
+});
+
+test("Docker digest lookup prefers Hub metadata and falls back safely", async () => {
+  let inspected = 0;
+  const fromMetadata = await dockerDigestResolver(
+    "docker.io/example/server:latest",
+    {
+      resolveDockerHub: async () => digestB,
+      inspect: () => {
+        inspected += 1;
+        return digestA;
+      },
+    },
+  );
+  assert.equal(fromMetadata, digestB);
+  assert.equal(inspected, 0);
+
+  let fallbacks = 0;
+  const fromInspect = await dockerDigestResolver(
+    "docker.io/example/server:latest",
+    {
+      resolveDockerHub: async () => {
+        throw new Error("metadata unavailable");
+      },
+      inspect: () => {
+        inspected += 1;
+        return digestA;
+      },
+      onMetadataFallback: () => {
+        fallbacks += 1;
+      },
+    },
+  );
+  assert.equal(fromInspect, digestA);
+  assert.equal(inspected, 1);
+  assert.equal(fallbacks, 1);
 });

@@ -55,14 +55,18 @@ jobs:
         run: |
           count="$(node -p "JSON.parse(require('fs').readFileSync(process.env.RUNNER_TEMP + '/seed-update-report.json')).updatesAvailable")"
           echo "count=$count" >> "$GITHUB_OUTPUT"
+      - name: Verify the stable Registry before preparing candidates
+        if: steps.updates.outputs.count != '0' && steps.updates.outputs.count != ''
+        run: npm run check
       - name: Prepare reviewable candidates
         if: steps.updates.outputs.count != '0' && steps.updates.outputs.count != ''
         run: |
           npm run updates:prepare -- \
             --report "$RUNNER_TEMP/seed-update-report.json" \
             --proof-plan "$RUNNER_TEMP/seed-proof-plan.json"
+          npm run validate
           npm run compile
-          npm run check
+          npm run compile -- --check
       - name: Publish candidate pull request
         if: steps.updates.outputs.count != '0' && steps.updates.outputs.count != ''
         run: |
