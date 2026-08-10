@@ -65,6 +65,7 @@ jobs:
             --report "$RUNNER_TEMP/seed-update-report.json" \
             --proof-plan "$RUNNER_TEMP/seed-proof-plan.json"
           npm run validate
+          npm run compile
           npm run compile -- --check
       - name: Publish candidate pull request
         if: steps.updates.outputs.count != '0' && steps.updates.outputs.count != ''

@@ -28,7 +28,15 @@ test("candidate validation does not rerun stable-fixture tests after mutation", 
 
   assert.match(candidateStep, /npm run updates:prepare/);
   assert.match(candidateStep, /npm run validate/);
+  assert.match(candidateStep, /npm run compile\r?\n/);
   assert.match(candidateStep, /npm run compile -- --check/);
   assert.doesNotMatch(candidateStep, /npm run check/);
-  assert.doesNotMatch(candidateStep, /npm run compile(?:\r?\n|$)/);
+
+  const prepare = candidateStep.indexOf("npm run updates:prepare");
+  const validate = candidateStep.indexOf("npm run validate");
+  const compile = candidateStep.search(/npm run compile\r?\n/);
+  const verify = candidateStep.indexOf("npm run compile -- --check");
+  assert.ok(prepare < validate);
+  assert.ok(validate < compile);
+  assert.ok(compile < verify);
 });
