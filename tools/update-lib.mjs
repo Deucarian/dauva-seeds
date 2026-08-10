@@ -1,6 +1,7 @@
 import { spawnSync } from "node:child_process";
 
 const digestPattern = /^sha256:[a-f0-9]{64}$/;
+const registryRetryDelaysMs = [5_000, 20_000, 60_000];
 
 export function parsePinnedImage(image) {
   const separator = image.lastIndexOf("@");
@@ -178,7 +179,33 @@ export async function createUpdateReport(seedEntries, resolveDigest) {
   };
 }
 
-export function dockerDigestResolver(reference) {
+export async function dockerDigestResolver(
+  reference,
+  {
+    inspect = inspectDockerManifest,
+    sleep = (delayMs) => new Promise((resolve) => setTimeout(resolve, delayMs)),
+    retryDelaysMs = registryRetryDelaysMs,
+    onRetry = (delayMs) =>
+      console.warn(
+        `Registry lookup for '${reference}' was temporarily unavailable; retrying in ${delayMs} ms.`,
+      ),
+  } = {},
+) {
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      return await inspect(reference);
+    } catch (error) {
+      const retryDelay = retryDelaysMs[attempt];
+      if (retryDelay == null || !isTransientRegistryInspectionError(error)) {
+        throw error;
+      }
+      onRetry(retryDelay);
+      await sleep(retryDelay);
+    }
+  }
+}
+
+function inspectDockerManifest(reference) {
   const result = spawnSync(
     "docker",
     [
@@ -216,6 +243,12 @@ export function dockerDigestResolver(reference) {
     throw new Error(`Docker returned no OCI digest for '${reference}'.`);
   }
   return manifest.digest;
+}
+
+function isTransientRegistryInspectionError(error) {
+  return /(?:\b429\b|too many requests|rate.?limit|temporar(?:y|ily)|timeout|timed out|connection (?:reset|refused|closed)|tls handshake|unexpected eof|\b5(?:00|02|03|04)\b)/i.test(
+    error instanceof Error ? error.message : String(error),
+  );
 }
 
 export function fixtureDigestResolver(fixture) {

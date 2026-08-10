@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   createUpdateReport,
+  dockerDigestResolver,
   fixtureDigestResolver,
   nextCandidateVersion,
   nextPatchVersion,
@@ -125,4 +126,46 @@ test("prepares a patch release candidate from a fresh report", () => {
   assert.equal(result.seed.components[0].image, availableImage);
   assert.deepEqual(result.updatedComponents, ["server"]);
   assert.equal(current.components[0].image, currentImage);
+});
+
+test("Docker registry lookup retries bounded temporary failures", async () => {
+  const attempts = [];
+  const delays = [];
+  const retries = [];
+  const digest = await dockerDigestResolver("docker.io/example/server:latest", {
+    inspect: () => {
+      attempts.push(attempts.length + 1);
+      if (attempts.length === 1) {
+        throw new Error("429 Too Many Requests");
+      }
+      if (attempts.length === 2) {
+        throw new Error("503 Service Unavailable");
+      }
+      return digestB;
+    },
+    sleep: async (delayMs) => delays.push(delayMs),
+    onRetry: (delayMs) => retries.push(delayMs),
+  });
+
+  assert.equal(digest, digestB);
+  assert.deepEqual(attempts, [1, 2, 3]);
+  assert.deepEqual(delays, [5_000, 20_000]);
+  assert.deepEqual(retries, delays);
+});
+
+test("Docker registry lookup does not retry authoritative failures", async () => {
+  let attempts = 0;
+  await assert.rejects(
+    () =>
+      dockerDigestResolver("docker.io/example/server:missing", {
+        inspect: () => {
+          attempts += 1;
+          throw new Error("manifest unknown");
+        },
+        sleep: async () => assert.fail("non-transient failure was retried"),
+        onRetry: () => assert.fail("non-transient failure was retried"),
+      }),
+    /manifest unknown/,
+  );
+  assert.equal(attempts, 1);
 });
