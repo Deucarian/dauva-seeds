@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Dauva internal Seed Studio API",
-    "version": "1.1.0",
-    "description": "Admin-only authoring, validation, proof orchestration, and deterministic export. There is no publish endpoint."
+    "version": "1.2.0",
+    "description": "Admin-only authoring, validation, proof orchestration, deterministic export, and durable submission to protected Git review. There is no direct stable-Registry mutation or merge endpoint."
   },
   "servers": [
     {
@@ -814,6 +814,185 @@
           }
         }
       }
+    },
+    "/exports/{exportId}/publications": {
+      "get": {
+        "operationId": "listSeedStudioPublicationsForExport",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ExportId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Durable publications created for this exact export.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicationPage"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      },
+      "post": {
+        "operationId": "createSeedStudioPublication",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ExportId"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/CsrfToken"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublicationCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "$ref": "#/components/responses/Publication"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/publications/{publicationId}": {
+      "get": {
+        "operationId": "getSeedStudioPublication",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PublicationId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Publication"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/publications/{publicationId}/events": {
+      "get": {
+        "operationId": "getSeedStudioPublicationEvents",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PublicationId"
+          },
+          {
+            "name": "afterSequence",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2147483647
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A bounded monotonic publication event page.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicationEventPage"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/publications/{publicationId}/resume": {
+      "post": {
+        "operationId": "resumeSeedStudioPublication",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PublicationId"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          },
+          {
+            "$ref": "#/components/parameters/CsrfToken"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublicationCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "$ref": "#/components/responses/Publication"
+          },
+          "403": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "404": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -852,6 +1031,14 @@
       },
       "ExportId": {
         "name": "exportId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "$ref": "#/components/schemas/Uuid"
+        }
+      },
+      "PublicationId": {
+        "name": "publicationId",
         "in": "path",
         "required": true,
         "schema": {
@@ -972,6 +1159,25 @@
           }
         }
       },
+      "Publication": {
+        "description": "Durable protected-review publication state.",
+        "headers": {
+          "Location": {
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^/api/admin/seed-studio/publications/[0-9a-f-]{36}$"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Publication"
+            }
+          }
+        }
+      },
       "Problem": {
         "description": "Localized-by-code problem without secret content.",
         "content": {
@@ -991,6 +1197,17 @@
       "Digest": {
         "type": "string",
         "pattern": "^sha256:[a-f0-9]{64}$"
+      },
+      "NullableGitObjectId": {
+        "oneOf": [
+          {
+            "type": "string",
+            "pattern": "^(?:[a-f0-9]{40}|[a-f0-9]{64})$"
+          },
+          {
+            "type": "null"
+          }
+        ]
       },
       "Timestamp": {
         "type": "string",
@@ -2029,6 +2246,285 @@
           }
         }
       },
+      "PublicationCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "maxProperties": 0
+      },
+      "PublicationFailure": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "recoverable",
+          "parameters"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$",
+            "maxLength": 128
+          },
+          "recoverable": {
+            "type": "boolean"
+          },
+          "parameters": {
+            "type": "array",
+            "maxItems": 16,
+            "items": {
+              "$ref": "#/components/schemas/LocalizedParameter"
+            }
+          }
+        }
+      },
+      "Publication": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "schemaVersion",
+          "publicationId",
+          "workspaceId",
+          "revisionId",
+          "exportId",
+          "environment",
+          "targetBranch",
+          "status",
+          "phase",
+          "attempt",
+          "lastEventSequence",
+          "acceptedAt",
+          "updatedAt",
+          "reviewUrl",
+          "mergeCommitSha",
+          "deployedCommitSha",
+          "deployedRegistryDigest",
+          "failure",
+          "completedAt"
+        ],
+        "properties": {
+          "schemaVersion": {
+            "const": "dauva.dev/seed-publication-state/v1"
+          },
+          "publicationId": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "workspaceId": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "revisionId": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "exportId": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "environment": {
+            "enum": [
+              "develop",
+              "production"
+            ]
+          },
+          "targetBranch": {
+            "enum": [
+              "develop",
+              "main"
+            ]
+          },
+          "status": {
+            "enum": [
+              "accepted",
+              "running",
+              "awaiting_review",
+              "registry_syncing",
+              "blocked",
+              "succeeded",
+              "failed",
+              "cancelled",
+              "expired"
+            ]
+          },
+          "phase": {
+            "enum": [
+              "dispatching",
+              "claiming",
+              "verifying_bundle",
+              "applying_bundle",
+              "checking",
+              "opening_review",
+              "waiting_for_review",
+              "merged",
+              "deploying_registry",
+              "verifying_registry",
+              "available"
+            ]
+          },
+          "attempt": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000
+          },
+          "lastEventSequence": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "acceptedAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "updatedAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "reviewUrl": {
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^https://github\\.com/Deucarian/dauva-seeds/pull/[1-9][0-9]*$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "mergeCommitSha": {
+            "$ref": "#/components/schemas/NullableGitObjectId"
+          },
+          "deployedCommitSha": {
+            "$ref": "#/components/schemas/NullableGitObjectId"
+          },
+          "deployedRegistryDigest": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Digest"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "failure": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PublicationFailure"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "completedAt": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Timestamp"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "environment": {
+                  "const": "develop"
+                }
+              },
+              "required": [
+                "environment"
+              ]
+            },
+            "then": {
+              "properties": {
+                "targetBranch": {
+                  "const": "develop"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "targetBranch": {
+                  "const": "main"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "PublicationPage": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 16,
+            "items": {
+              "$ref": "#/components/schemas/Publication"
+            }
+          }
+        }
+      },
+      "PublicationEvent": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sequence",
+          "code",
+          "parameters",
+          "occurredAt"
+        ],
+        "properties": {
+          "sequence": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "code": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$",
+            "maxLength": 128
+          },
+          "parameters": {
+            "type": "array",
+            "maxItems": 16,
+            "items": {
+              "$ref": "#/components/schemas/LocalizedParameter"
+            }
+          },
+          "occurredAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          }
+        }
+      },
+      "PublicationEventPage": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "items",
+          "lastSequence",
+          "hasMore"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 200,
+            "items": {
+              "$ref": "#/components/schemas/PublicationEvent"
+            }
+          },
+          "lastSequence": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2147483647
+          },
+          "hasMore": {
+            "type": "boolean"
+          }
+        }
+      },
       "EligibleLeaf": {
         "type": "object",
         "additionalProperties": false,
@@ -2104,6 +2600,10 @@
           "engineVersion",
           "policyVersion",
           "registryDigest",
+          "registryCommit",
+          "publicationEnabled",
+          "publicationEnvironment",
+          "publicationTargetBranch",
           "pods",
           "seeds",
           "eligibleProofLeaves"
@@ -2125,6 +2625,25 @@
           },
           "registryDigest": {
             "$ref": "#/components/schemas/Digest"
+          },
+          "registryCommit": {
+            "type": "string",
+            "pattern": "^(?:[a-f0-9]{40}|[a-f0-9]{64})$"
+          },
+          "publicationEnabled": {
+            "type": "boolean"
+          },
+          "publicationEnvironment": {
+            "enum": [
+              "develop",
+              "production"
+            ]
+          },
+          "publicationTargetBranch": {
+            "enum": [
+              "develop",
+              "main"
+            ]
           },
           "pods": {
             "type": "array",

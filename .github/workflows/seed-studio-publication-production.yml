@@ -1,0 +1,22 @@
+name: Seed Studio publication - Production
+
+on:
+  repository_dispatch:
+    types:
+      - dauva-seed-publication-production-v1
+
+permissions:
+  contents: read
+
+concurrency:
+  group: seed-publication-production-${{ github.event.client_payload.publication_id }}
+  cancel-in-progress: false
+
+jobs:
+  foundation:
+    uses: Deucarian/dauva-seeds/.github/workflows/_seed-studio-publication.yml@main
+    with:
+      publication_id: ${{ github.event.client_payload.publication_id }}
+      environment: production
+      target_ref: refs/heads/main
+      api_origin: https://jorishoef.nl

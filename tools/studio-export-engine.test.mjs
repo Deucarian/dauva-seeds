@@ -115,8 +115,8 @@ test("stable reproof export is deterministic and never rewrites stable manifests
     "package.json",
     `proofs/minecraft-paper-1.0.0-amd64-${receiptPayload.proofId}.json`,
   ]);
-  assert.equal(first.semanticVersions[0].from, "0.14.5");
-  assert.equal(first.semanticVersions[0].to, "0.14.6");
+  assert.equal(first.semanticVersions[0].from, "0.15.0");
+  assert.equal(first.semanticVersions[0].to, "0.15.1");
 
   await assert.rejects(
     () =>

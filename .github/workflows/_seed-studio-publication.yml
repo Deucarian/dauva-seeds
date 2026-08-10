@@ -1,0 +1,56 @@
+name: Seed Studio publication foundation
+
+on:
+  workflow_call:
+    inputs:
+      publication_id:
+        required: true
+        type: string
+      environment:
+        required: true
+        type: string
+      target_ref:
+        required: true
+        type: string
+      api_origin:
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  non-activating-preflight:
+    environment: ${{ inputs.environment }}
+    runs-on: [self-hosted, Linux, X64, deucarian]
+    steps:
+      - name: Check out trusted foundation from main
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.0.2
+        with:
+          ref: main
+          path: trusted
+      - name: Read repository and target protection
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_REF: ${{ inputs.target_ref }}
+        shell: bash
+        run: |
+          test "${{ github.repository_id }}" = "1311366821"
+          test "${{ github.repository }}" = "Deucarian/dauva-seeds"
+          gh api "repos/${{ github.repository }}" > "$RUNNER_TEMP/repository.json"
+          branch="${TARGET_REF#refs/heads/}"
+          gh api "repos/${{ github.repository }}/branches/$branch/protection" \
+            > "$RUNNER_TEMP/protection.json"
+      - name: Prove the foundation remains non-activating
+        env:
+          DAUVA_SEED_PUBLICATION_ACTIVATION: ${{ vars.DAUVA_SEED_PUBLICATION_ACTIVATION }}
+        run: >-
+          node trusted/tools/publication-preconditions.mjs
+          --phase foundation
+          --environment "${{ inputs.environment }}"
+          --target-ref "${{ inputs.target_ref }}"
+          --api-origin "${{ inputs.api_origin }}"
+          --activation "$DAUVA_SEED_PUBLICATION_ACTIVATION"
+          --repository "$RUNNER_TEMP/repository.json"
+          --protection "$RUNNER_TEMP/protection.json"
+          --verification-roots trusted/trust/seed-studio-verification-roots.json
