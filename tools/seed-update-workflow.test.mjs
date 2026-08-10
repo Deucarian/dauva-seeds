@@ -47,6 +47,14 @@ test("candidate validation does not rerun stable-fixture tests after mutation", 
 
 test("draft candidate pull requests prove the stable base without treating RCs as stable fixtures", async () => {
   const workflow = await readFile(validationWorkflowUrl, "utf8");
+  const ordinaryProfile = workflow.indexOf(
+    "reason=ordinary-or-reviewable-pull-request",
+  );
+  const trustedClassifier = workflow.indexOf(
+    "stable-base/tools/ci-validation-profile.mjs",
+  );
+  assert.ok(ordinaryProfile >= 0);
+  assert.ok(ordinaryProfile < trustedClassifier);
   assert.match(workflow, /stable-base\/tools\/ci-validation-profile\.mjs/);
   assert.match(
     workflow,
