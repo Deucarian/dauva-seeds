@@ -1,8 +1,8 @@
 {
   "schemaVersion": "dauva.dev/seed/v1",
   "id": "minecraft-fabric",
-  "version": "1.0.1-rc.1",
-  "status": "candidate",
+  "version": "1.0.0",
+  "status": "stable",
   "podId": "minecraft",
   "genres": [
     "sandbox",
@@ -40,7 +40,7 @@
     {
       "id": "server",
       "role": "primary",
-      "image": "ghcr.io/itzg/minecraft-server@sha256:e3335993929a1565f73c30b2041bcbc1473fc9c406fdd5a0d0ea24c08ef73320",
+      "image": "ghcr.io/itzg/minecraft-server@sha256:6ec1110e4d9236d00ae9436a3e4a5929583e5b19cc94b756a7c603f7cf647a77",
       "imageUpdate": {
         "reference": "ghcr.io/itzg/minecraft-server:stable"
       },
@@ -91,7 +91,7 @@
     {
       "id": "backups",
       "role": "companion",
-      "image": "ghcr.io/itzg/mc-backup@sha256:ae54d88d1a5dfbc185f1f94e50bb2e9b68484719013f4f21c573422dd4950f32",
+      "image": "ghcr.io/itzg/mc-backup@sha256:db2bca9a54aac96e8db74be038b920cb549c8e3b3384067251aad5e178dd03cc",
       "imageUpdate": {
         "reference": "ghcr.io/itzg/mc-backup:stable"
       },

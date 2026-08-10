@@ -1,8 +1,8 @@
 {
   "schemaVersion": "dauva.dev/seed/v1",
-  "id": "core-keeper-hard",
-  "version": "1.0.2-rc.1",
-  "status": "candidate",
+  "id": "core-keeper",
+  "version": "1.0.2",
+  "status": "stable",
   "podId": "core-keeper",
   "genres": [
     "adventure",
@@ -11,14 +11,14 @@
   ],
   "metadata": {
     "title": {
-      "en": "Core Keeper Hard",
-      "nl": "Core Keeper Hard",
-      "de": "Core Keeper Schwer"
+      "en": "Core Keeper Normal",
+      "nl": "Core Keeper Normal",
+      "de": "Core Keeper Normal"
     },
     "description": {
-      "en": "A Core Keeper Server that sprouts new worlds in Hard mode.",
-      "nl": "Een Core Keeper-Server die nieuwe werelden in de modus Hard ontkiemt.",
-      "de": "Ein Core-Keeper-Server, der neue Welten im schweren Modus startet."
+      "en": "A persistent Core Keeper Server that sprouts new worlds in Normal mode.",
+      "nl": "Een blijvende Core Keeper-Server die nieuwe werelden in de modus Normal ontkiemt.",
+      "de": "Ein persistenter Core-Keeper-Server, der neue Welten im normalen Modus startet."
     },
     "icon": "gem"
   },
@@ -40,7 +40,7 @@
     {
       "id": "server",
       "role": "primary",
-      "image": "docker.io/escaping/core-keeper-dedicated@sha256:87fa7925596264e1460cb6c7c128e9d39ac5445206e04e587993b5d4afa7c90f",
+      "image": "docker.io/escaping/core-keeper-dedicated@sha256:6531227708c06db6850731609e2df3e0940e63149395c743f12a0ce5f0c34ead",
       "imageUpdate": {
         "reference": "docker.io/escaping/core-keeper-dedicated:latest"
       },
@@ -49,7 +49,7 @@
         "MODS_ENABLED": "false",
         "TINI_KILL_PROCESS_GROUP": "1",
         "WORLD_INDEX": "0",
-        "WORLD_MODE": "1"
+        "WORLD_MODE": "0"
       },
       "optionEnvironment": {
         "max-players": "MAX_PLAYERS",

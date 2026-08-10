@@ -1,8 +1,8 @@
 {
   "schemaVersion": "dauva.dev/seed/v1",
-  "id": "enshrouded-wine",
-  "version": "1.0.1-rc.1",
-  "status": "candidate",
+  "id": "enshrouded",
+  "version": "1.0.0",
+  "status": "stable",
   "podId": "enshrouded",
   "genres": [
     "adventure",
@@ -11,14 +11,14 @@
   ],
   "metadata": {
     "title": {
-      "en": "Enshrouded Wine — Recommended",
-      "nl": "Enshrouded Wine — Aanbevolen",
-      "de": "Enshrouded Wine — Empfohlen"
+      "en": "Enshrouded Proton",
+      "nl": "Enshrouded Proton",
+      "de": "Enshrouded Proton"
     },
     "description": {
-      "en": "An Enshrouded Server on the maintained Wine runtime with scheduled local backups.",
-      "nl": "Een Enshrouded-Server op de onderhouden Wine-runtime met geplande lokale back-ups.",
-      "de": "Ein Enshrouded-Server auf der gepflegten Wine-Laufzeit mit geplanten lokalen Backups."
+      "en": "A Windows-through-Proton Enshrouded Server with persistent saves; cold starts revalidate the large game install.",
+      "nl": "Een Enshrouded-Server via Proton met blijvende saves; bij een koude start wordt de grote game-installatie opnieuw gecontroleerd.",
+      "de": "Ein Enshrouded-Server über Proton mit persistenten Spielständen; beim Kaltstart wird die große Spielinstallation erneut geprüft."
     },
     "icon": "flame"
   },
@@ -40,39 +40,27 @@
     {
       "id": "server",
       "role": "primary",
-      "image": "docker.io/mornedhels/enshrouded-server@sha256:6bd473b78e5331a0fc86553d9e9ddef5c712d7e9b356af385aa90e772f931019",
+      "image": "docker.io/sknnr/enshrouded-dedicated-server@sha256:45d8b62209fb60889068b3d679dd6d9af0e530516e46752a5f7c82a0bbb5366d",
       "imageUpdate": {
-        "reference": "docker.io/mornedhels/enshrouded-server:stable-wine"
+        "reference": "docker.io/sknnr/enshrouded-dedicated-server:latest"
       },
       "environment": {
-        "BACKUP_CRON": "0 */6 * * *",
-        "BACKUP_MAX_COUNT": "24",
-        "GAME_BRANCH": "public",
-        "PGID": "4711",
-        "PUID": "4711",
-        "SERVER_IP": "0.0.0.0",
-        "SERVER_ROLE_0_CAN_ACCESS_INVENTORIES": "true",
-        "SERVER_ROLE_0_CAN_EDIT_BASE": "true",
-        "SERVER_ROLE_0_CAN_EDIT_WORLD": "true",
-        "SERVER_ROLE_0_CAN_EXTEND_BASE": "true",
-        "SERVER_ROLE_0_CAN_KICK_BAN": "true",
-        "SERVER_ROLE_0_NAME": "Admins"
+        "SERVER_IP": "0.0.0.0"
       },
       "optionEnvironment": {
-        "server-slots": "SERVER_SLOT_COUNT"
+        "server-slots": "SERVER_SLOTS"
       },
       "agreementEnvironment": {},
       "secretEnvironment": {
-        "admin-password": "SERVER_ROLE_0_PASSWORD"
+        "admin-password": "SERVER_PASSWORD"
       },
       "runtimeEnvironment": {
-        "serverName": "SERVER_NAME",
-        "primaryPort": "SERVER_QUERYPORT"
+        "serverName": "SERVER_NAME"
       },
       "volumeMounts": [
         {
-          "volumeId": "data",
-          "target": "/opt/enshrouded",
+          "volumeId": "saves",
+          "target": "/home/steam/enshrouded/savegame",
           "readOnly": false
         }
       ],
@@ -85,11 +73,11 @@
   ],
   "volumes": [
     {
-      "id": "data",
-      "role": "data",
+      "id": "saves",
+      "role": "save",
       "retention": "delete-with-server",
-      "ownerUid": 4711,
-      "ownerGid": 4711,
+      "ownerUid": 10000,
+      "ownerGid": 10000,
       "directoryMode": "0750"
     }
   ],
@@ -106,7 +94,7 @@
       "purpose": "game",
       "primary": true,
       "sharedHostPort": true,
-      "environment": "SERVER_QUERYPORT"
+      "environment": "PORT"
     }
   ],
   "resources": {
@@ -196,7 +184,7 @@
     "stopTimeoutSeconds": 180
   },
   "capabilities": {
-    "backup": true,
+    "backup": false,
     "restore": false,
     "update": false,
     "console": false
@@ -220,13 +208,13 @@
     "estimatedDownloadMb": 9000,
     "estimatedInstallMb": 18000,
     "estimatedMutableMb": 12288,
-    "backupPolicy": "recommended"
+    "backupPolicy": "optional"
   },
   "updatePolicy": {
     "discovery": "oci-tag",
     "automaticCheck": true,
     "automaticInstall": false,
-    "requiresBackup": true,
+    "requiresBackup": false,
     "rollback": true
   },
   "proofPolicy": {
