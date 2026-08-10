@@ -1,8 +1,8 @@
 {
   "schemaVersion": "dauva.dev/seed/v1",
   "id": "factorio",
-  "version": "1.0.1",
-  "status": "stable",
+  "version": "1.0.2-rc.1",
+  "status": "candidate",
   "podId": "factorio",
   "genres": [
     "automation",
@@ -39,7 +39,7 @@
     {
       "id": "server",
       "role": "primary",
-      "image": "docker.io/factoriotools/factorio@sha256:f7942281d7d3a54fd7e5b1aca57428fce4f035aabdb1cb798473f7b78778fb49",
+      "image": "docker.io/factoriotools/factorio@sha256:fb7a13c5d2593e5196795eeb15338c1fbc54ec8eb4e3023ec004fa1de6d7f0b2",
       "imageUpdate": {
         "reference": "docker.io/factoriotools/factorio:latest"
       },

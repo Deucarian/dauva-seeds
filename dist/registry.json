@@ -180,8 +180,8 @@
     {
       "schemaVersion": "dauva.dev/seed/v1",
       "id": "core-keeper",
-      "version": "1.0.2",
-      "status": "stable",
+      "version": "1.0.3-rc.1",
+      "status": "candidate",
       "podId": "core-keeper",
       "genres": [
         "adventure",
@@ -219,7 +219,7 @@
         {
           "id": "server",
           "role": "primary",
-          "image": "docker.io/escaping/core-keeper-dedicated@sha256:6531227708c06db6850731609e2df3e0940e63149395c743f12a0ce5f0c34ead",
+          "image": "docker.io/escaping/core-keeper-dedicated@sha256:87fa7925596264e1460cb6c7c128e9d39ac5445206e04e587993b5d4afa7c90f",
           "imageUpdate": {
             "reference": "docker.io/escaping/core-keeper-dedicated:latest"
           },
@@ -455,16 +455,9 @@
         ],
         "expiresAfterDays": 90
       },
-      "manifestDigest": "sha256:5c6fd177d82c3038bb2baf67ea26d480202d089936cfc6b6c14d30ba497a2ac7",
+      "manifestDigest": "sha256:319ab1a455c72e03e12594f777d6c8a920c1b5200edfb5ab9b9a6b0ff6dfe73e",
       "proof": {
-        "state": "legacy",
-        "schemaVersion": "dauva.dev/seed-proof/v1",
-        "binding": "legacy-unverified",
-        "provedAt": "2026-07-30T23:21:43.9296733+00:00",
-        "expiresAt": "2026-10-28T23:21:43.929Z",
-        "leaf": "proof-core-keeper-102rc1",
-        "provedVersion": "1.0.2-rc.1",
-        "receiptDigest": "sha256:f496cf2adb1fcdb635150ec719980dba6ef93ad90fbe551d4054693cb5eb54ef",
+        "state": "unproven",
         "missingArchitectures": [
           "amd64"
         ]
@@ -473,8 +466,8 @@
     {
       "schemaVersion": "dauva.dev/seed/v1",
       "id": "core-keeper-hard",
-      "version": "1.0.1",
-      "status": "stable",
+      "version": "1.0.2-rc.1",
+      "status": "candidate",
       "podId": "core-keeper",
       "genres": [
         "adventure",
@@ -512,7 +505,7 @@
         {
           "id": "server",
           "role": "primary",
-          "image": "docker.io/escaping/core-keeper-dedicated@sha256:6531227708c06db6850731609e2df3e0940e63149395c743f12a0ce5f0c34ead",
+          "image": "docker.io/escaping/core-keeper-dedicated@sha256:87fa7925596264e1460cb6c7c128e9d39ac5445206e04e587993b5d4afa7c90f",
           "imageUpdate": {
             "reference": "docker.io/escaping/core-keeper-dedicated:latest"
           },
@@ -748,16 +741,9 @@
         ],
         "expiresAfterDays": 90
       },
-      "manifestDigest": "sha256:9a5cab3342cf3d17273483d340d7add91b5a4d28b3b856c2f06fc06615fafbbb",
+      "manifestDigest": "sha256:c97e9aa3ccdadc1f051f71b11b87d01fd932929f0b45f7718c2316dc36b035a2",
       "proof": {
-        "state": "legacy",
-        "schemaVersion": "dauva.dev/seed-proof/v1",
-        "binding": "legacy-unverified",
-        "provedAt": "2026-07-30T23:22:30.5074181+00:00",
-        "expiresAt": "2026-10-28T23:22:30.507Z",
-        "leaf": "proof-core-keeper-102rc1",
-        "provedVersion": "1.0.1-rc.1",
-        "receiptDigest": "sha256:07d83fca8200943dcc40f2544f9c39d6e36c2657014408bee5b1605c3f243195",
+        "state": "unproven",
         "missingArchitectures": [
           "amd64"
         ]
@@ -766,8 +752,8 @@
     {
       "schemaVersion": "dauva.dev/seed/v1",
       "id": "enshrouded",
-      "version": "1.0.0",
-      "status": "stable",
+      "version": "1.0.1-rc.1",
+      "status": "candidate",
       "podId": "enshrouded",
       "genres": [
         "adventure",
@@ -805,7 +791,7 @@
         {
           "id": "server",
           "role": "primary",
-          "image": "docker.io/sknnr/enshrouded-dedicated-server@sha256:45d8b62209fb60889068b3d679dd6d9af0e530516e46752a5f7c82a0bbb5366d",
+          "image": "docker.io/sknnr/enshrouded-dedicated-server@sha256:c410b742812cc55723cdaa97950f94cdef1b1f8a332bceedce13da9b681c98ee",
           "imageUpdate": {
             "reference": "docker.io/sknnr/enshrouded-dedicated-server:latest"
           },
@@ -995,16 +981,9 @@
         ],
         "expiresAfterDays": 90
       },
-      "manifestDigest": "sha256:bd635359b943fff47470430241a3626aa824dd5b4fd5045004e5e255c8dcac33",
+      "manifestDigest": "sha256:94db3257627b6d3f26f3e080b1b10f3b9bfbafbeaf20effe0cbc692470fabb93",
       "proof": {
-        "state": "legacy",
-        "schemaVersion": "dauva.dev/seed-proof/v1",
-        "binding": "legacy-unverified",
-        "provedAt": "2026-07-30T23:40:44.8566232+00:00",
-        "expiresAt": "2026-10-28T23:40:44.856Z",
-        "leaf": "primary-leaf",
-        "provedVersion": "1.0.0",
-        "receiptDigest": "sha256:52c734b3d7884f6f5a969a95c1770907269921364ffd41c5c1e310075b128248",
+        "state": "unproven",
         "missingArchitectures": [
           "amd64"
         ]
@@ -1013,8 +992,8 @@
     {
       "schemaVersion": "dauva.dev/seed/v1",
       "id": "enshrouded-wine",
-      "version": "1.0.0",
-      "status": "stable",
+      "version": "1.0.1-rc.1",
+      "status": "candidate",
       "podId": "enshrouded",
       "genres": [
         "adventure",
@@ -1052,7 +1031,7 @@
         {
           "id": "server",
           "role": "primary",
-          "image": "docker.io/mornedhels/enshrouded-server@sha256:6e7eb94c52a2bbd0aa3c462edf0412dbf8fbf181984d94199cc4adf42085bdda",
+          "image": "docker.io/mornedhels/enshrouded-server@sha256:6bd473b78e5331a0fc86553d9e9ddef5c712d7e9b356af385aa90e772f931019",
           "imageUpdate": {
             "reference": "docker.io/mornedhels/enshrouded-server:stable-wine"
           },
@@ -1254,16 +1233,9 @@
         ],
         "expiresAfterDays": 90
       },
-      "manifestDigest": "sha256:b95e8b6320df36563fbe8af5028144830143f18037d303c34d6ff617f1b46813",
+      "manifestDigest": "sha256:60f98c5b0e293974ac3bc6d1231b164dd34cd49465da3c6b2088673ac818919c",
       "proof": {
-        "state": "legacy",
-        "schemaVersion": "dauva.dev/seed-proof/v1",
-        "binding": "legacy-unverified",
-        "provedAt": "2026-07-30T23:26:07.8521358+00:00",
-        "expiresAt": "2026-10-28T23:26:07.852Z",
-        "leaf": "primary-leaf",
-        "provedVersion": "1.0.0",
-        "receiptDigest": "sha256:f1ab3d4ac2b881d1513120bb03af48262c4ed843e0baad7682a2a93b34d42061",
+        "state": "unproven",
         "missingArchitectures": [
           "amd64"
         ]
@@ -1272,8 +1244,8 @@
     {
       "schemaVersion": "dauva.dev/seed/v1",
       "id": "factorio",
-      "version": "1.0.1",
-      "status": "stable",
+      "version": "1.0.2-rc.1",
+      "status": "candidate",
       "podId": "factorio",
       "genres": [
         "automation",
@@ -1310,7 +1282,7 @@
         {
           "id": "server",
           "role": "primary",
-          "image": "docker.io/factoriotools/factorio@sha256:f7942281d7d3a54fd7e5b1aca57428fce4f035aabdb1cb798473f7b78778fb49",
+          "image": "docker.io/factoriotools/factorio@sha256:fb7a13c5d2593e5196795eeb15338c1fbc54ec8eb4e3023ec004fa1de6d7f0b2",
           "imageUpdate": {
             "reference": "docker.io/factoriotools/factorio:latest"
           },
@@ -1494,16 +1466,9 @@
         ],
         "expiresAfterDays": 90
       },
-      "manifestDigest": "sha256:08f45c8a532550030a3e579fb535f8fa43103f270aaafb0dca4637e8d4121148",
+      "manifestDigest": "sha256:e0530945cbe4f6741ff75ca228fb0738978415781304af11ee9683c62efc1b56",
       "proof": {
-        "state": "legacy",
-        "schemaVersion": "dauva.dev/seed-proof/v1",
-        "binding": "legacy-unverified",
-        "provedAt": "2026-07-30T23:24:57.2534464+00:00",
-        "expiresAt": "2026-10-28T23:24:57.253Z",
-        "leaf": "primary-leaf",
-        "provedVersion": "1.0.1",
-        "receiptDigest": "sha256:7aea326026c2945bf0512043b4fbf303258782fc3f26cec87b01d8acb2d8643c",
+        "state": "unproven",
         "missingArchitectures": [
           "amd64"
         ]
@@ -1512,8 +1477,8 @@
     {
       "schemaVersion": "dauva.dev/seed/v1",
       "id": "factorio-stable",
-      "version": "1.0.0",
-      "status": "stable",
+      "version": "1.0.1-rc.1",
+      "status": "candidate",
       "podId": "factorio",
       "genres": [
         "automation",
@@ -1550,7 +1515,7 @@
         {
           "id": "server",
           "role": "primary",
-          "image": "docker.io/factoriotools/factorio@sha256:7052b3cca8ca7790f99f4058617d5c8089df544de736b1baa23f2c5f58fb7f48",
+          "image": "docker.io/factoriotools/factorio@sha256:c21d798e75a8333ddca2f7029290325b3f2085841c72ab31cc64f7a916872841",
           "imageUpdate": {
             "reference": "docker.io/factoriotools/factorio:stable"
           },
@@ -1734,7 +1699,7 @@
         ],
         "expiresAfterDays": 90
       },
-      "manifestDigest": "sha256:70801c5a046173ad2c151c041a6a26bf5faa8f4678f2107c4dbdd2f504c249b1",
+      "manifestDigest": "sha256:b2b4a58e190af8bd25a1aeac6d6b4f47c409b46aa94ac65b6a67bd36a83e4c59",
       "proof": {
         "state": "unproven",
         "missingArchitectures": [
@@ -1745,8 +1710,8 @@
     {
       "schemaVersion": "dauva.dev/seed/v1",
       "id": "garrys-mod-construct",
-      "version": "1.0.0",
-      "status": "stable",
+      "version": "1.0.1-rc.1",
+      "status": "candidate",
       "podId": "garrys-mod",
       "genres": [
         "sandbox"
@@ -1783,7 +1748,7 @@
         {
           "id": "server",
           "role": "primary",
-          "image": "docker.io/ceifa/garrysmod@sha256:08628a0c98cb545d56006294d86f02a64cd77f344ff4bc114e0a324045905841",
+          "image": "docker.io/ceifa/garrysmod@sha256:e3494a218ee06e82ea7d80fcf7530a22fd833a6720f81b70e05b8e18d12b933c",
           "imageUpdate": {
             "reference": "docker.io/ceifa/garrysmod:ubuntu"
           },
@@ -2000,16 +1965,9 @@
         ],
         "expiresAfterDays": 90
       },
-      "manifestDigest": "sha256:1dd52a967be771169f45879328a2c2d653e295d845af93d1e39d8a2a9f2cb2aa",
+      "manifestDigest": "sha256:3f5ba18691f876c4245c425fb3d5b2048ae9ac3902de4e57887bfe9108dede95",
       "proof": {
-        "state": "legacy",
-        "schemaVersion": "dauva.dev/seed-proof/v1",
-        "binding": "legacy-unverified",
-        "provedAt": "2026-07-26T01:26:39.2596794+00:00",
-        "expiresAt": "2026-10-24T01:26:39.259Z",
-        "leaf": "j-hoef-debian-proof",
-        "provedVersion": "1.0.0-rc.1",
-        "receiptDigest": "sha256:79051b219dbb15fe2a1994b37488252e094ef144697a1284b1c20f84a21f5940",
+        "state": "unproven",
         "missingArchitectures": [
           "amd64"
         ]
@@ -2018,8 +1976,8 @@
     {
       "schemaVersion": "dauva.dev/seed/v1",
       "id": "garrys-mod-flatgrass",
-      "version": "1.0.0",
-      "status": "stable",
+      "version": "1.0.1-rc.1",
+      "status": "candidate",
       "podId": "garrys-mod",
       "genres": [
         "sandbox"
@@ -2056,7 +2014,7 @@
         {
           "id": "server",
           "role": "primary",
-          "image": "docker.io/ceifa/garrysmod@sha256:08628a0c98cb545d56006294d86f02a64cd77f344ff4bc114e0a324045905841",
+          "image": "docker.io/ceifa/garrysmod@sha256:e3494a218ee06e82ea7d80fcf7530a22fd833a6720f81b70e05b8e18d12b933c",
           "imageUpdate": {
             "reference": "docker.io/ceifa/garrysmod:ubuntu"
           },
@@ -2273,16 +2231,9 @@
         ],
         "expiresAfterDays": 90
       },
-      "manifestDigest": "sha256:d92b50b953a8f0f9018e349b70a8ff05460cfd61efa69b55c9f761a0879e001f",
+      "manifestDigest": "sha256:43fc500714dd465e5e3275353f5c83a1fea94a1ec161cb365970c73870a10949",
       "proof": {
-        "state": "legacy",
-        "schemaVersion": "dauva.dev/seed-proof/v1",
-        "binding": "legacy-unverified",
-        "provedAt": "2026-07-26T01:39:05.3043617+00:00",
-        "expiresAt": "2026-10-24T01:39:05.304Z",
-        "leaf": "j-hoef-debian-proof",
-        "provedVersion": "1.0.0-rc.1",
-        "receiptDigest": "sha256:ccdb57b8b07ef48f005ed3b77f8413bbb3c55227c4b77b21afb32707e2c01a29",
+        "state": "unproven",
         "missingArchitectures": [
           "amd64"
         ]
@@ -2291,8 +2242,8 @@
     {
       "schemaVersion": "dauva.dev/seed/v1",
       "id": "minecraft-fabric",
-      "version": "1.0.0",
-      "status": "stable",
+      "version": "1.0.1-rc.1",
+      "status": "candidate",
       "podId": "minecraft",
       "genres": [
         "sandbox",
@@ -2330,7 +2281,7 @@
         {
           "id": "server",
           "role": "primary",
-          "image": "ghcr.io/itzg/minecraft-server@sha256:6ec1110e4d9236d00ae9436a3e4a5929583e5b19cc94b756a7c603f7cf647a77",
+          "image": "ghcr.io/itzg/minecraft-server@sha256:e3335993929a1565f73c30b2041bcbc1473fc9c406fdd5a0d0ea24c08ef73320",
           "imageUpdate": {
             "reference": "ghcr.io/itzg/minecraft-server:stable"
           },
@@ -2381,7 +2332,7 @@
         {
           "id": "backups",
           "role": "companion",
-          "image": "ghcr.io/itzg/mc-backup@sha256:db2bca9a54aac96e8db74be038b920cb549c8e3b3384067251aad5e178dd03cc",
+          "image": "ghcr.io/itzg/mc-backup@sha256:ae54d88d1a5dfbc185f1f94e50bb2e9b68484719013f4f21c573422dd4950f32",
           "imageUpdate": {
             "reference": "ghcr.io/itzg/mc-backup:stable"
           },
@@ -2712,7 +2663,7 @@
         ],
         "expiresAfterDays": 90
       },
-      "manifestDigest": "sha256:6ebbd77db5dee22c6b428f256aeb88635f06a33b1f125bb83f467d6e6c0ae94d",
+      "manifestDigest": "sha256:29e58c4c115c1c90141defc2f91a62d3cf6ae9ff02a53c81e8e52357a056579b",
       "proof": {
         "state": "unproven",
         "missingArchitectures": [
@@ -2723,8 +2674,8 @@
     {
       "schemaVersion": "dauva.dev/seed/v1",
       "id": "minecraft-paper",
-      "version": "1.0.0",
-      "status": "stable",
+      "version": "1.0.1-rc.1",
+      "status": "candidate",
       "podId": "minecraft",
       "genres": [
         "sandbox",
@@ -2762,7 +2713,7 @@
         {
           "id": "server",
           "role": "primary",
-          "image": "ghcr.io/itzg/minecraft-server@sha256:6ec1110e4d9236d00ae9436a3e4a5929583e5b19cc94b756a7c603f7cf647a77",
+          "image": "ghcr.io/itzg/minecraft-server@sha256:e3335993929a1565f73c30b2041bcbc1473fc9c406fdd5a0d0ea24c08ef73320",
           "imageUpdate": {
             "reference": "ghcr.io/itzg/minecraft-server:stable"
           },
@@ -2813,7 +2764,7 @@
         {
           "id": "backups",
           "role": "companion",
-          "image": "ghcr.io/itzg/mc-backup@sha256:db2bca9a54aac96e8db74be038b920cb549c8e3b3384067251aad5e178dd03cc",
+          "image": "ghcr.io/itzg/mc-backup@sha256:ae54d88d1a5dfbc185f1f94e50bb2e9b68484719013f4f21c573422dd4950f32",
           "imageUpdate": {
             "reference": "ghcr.io/itzg/mc-backup:stable"
           },
@@ -3144,16 +3095,9 @@
         ],
         "expiresAfterDays": 90
       },
-      "manifestDigest": "sha256:31e06e591bfa4afb6f6f11ad3f02dab1bfbd4c80255bdda3aa9b333cac3d40fb",
+      "manifestDigest": "sha256:c1a8b4791ab9a637a56a0a09d6b8a79bb15a26070f7e1dd6b3fe53d84c73f151",
       "proof": {
-        "state": "legacy",
-        "schemaVersion": "dauva.dev/seed-proof/v1",
-        "binding": "legacy-unverified",
-        "provedAt": "2026-07-26T00:45:48+02:00",
-        "expiresAt": "2026-10-23T22:45:48.000Z",
-        "leaf": "j-hoef-debian",
-        "provedVersion": "1.0.0",
-        "receiptDigest": "sha256:a13066bf8448e1ccbda8a3d390c34a9688166566b6ec14cdd17fa0a6e9b5849e",
+        "state": "unproven",
         "missingArchitectures": [
           "amd64"
         ]
@@ -5640,6 +5584,2932 @@
   "releases": [
     {
       "schemaVersion": "dauva.dev/seed/v1",
+      "id": "core-keeper-hard",
+      "version": "1.0.1",
+      "status": "stable",
+      "podId": "core-keeper",
+      "genres": [
+        "adventure",
+        "sandbox",
+        "survival"
+      ],
+      "metadata": {
+        "title": {
+          "en": "Core Keeper Hard",
+          "nl": "Core Keeper Hard",
+          "de": "Core Keeper Schwer"
+        },
+        "description": {
+          "en": "A Core Keeper Server that sprouts new worlds in Hard mode.",
+          "nl": "Een Core Keeper-Server die nieuwe werelden in de modus Hard ontkiemt.",
+          "de": "Ein Core-Keeper-Server, der neue Welten im schweren Modus startet."
+        },
+        "icon": "gem"
+      },
+      "compatibility": {
+        "operatingSystems": [
+          "linux"
+        ],
+        "architectures": [
+          "amd64"
+        ],
+        "leafCapabilities": [
+          "dynamic-ports",
+          "oci",
+          "persistent-storage",
+          "resource-limits"
+        ]
+      },
+      "components": [
+        {
+          "id": "server",
+          "role": "primary",
+          "image": "docker.io/escaping/core-keeper-dedicated@sha256:6531227708c06db6850731609e2df3e0940e63149395c743f12a0ce5f0c34ead",
+          "imageUpdate": {
+            "reference": "docker.io/escaping/core-keeper-dedicated:latest"
+          },
+          "stopSignal": "SIGINT",
+          "environment": {
+            "MODS_ENABLED": "false",
+            "TINI_KILL_PROCESS_GROUP": "1",
+            "WORLD_INDEX": "0",
+            "WORLD_MODE": "1"
+          },
+          "optionEnvironment": {
+            "max-players": "MAX_PLAYERS",
+            "world-name": "WORLD_NAME",
+            "world-seed": "WORLD_SEED"
+          },
+          "agreementEnvironment": {},
+          "secretEnvironment": {
+            "server-password": "PASSWORD"
+          },
+          "runtimeEnvironment": {},
+          "volumeMounts": [
+            {
+              "volumeId": "data",
+              "target": "/home/steam/core-keeper-data",
+              "readOnly": false
+            },
+            {
+              "volumeId": "game",
+              "target": "/home/steam/core-keeper-dedicated",
+              "readOnly": false
+            }
+          ],
+          "dependsOn": [],
+          "health": {
+            "source": "running",
+            "startupGraceSeconds": 900
+          }
+        }
+      ],
+      "volumes": [
+        {
+          "id": "data",
+          "role": "data",
+          "retention": "delete-with-server"
+        },
+        {
+          "id": "game",
+          "role": "cache",
+          "retention": "disposable"
+        }
+      ],
+      "ports": [
+        {
+          "id": "game",
+          "componentId": "server",
+          "containerPort": 28080,
+          "containerPortMode": "allocated",
+          "protocols": [
+            "udp"
+          ],
+          "exposure": "public",
+          "purpose": "game",
+          "primary": true,
+          "sharedHostPort": true,
+          "environment": "SERVER_PORT"
+        }
+      ],
+      "resources": {
+        "defaultPresetId": "balanced",
+        "presets": [
+          {
+            "id": "balanced",
+            "title": {
+              "en": "Balanced",
+              "nl": "Gebalanceerd",
+              "de": "Ausgewogen"
+            },
+            "description": {
+              "en": "Recommended starting resources for a small group.",
+              "nl": "Aanbevolen startresources voor een kleine groep.",
+              "de": "Empfohlene Startressourcen für eine kleine Gruppe."
+            },
+            "memoryMb": 3072,
+            "diskMb": 12288,
+            "cpuPercent": 150
+          }
+        ]
+      },
+      "inputs": [
+        {
+          "key": "accept-steam-agreement",
+          "type": "agreement",
+          "label": {
+            "en": "Steam Subscriber Agreement",
+            "nl": "Steam Subscriber Agreement",
+            "de": "Steam-Nutzungsvertrag"
+          },
+          "help": {
+            "en": "I have read and accept the Steam Subscriber Agreement and the applicable Core Keeper terms.",
+            "nl": "Ik heb de Steam Subscriber Agreement en de toepasselijke Core Keeper-voorwaarden gelezen en accepteer deze.",
+            "de": "Ich habe den Steam-Nutzungsvertrag und die anwendbaren Core-Keeper-Bedingungen gelesen und akzeptiert."
+          },
+          "required": true,
+          "defaultValue": "false",
+          "url": "https://store.steampowered.com/subscriber_agreement/",
+          "revision": "official-current"
+        },
+        {
+          "key": "world-name",
+          "type": "string",
+          "label": {
+            "en": "World name",
+            "nl": "Wereldnaam",
+            "de": "Weltname"
+          },
+          "help": {
+            "en": "Name of the persistent world.",
+            "nl": "Naam van de blijvende wereld.",
+            "de": "Name der persistenten Welt."
+          },
+          "required": true,
+          "defaultValue": "Dauva",
+          "minLength": 3,
+          "maxLength": 64
+        },
+        {
+          "key": "world-seed",
+          "type": "string",
+          "label": {
+            "en": "World seed",
+            "nl": "World seed",
+            "de": "Welt-Seed"
+          },
+          "help": {
+            "en": "Optional deterministic world seed.",
+            "nl": "Optionele vaste seed voor de wereldgeneratie.",
+            "de": "Optionaler deterministischer Seed für die Weltgenerierung."
+          },
+          "required": false,
+          "defaultValue": "",
+          "maxLength": 64
+        },
+        {
+          "key": "max-players",
+          "type": "integer",
+          "label": {
+            "en": "Maximum players",
+            "nl": "Maximumaantal spelers",
+            "de": "Maximale Spielerzahl"
+          },
+          "help": {
+            "en": "Maximum simultaneous players.",
+            "nl": "Maximaal aantal gelijktijdige spelers.",
+            "de": "Maximale Anzahl gleichzeitiger Spieler."
+          },
+          "required": true,
+          "defaultValue": "8",
+          "minLength": 1,
+          "maxLength": 2
+        }
+      ],
+      "secrets": [
+        {
+          "key": "server-password",
+          "source": "admin",
+          "label": {
+            "en": "Server password",
+            "nl": "Serverwachtwoord",
+            "de": "Serverpasswort"
+          },
+          "help": {
+            "en": "Used for direct connections and never stored in the Dauva Server record.",
+            "nl": "Wordt gebruikt voor directe verbindingen en nooit opgeslagen in het Dauva Server-record.",
+            "de": "Wird für Direktverbindungen verwendet und nie im Dauva-Server-Datensatz gespeichert."
+          },
+          "minLength": 5,
+          "maxLength": 128
+        }
+      ],
+      "lifecycle": {
+        "startOrder": [
+          "server"
+        ],
+        "stopOrder": [
+          "server"
+        ],
+        "stopTimeoutSeconds": 120
+      },
+      "capabilities": {
+        "backup": false,
+        "restore": false,
+        "update": false,
+        "console": false
+      },
+      "source": {
+        "kind": "oci",
+        "homepage": "https://corekeepergame.com/",
+        "repository": "https://hub.docker.com/r/escaping/core-keeper-dedicated",
+        "imageRegistries": [
+          "docker.io"
+        ]
+      },
+      "trust": {
+        "level": "curated",
+        "reviewedAt": "2026-07-26",
+        "mutableRuntimeImagesAllowed": false
+      },
+      "storage": {
+        "class": "bulk",
+        "backupClass": "backup",
+        "estimatedDownloadMb": 1200,
+        "estimatedInstallMb": 5000,
+        "estimatedMutableMb": 8192,
+        "backupPolicy": "optional"
+      },
+      "updatePolicy": {
+        "discovery": "oci-tag",
+        "automaticCheck": true,
+        "automaticInstall": false,
+        "requiresBackup": false,
+        "rollback": true
+      },
+      "proofPolicy": {
+        "requiredChecks": [
+          "images-pinned",
+          "healthy",
+          "ports",
+          "backup-if-supported",
+          "graceful-stop",
+          "restart",
+          "persistence",
+          "cleanup"
+        ],
+        "expiresAfterDays": 90
+      },
+      "manifestDigest": "sha256:9a5cab3342cf3d17273483d340d7add91b5a4d28b3b856c2f06fc06615fafbbb",
+      "proof": {
+        "state": "unproven",
+        "missingArchitectures": [
+          "amd64"
+        ]
+      }
+    },
+    {
+      "schemaVersion": "dauva.dev/seed/v1",
+      "id": "core-keeper",
+      "version": "1.0.2",
+      "status": "stable",
+      "podId": "core-keeper",
+      "genres": [
+        "adventure",
+        "sandbox",
+        "survival"
+      ],
+      "metadata": {
+        "title": {
+          "en": "Core Keeper Normal",
+          "nl": "Core Keeper Normal",
+          "de": "Core Keeper Normal"
+        },
+        "description": {
+          "en": "A persistent Core Keeper Server that sprouts new worlds in Normal mode.",
+          "nl": "Een blijvende Core Keeper-Server die nieuwe werelden in de modus Normal ontkiemt.",
+          "de": "Ein persistenter Core-Keeper-Server, der neue Welten im normalen Modus startet."
+        },
+        "icon": "gem"
+      },
+      "compatibility": {
+        "operatingSystems": [
+          "linux"
+        ],
+        "architectures": [
+          "amd64"
+        ],
+        "leafCapabilities": [
+          "dynamic-ports",
+          "oci",
+          "persistent-storage",
+          "resource-limits"
+        ]
+      },
+      "components": [
+        {
+          "id": "server",
+          "role": "primary",
+          "image": "docker.io/escaping/core-keeper-dedicated@sha256:6531227708c06db6850731609e2df3e0940e63149395c743f12a0ce5f0c34ead",
+          "imageUpdate": {
+            "reference": "docker.io/escaping/core-keeper-dedicated:latest"
+          },
+          "stopSignal": "SIGINT",
+          "environment": {
+            "MODS_ENABLED": "false",
+            "TINI_KILL_PROCESS_GROUP": "1",
+            "WORLD_INDEX": "0",
+            "WORLD_MODE": "0"
+          },
+          "optionEnvironment": {
+            "max-players": "MAX_PLAYERS",
+            "world-name": "WORLD_NAME",
+            "world-seed": "WORLD_SEED"
+          },
+          "agreementEnvironment": {},
+          "secretEnvironment": {
+            "server-password": "PASSWORD"
+          },
+          "runtimeEnvironment": {},
+          "volumeMounts": [
+            {
+              "volumeId": "data",
+              "target": "/home/steam/core-keeper-data",
+              "readOnly": false
+            },
+            {
+              "volumeId": "game",
+              "target": "/home/steam/core-keeper-dedicated",
+              "readOnly": false
+            }
+          ],
+          "dependsOn": [],
+          "health": {
+            "source": "running",
+            "startupGraceSeconds": 900
+          }
+        }
+      ],
+      "volumes": [
+        {
+          "id": "data",
+          "role": "data",
+          "retention": "delete-with-server"
+        },
+        {
+          "id": "game",
+          "role": "cache",
+          "retention": "disposable"
+        }
+      ],
+      "ports": [
+        {
+          "id": "game",
+          "componentId": "server",
+          "containerPort": 28080,
+          "containerPortMode": "allocated",
+          "protocols": [
+            "udp"
+          ],
+          "exposure": "public",
+          "purpose": "game",
+          "primary": true,
+          "sharedHostPort": true,
+          "environment": "SERVER_PORT"
+        }
+      ],
+      "resources": {
+        "defaultPresetId": "balanced",
+        "presets": [
+          {
+            "id": "balanced",
+            "title": {
+              "en": "Balanced",
+              "nl": "Gebalanceerd",
+              "de": "Ausgewogen"
+            },
+            "description": {
+              "en": "Recommended starting resources for a small group.",
+              "nl": "Aanbevolen startresources voor een kleine groep.",
+              "de": "Empfohlene Startressourcen für eine kleine Gruppe."
+            },
+            "memoryMb": 3072,
+            "diskMb": 12288,
+            "cpuPercent": 150
+          }
+        ]
+      },
+      "inputs": [
+        {
+          "key": "accept-steam-agreement",
+          "type": "agreement",
+          "label": {
+            "en": "Steam Subscriber Agreement",
+            "nl": "Steam Subscriber Agreement",
+            "de": "Steam-Nutzungsvertrag"
+          },
+          "help": {
+            "en": "I have read and accept the Steam Subscriber Agreement and the applicable Core Keeper terms.",
+            "nl": "Ik heb de Steam Subscriber Agreement en de toepasselijke Core Keeper-voorwaarden gelezen en accepteer deze.",
+            "de": "Ich habe den Steam-Nutzungsvertrag und die anwendbaren Core-Keeper-Bedingungen gelesen und akzeptiert."
+          },
+          "required": true,
+          "defaultValue": "false",
+          "url": "https://store.steampowered.com/subscriber_agreement/",
+          "revision": "official-current"
+        },
+        {
+          "key": "world-name",
+          "type": "string",
+          "label": {
+            "en": "World name",
+            "nl": "Wereldnaam",
+            "de": "Weltname"
+          },
+          "help": {
+            "en": "Name of the persistent world.",
+            "nl": "Naam van de blijvende wereld.",
+            "de": "Name der persistenten Welt."
+          },
+          "required": true,
+          "defaultValue": "Dauva",
+          "minLength": 3,
+          "maxLength": 64
+        },
+        {
+          "key": "world-seed",
+          "type": "string",
+          "label": {
+            "en": "World seed",
+            "nl": "World seed",
+            "de": "Welt-Seed"
+          },
+          "help": {
+            "en": "Optional deterministic world seed.",
+            "nl": "Optionele vaste seed voor de wereldgeneratie.",
+            "de": "Optionaler deterministischer Seed für die Weltgenerierung."
+          },
+          "required": false,
+          "defaultValue": "",
+          "maxLength": 64
+        },
+        {
+          "key": "max-players",
+          "type": "integer",
+          "label": {
+            "en": "Maximum players",
+            "nl": "Maximumaantal spelers",
+            "de": "Maximale Spielerzahl"
+          },
+          "help": {
+            "en": "Maximum simultaneous players.",
+            "nl": "Maximaal aantal gelijktijdige spelers.",
+            "de": "Maximale Anzahl gleichzeitiger Spieler."
+          },
+          "required": true,
+          "defaultValue": "8",
+          "minLength": 1,
+          "maxLength": 2
+        }
+      ],
+      "secrets": [
+        {
+          "key": "server-password",
+          "source": "admin",
+          "label": {
+            "en": "Server password",
+            "nl": "Serverwachtwoord",
+            "de": "Serverpasswort"
+          },
+          "help": {
+            "en": "Used for direct connections and never stored in the Dauva Server record.",
+            "nl": "Wordt gebruikt voor directe verbindingen en nooit opgeslagen in het Dauva Server-record.",
+            "de": "Wird für Direktverbindungen verwendet und nie im Dauva-Server-Datensatz gespeichert."
+          },
+          "minLength": 5,
+          "maxLength": 128
+        }
+      ],
+      "lifecycle": {
+        "startOrder": [
+          "server"
+        ],
+        "stopOrder": [
+          "server"
+        ],
+        "stopTimeoutSeconds": 120
+      },
+      "capabilities": {
+        "backup": false,
+        "restore": false,
+        "update": false,
+        "console": false
+      },
+      "source": {
+        "kind": "oci",
+        "homepage": "https://corekeepergame.com/",
+        "repository": "https://hub.docker.com/r/escaping/core-keeper-dedicated",
+        "imageRegistries": [
+          "docker.io"
+        ]
+      },
+      "trust": {
+        "level": "curated",
+        "reviewedAt": "2026-07-26",
+        "mutableRuntimeImagesAllowed": false
+      },
+      "storage": {
+        "class": "bulk",
+        "backupClass": "backup",
+        "estimatedDownloadMb": 1200,
+        "estimatedInstallMb": 5000,
+        "estimatedMutableMb": 8192,
+        "backupPolicy": "optional"
+      },
+      "updatePolicy": {
+        "discovery": "oci-tag",
+        "automaticCheck": true,
+        "automaticInstall": false,
+        "requiresBackup": false,
+        "rollback": true
+      },
+      "proofPolicy": {
+        "requiredChecks": [
+          "images-pinned",
+          "healthy",
+          "ports",
+          "backup-if-supported",
+          "graceful-stop",
+          "restart",
+          "persistence",
+          "cleanup"
+        ],
+        "expiresAfterDays": 90
+      },
+      "manifestDigest": "sha256:5c6fd177d82c3038bb2baf67ea26d480202d089936cfc6b6c14d30ba497a2ac7",
+      "proof": {
+        "state": "unproven",
+        "missingArchitectures": [
+          "amd64"
+        ]
+      }
+    },
+    {
+      "schemaVersion": "dauva.dev/seed/v1",
+      "id": "enshrouded-wine",
+      "version": "1.0.0",
+      "status": "stable",
+      "podId": "enshrouded",
+      "genres": [
+        "adventure",
+        "cooperative",
+        "survival"
+      ],
+      "metadata": {
+        "title": {
+          "en": "Enshrouded Wine — Recommended",
+          "nl": "Enshrouded Wine — Aanbevolen",
+          "de": "Enshrouded Wine — Empfohlen"
+        },
+        "description": {
+          "en": "An Enshrouded Server on the maintained Wine runtime with scheduled local backups.",
+          "nl": "Een Enshrouded-Server op de onderhouden Wine-runtime met geplande lokale back-ups.",
+          "de": "Ein Enshrouded-Server auf der gepflegten Wine-Laufzeit mit geplanten lokalen Backups."
+        },
+        "icon": "flame"
+      },
+      "compatibility": {
+        "operatingSystems": [
+          "linux"
+        ],
+        "architectures": [
+          "amd64"
+        ],
+        "leafCapabilities": [
+          "dynamic-ports",
+          "oci",
+          "persistent-storage",
+          "resource-limits"
+        ]
+      },
+      "components": [
+        {
+          "id": "server",
+          "role": "primary",
+          "image": "docker.io/mornedhels/enshrouded-server@sha256:6e7eb94c52a2bbd0aa3c462edf0412dbf8fbf181984d94199cc4adf42085bdda",
+          "imageUpdate": {
+            "reference": "docker.io/mornedhels/enshrouded-server:stable-wine"
+          },
+          "environment": {
+            "BACKUP_CRON": "0 */6 * * *",
+            "BACKUP_MAX_COUNT": "24",
+            "GAME_BRANCH": "public",
+            "PGID": "4711",
+            "PUID": "4711",
+            "SERVER_IP": "0.0.0.0",
+            "SERVER_ROLE_0_CAN_ACCESS_INVENTORIES": "true",
+            "SERVER_ROLE_0_CAN_EDIT_BASE": "true",
+            "SERVER_ROLE_0_CAN_EDIT_WORLD": "true",
+            "SERVER_ROLE_0_CAN_EXTEND_BASE": "true",
+            "SERVER_ROLE_0_CAN_KICK_BAN": "true",
+            "SERVER_ROLE_0_NAME": "Admins"
+          },
+          "optionEnvironment": {
+            "server-slots": "SERVER_SLOT_COUNT"
+          },
+          "agreementEnvironment": {},
+          "secretEnvironment": {
+            "admin-password": "SERVER_ROLE_0_PASSWORD"
+          },
+          "runtimeEnvironment": {
+            "serverName": "SERVER_NAME",
+            "primaryPort": "SERVER_QUERYPORT"
+          },
+          "volumeMounts": [
+            {
+              "volumeId": "data",
+              "target": "/opt/enshrouded",
+              "readOnly": false
+            }
+          ],
+          "dependsOn": [],
+          "health": {
+            "source": "running",
+            "startupGraceSeconds": 1800
+          }
+        }
+      ],
+      "volumes": [
+        {
+          "id": "data",
+          "role": "data",
+          "retention": "delete-with-server",
+          "ownerUid": 4711,
+          "ownerGid": 4711,
+          "directoryMode": "0750"
+        }
+      ],
+      "ports": [
+        {
+          "id": "game",
+          "componentId": "server",
+          "containerPort": 15637,
+          "containerPortMode": "allocated",
+          "protocols": [
+            "udp"
+          ],
+          "exposure": "public",
+          "purpose": "game",
+          "primary": true,
+          "sharedHostPort": true,
+          "environment": "SERVER_QUERYPORT"
+        }
+      ],
+      "resources": {
+        "defaultPresetId": "large",
+        "presets": [
+          {
+            "id": "large",
+            "title": {
+              "en": "Large",
+              "nl": "Groot",
+              "de": "Groß"
+            },
+            "description": {
+              "en": "Minimum target for the current Proton-based runtime.",
+              "nl": "Minimaal doel voor de huidige Proton-runtime.",
+              "de": "Mindestziel für die aktuelle Proton-basierte Laufzeit."
+            },
+            "memoryMb": 8192,
+            "diskMb": 40960,
+            "cpuPercent": 300
+          }
+        ]
+      },
+      "inputs": [
+        {
+          "key": "accept-steam-agreement",
+          "type": "agreement",
+          "label": {
+            "en": "Steam Subscriber Agreement",
+            "nl": "Steam Subscriber Agreement",
+            "de": "Steam-Nutzungsvertrag"
+          },
+          "help": {
+            "en": "I have read and accept the Steam Subscriber Agreement and the applicable Enshrouded terms.",
+            "nl": "Ik heb de Steam Subscriber Agreement en de toepasselijke Enshrouded-voorwaarden gelezen en accepteer deze.",
+            "de": "Ich habe den Steam-Nutzungsvertrag und die anwendbaren Enshrouded-Bedingungen gelesen und akzeptiert."
+          },
+          "required": true,
+          "defaultValue": "false",
+          "url": "https://store.steampowered.com/subscriber_agreement/",
+          "revision": "official-current"
+        },
+        {
+          "key": "server-slots",
+          "type": "integer",
+          "label": {
+            "en": "Player slots",
+            "nl": "Spelersplaatsen",
+            "de": "Spielerplätze"
+          },
+          "help": {
+            "en": "Maximum simultaneous players, up to 16.",
+            "nl": "Maximaal aantal gelijktijdige spelers, tot 16.",
+            "de": "Maximale Anzahl gleichzeitiger Spieler, bis zu 16."
+          },
+          "required": true,
+          "defaultValue": "16",
+          "minLength": 1,
+          "maxLength": 2
+        }
+      ],
+      "secrets": [
+        {
+          "key": "admin-password",
+          "source": "admin",
+          "label": {
+            "en": "Administrator password",
+            "nl": "Beheerderswachtwoord",
+            "de": "Administratorpasswort"
+          },
+          "help": {
+            "en": "Used for the initial administrator group and never stored in the Dauva Server record.",
+            "nl": "Wordt gebruikt voor de eerste beheerdersgroep en nooit opgeslagen in het Dauva Server-record.",
+            "de": "Wird für die erste Administratorgruppe verwendet und nie im Dauva-Server-Datensatz gespeichert."
+          },
+          "minLength": 5,
+          "maxLength": 128
+        }
+      ],
+      "lifecycle": {
+        "startOrder": [
+          "server"
+        ],
+        "stopOrder": [
+          "server"
+        ],
+        "stopTimeoutSeconds": 180
+      },
+      "capabilities": {
+        "backup": true,
+        "restore": false,
+        "update": false,
+        "console": false
+      },
+      "source": {
+        "kind": "oci",
+        "homepage": "https://enshrouded.com/",
+        "repository": "https://hub.docker.com/r/mornedhels/enshrouded-server",
+        "imageRegistries": [
+          "docker.io"
+        ]
+      },
+      "trust": {
+        "level": "curated",
+        "reviewedAt": "2026-07-26",
+        "mutableRuntimeImagesAllowed": false
+      },
+      "storage": {
+        "class": "bulk",
+        "backupClass": "backup",
+        "estimatedDownloadMb": 9000,
+        "estimatedInstallMb": 18000,
+        "estimatedMutableMb": 12288,
+        "backupPolicy": "recommended"
+      },
+      "updatePolicy": {
+        "discovery": "oci-tag",
+        "automaticCheck": true,
+        "automaticInstall": false,
+        "requiresBackup": true,
+        "rollback": true
+      },
+      "proofPolicy": {
+        "requiredChecks": [
+          "images-pinned",
+          "healthy",
+          "ports",
+          "backup-if-supported",
+          "graceful-stop",
+          "restart",
+          "persistence",
+          "cleanup"
+        ],
+        "expiresAfterDays": 90
+      },
+      "manifestDigest": "sha256:b95e8b6320df36563fbe8af5028144830143f18037d303c34d6ff617f1b46813",
+      "proof": {
+        "state": "unproven",
+        "missingArchitectures": [
+          "amd64"
+        ]
+      }
+    },
+    {
+      "schemaVersion": "dauva.dev/seed/v1",
+      "id": "enshrouded",
+      "version": "1.0.0",
+      "status": "stable",
+      "podId": "enshrouded",
+      "genres": [
+        "adventure",
+        "cooperative",
+        "survival"
+      ],
+      "metadata": {
+        "title": {
+          "en": "Enshrouded Proton",
+          "nl": "Enshrouded Proton",
+          "de": "Enshrouded Proton"
+        },
+        "description": {
+          "en": "A Windows-through-Proton Enshrouded Server with persistent saves; cold starts revalidate the large game install.",
+          "nl": "Een Enshrouded-Server via Proton met blijvende saves; bij een koude start wordt de grote game-installatie opnieuw gecontroleerd.",
+          "de": "Ein Enshrouded-Server über Proton mit persistenten Spielständen; beim Kaltstart wird die große Spielinstallation erneut geprüft."
+        },
+        "icon": "flame"
+      },
+      "compatibility": {
+        "operatingSystems": [
+          "linux"
+        ],
+        "architectures": [
+          "amd64"
+        ],
+        "leafCapabilities": [
+          "dynamic-ports",
+          "oci",
+          "persistent-storage",
+          "resource-limits"
+        ]
+      },
+      "components": [
+        {
+          "id": "server",
+          "role": "primary",
+          "image": "docker.io/sknnr/enshrouded-dedicated-server@sha256:45d8b62209fb60889068b3d679dd6d9af0e530516e46752a5f7c82a0bbb5366d",
+          "imageUpdate": {
+            "reference": "docker.io/sknnr/enshrouded-dedicated-server:latest"
+          },
+          "environment": {
+            "SERVER_IP": "0.0.0.0"
+          },
+          "optionEnvironment": {
+            "server-slots": "SERVER_SLOTS"
+          },
+          "agreementEnvironment": {},
+          "secretEnvironment": {
+            "admin-password": "SERVER_PASSWORD"
+          },
+          "runtimeEnvironment": {
+            "serverName": "SERVER_NAME"
+          },
+          "volumeMounts": [
+            {
+              "volumeId": "saves",
+              "target": "/home/steam/enshrouded/savegame",
+              "readOnly": false
+            }
+          ],
+          "dependsOn": [],
+          "health": {
+            "source": "running",
+            "startupGraceSeconds": 1800
+          }
+        }
+      ],
+      "volumes": [
+        {
+          "id": "saves",
+          "role": "save",
+          "retention": "delete-with-server",
+          "ownerUid": 10000,
+          "ownerGid": 10000,
+          "directoryMode": "0750"
+        }
+      ],
+      "ports": [
+        {
+          "id": "game",
+          "componentId": "server",
+          "containerPort": 15637,
+          "containerPortMode": "allocated",
+          "protocols": [
+            "udp"
+          ],
+          "exposure": "public",
+          "purpose": "game",
+          "primary": true,
+          "sharedHostPort": true,
+          "environment": "PORT"
+        }
+      ],
+      "resources": {
+        "defaultPresetId": "large",
+        "presets": [
+          {
+            "id": "large",
+            "title": {
+              "en": "Large",
+              "nl": "Groot",
+              "de": "Groß"
+            },
+            "description": {
+              "en": "Minimum target for the current Proton-based runtime.",
+              "nl": "Minimaal doel voor de huidige Proton-runtime.",
+              "de": "Mindestziel für die aktuelle Proton-basierte Laufzeit."
+            },
+            "memoryMb": 8192,
+            "diskMb": 40960,
+            "cpuPercent": 300
+          }
+        ]
+      },
+      "inputs": [
+        {
+          "key": "accept-steam-agreement",
+          "type": "agreement",
+          "label": {
+            "en": "Steam Subscriber Agreement",
+            "nl": "Steam Subscriber Agreement",
+            "de": "Steam-Nutzungsvertrag"
+          },
+          "help": {
+            "en": "I have read and accept the Steam Subscriber Agreement and the applicable Enshrouded terms.",
+            "nl": "Ik heb de Steam Subscriber Agreement en de toepasselijke Enshrouded-voorwaarden gelezen en accepteer deze.",
+            "de": "Ich habe den Steam-Nutzungsvertrag und die anwendbaren Enshrouded-Bedingungen gelesen und akzeptiert."
+          },
+          "required": true,
+          "defaultValue": "false",
+          "url": "https://store.steampowered.com/subscriber_agreement/",
+          "revision": "official-current"
+        },
+        {
+          "key": "server-slots",
+          "type": "integer",
+          "label": {
+            "en": "Player slots",
+            "nl": "Spelersplaatsen",
+            "de": "Spielerplätze"
+          },
+          "help": {
+            "en": "Maximum simultaneous players, up to 16.",
+            "nl": "Maximaal aantal gelijktijdige spelers, tot 16.",
+            "de": "Maximale Anzahl gleichzeitiger Spieler, bis zu 16."
+          },
+          "required": true,
+          "defaultValue": "16",
+          "minLength": 1,
+          "maxLength": 2
+        }
+      ],
+      "secrets": [
+        {
+          "key": "admin-password",
+          "source": "admin",
+          "label": {
+            "en": "Administrator password",
+            "nl": "Beheerderswachtwoord",
+            "de": "Administratorpasswort"
+          },
+          "help": {
+            "en": "Used for the initial administrator group and never stored in the Dauva Server record.",
+            "nl": "Wordt gebruikt voor de eerste beheerdersgroep en nooit opgeslagen in het Dauva Server-record.",
+            "de": "Wird für die erste Administratorgruppe verwendet und nie im Dauva-Server-Datensatz gespeichert."
+          },
+          "minLength": 5,
+          "maxLength": 128
+        }
+      ],
+      "lifecycle": {
+        "startOrder": [
+          "server"
+        ],
+        "stopOrder": [
+          "server"
+        ],
+        "stopTimeoutSeconds": 180
+      },
+      "capabilities": {
+        "backup": false,
+        "restore": false,
+        "update": false,
+        "console": false
+      },
+      "source": {
+        "kind": "oci",
+        "homepage": "https://enshrouded.com/",
+        "repository": "https://hub.docker.com/r/mornedhels/enshrouded-server",
+        "imageRegistries": [
+          "docker.io"
+        ]
+      },
+      "trust": {
+        "level": "curated",
+        "reviewedAt": "2026-07-26",
+        "mutableRuntimeImagesAllowed": false
+      },
+      "storage": {
+        "class": "bulk",
+        "backupClass": "backup",
+        "estimatedDownloadMb": 9000,
+        "estimatedInstallMb": 18000,
+        "estimatedMutableMb": 12288,
+        "backupPolicy": "optional"
+      },
+      "updatePolicy": {
+        "discovery": "oci-tag",
+        "automaticCheck": true,
+        "automaticInstall": false,
+        "requiresBackup": false,
+        "rollback": true
+      },
+      "proofPolicy": {
+        "requiredChecks": [
+          "images-pinned",
+          "healthy",
+          "ports",
+          "backup-if-supported",
+          "graceful-stop",
+          "restart",
+          "persistence",
+          "cleanup"
+        ],
+        "expiresAfterDays": 90
+      },
+      "manifestDigest": "sha256:bd635359b943fff47470430241a3626aa824dd5b4fd5045004e5e255c8dcac33",
+      "proof": {
+        "state": "unproven",
+        "missingArchitectures": [
+          "amd64"
+        ]
+      }
+    },
+    {
+      "schemaVersion": "dauva.dev/seed/v1",
+      "id": "factorio-stable",
+      "version": "1.0.0",
+      "status": "stable",
+      "podId": "factorio",
+      "genres": [
+        "automation",
+        "simulation"
+      ],
+      "metadata": {
+        "title": {
+          "en": "Factorio Stable",
+          "nl": "Factorio Stable",
+          "de": "Factorio Stable"
+        },
+        "description": {
+          "en": "A Factorio Server pinned to the stable release channel.",
+          "nl": "Een Factorio-Server vastgezet op het stabiele releasekanaal.",
+          "de": "Ein Factorio-Server auf dem stabilen Veröffentlichungskanal."
+        },
+        "icon": "settings"
+      },
+      "compatibility": {
+        "operatingSystems": [
+          "linux"
+        ],
+        "architectures": [
+          "amd64"
+        ],
+        "leafCapabilities": [
+          "dynamic-ports",
+          "oci",
+          "persistent-storage",
+          "resource-limits"
+        ]
+      },
+      "components": [
+        {
+          "id": "server",
+          "role": "primary",
+          "image": "docker.io/factoriotools/factorio@sha256:7052b3cca8ca7790f99f4058617d5c8089df544de736b1baa23f2c5f58fb7f48",
+          "imageUpdate": {
+            "reference": "docker.io/factoriotools/factorio:stable"
+          },
+          "environment": {
+            "GENERATE_NEW_SAVE": "true",
+            "LOAD_LATEST_SAVE": "true",
+            "UPDATE_MODS_ON_START": "false"
+          },
+          "optionEnvironment": {
+            "save-name": "SAVE_NAME"
+          },
+          "agreementEnvironment": {},
+          "secretEnvironment": {},
+          "runtimeEnvironment": {
+            "primaryPort": "PORT"
+          },
+          "volumeMounts": [
+            {
+              "volumeId": "data",
+              "target": "/factorio",
+              "readOnly": false
+            }
+          ],
+          "dependsOn": [],
+          "health": {
+            "source": "running",
+            "startupGraceSeconds": 600
+          }
+        }
+      ],
+      "volumes": [
+        {
+          "id": "data",
+          "role": "data",
+          "retention": "delete-with-server"
+        }
+      ],
+      "ports": [
+        {
+          "id": "game",
+          "componentId": "server",
+          "containerPort": 34197,
+          "containerPortMode": "allocated",
+          "protocols": [
+            "udp"
+          ],
+          "exposure": "public",
+          "purpose": "game",
+          "primary": true,
+          "sharedHostPort": true,
+          "environment": "PORT"
+        },
+        {
+          "id": "rcon",
+          "componentId": "server",
+          "containerPort": 27015,
+          "containerPortMode": "fixed",
+          "protocols": [
+            "tcp"
+          ],
+          "exposure": "private",
+          "purpose": "rcon",
+          "primary": false,
+          "sharedHostPort": true,
+          "environment": "RCON_PORT"
+        }
+      ],
+      "resources": {
+        "defaultPresetId": "balanced",
+        "presets": [
+          {
+            "id": "balanced",
+            "title": {
+              "en": "Balanced",
+              "nl": "Gebalanceerd",
+              "de": "Ausgewogen"
+            },
+            "description": {
+              "en": "Recommended for an established factory with a small group.",
+              "nl": "Aanbevolen voor een bestaande fabriek met een kleine groep.",
+              "de": "Empfohlen für eine bestehende Fabrik mit einer kleinen Gruppe."
+            },
+            "memoryMb": 3072,
+            "diskMb": 12288,
+            "cpuPercent": 200
+          }
+        ]
+      },
+      "inputs": [
+        {
+          "key": "accept-factorio-terms",
+          "type": "agreement",
+          "label": {
+            "en": "Factorio Terms of Service",
+            "nl": "Factorio-gebruiksvoorwaarden",
+            "de": "Factorio-Nutzungsbedingungen"
+          },
+          "help": {
+            "en": "I have read and accept the official Factorio Terms of Service.",
+            "nl": "Ik heb de officiële Factorio-gebruiksvoorwaarden gelezen en accepteer deze.",
+            "de": "Ich habe die offiziellen Factorio-Nutzungsbedingungen gelesen und akzeptiert."
+          },
+          "required": true,
+          "defaultValue": "false",
+          "url": "https://www.factorio.com/terms-of-service",
+          "revision": "2024-10-10"
+        },
+        {
+          "key": "save-name",
+          "type": "string",
+          "label": {
+            "en": "Save name",
+            "nl": "Savenaam",
+            "de": "Spielstandname"
+          },
+          "help": {
+            "en": "Name used when a new save is generated.",
+            "nl": "Naam die wordt gebruikt bij het maken van een nieuwe save.",
+            "de": "Name für einen neu erzeugten Spielstand."
+          },
+          "required": true,
+          "defaultValue": "dauva",
+          "minLength": 3,
+          "maxLength": 64
+        }
+      ],
+      "secrets": [],
+      "lifecycle": {
+        "startOrder": [
+          "server"
+        ],
+        "stopOrder": [
+          "server"
+        ],
+        "stopTimeoutSeconds": 120
+      },
+      "capabilities": {
+        "backup": false,
+        "restore": false,
+        "update": false,
+        "console": false
+      },
+      "source": {
+        "kind": "oci",
+        "homepage": "https://www.factorio.com/",
+        "repository": "https://github.com/factoriotools/factorio-docker",
+        "imageRegistries": [
+          "docker.io"
+        ]
+      },
+      "trust": {
+        "level": "curated",
+        "reviewedAt": "2026-07-26",
+        "mutableRuntimeImagesAllowed": false
+      },
+      "storage": {
+        "class": "bulk",
+        "backupClass": "backup",
+        "estimatedDownloadMb": 500,
+        "estimatedInstallMb": 2048,
+        "estimatedMutableMb": 10240,
+        "backupPolicy": "optional"
+      },
+      "updatePolicy": {
+        "discovery": "oci-tag",
+        "automaticCheck": true,
+        "automaticInstall": false,
+        "requiresBackup": false,
+        "rollback": true
+      },
+      "proofPolicy": {
+        "requiredChecks": [
+          "images-pinned",
+          "healthy",
+          "ports",
+          "backup-if-supported",
+          "graceful-stop",
+          "restart",
+          "persistence",
+          "cleanup"
+        ],
+        "expiresAfterDays": 90
+      },
+      "manifestDigest": "sha256:70801c5a046173ad2c151c041a6a26bf5faa8f4678f2107c4dbdd2f504c249b1",
+      "proof": {
+        "state": "unproven",
+        "missingArchitectures": [
+          "amd64"
+        ]
+      }
+    },
+    {
+      "schemaVersion": "dauva.dev/seed/v1",
+      "id": "factorio",
+      "version": "1.0.1",
+      "status": "stable",
+      "podId": "factorio",
+      "genres": [
+        "automation",
+        "simulation"
+      ],
+      "metadata": {
+        "title": {
+          "en": "Factorio Latest",
+          "nl": "Factorio Latest",
+          "de": "Factorio Latest"
+        },
+        "description": {
+          "en": "A Factorio Server that follows the newest available release channel.",
+          "nl": "Een Factorio-Server die het nieuwste beschikbare releasekanaal volgt.",
+          "de": "Ein Factorio-Server auf dem neuesten verfügbaren Veröffentlichungskanal."
+        },
+        "icon": "settings"
+      },
+      "compatibility": {
+        "operatingSystems": [
+          "linux"
+        ],
+        "architectures": [
+          "amd64"
+        ],
+        "leafCapabilities": [
+          "dynamic-ports",
+          "oci",
+          "persistent-storage",
+          "resource-limits"
+        ]
+      },
+      "components": [
+        {
+          "id": "server",
+          "role": "primary",
+          "image": "docker.io/factoriotools/factorio@sha256:f7942281d7d3a54fd7e5b1aca57428fce4f035aabdb1cb798473f7b78778fb49",
+          "imageUpdate": {
+            "reference": "docker.io/factoriotools/factorio:latest"
+          },
+          "environment": {
+            "GENERATE_NEW_SAVE": "true",
+            "LOAD_LATEST_SAVE": "true",
+            "UPDATE_MODS_ON_START": "false"
+          },
+          "optionEnvironment": {
+            "save-name": "SAVE_NAME"
+          },
+          "agreementEnvironment": {},
+          "secretEnvironment": {},
+          "runtimeEnvironment": {
+            "primaryPort": "PORT"
+          },
+          "volumeMounts": [
+            {
+              "volumeId": "data",
+              "target": "/factorio",
+              "readOnly": false
+            }
+          ],
+          "dependsOn": [],
+          "health": {
+            "source": "running",
+            "startupGraceSeconds": 600
+          }
+        }
+      ],
+      "volumes": [
+        {
+          "id": "data",
+          "role": "data",
+          "retention": "delete-with-server"
+        }
+      ],
+      "ports": [
+        {
+          "id": "game",
+          "componentId": "server",
+          "containerPort": 34197,
+          "containerPortMode": "allocated",
+          "protocols": [
+            "udp"
+          ],
+          "exposure": "public",
+          "purpose": "game",
+          "primary": true,
+          "sharedHostPort": true,
+          "environment": "PORT"
+        },
+        {
+          "id": "rcon",
+          "componentId": "server",
+          "containerPort": 27015,
+          "containerPortMode": "fixed",
+          "protocols": [
+            "tcp"
+          ],
+          "exposure": "private",
+          "purpose": "rcon",
+          "primary": false,
+          "sharedHostPort": true,
+          "environment": "RCON_PORT"
+        }
+      ],
+      "resources": {
+        "defaultPresetId": "balanced",
+        "presets": [
+          {
+            "id": "balanced",
+            "title": {
+              "en": "Balanced",
+              "nl": "Gebalanceerd",
+              "de": "Ausgewogen"
+            },
+            "description": {
+              "en": "Recommended for an established factory with a small group.",
+              "nl": "Aanbevolen voor een bestaande fabriek met een kleine groep.",
+              "de": "Empfohlen für eine bestehende Fabrik mit einer kleinen Gruppe."
+            },
+            "memoryMb": 3072,
+            "diskMb": 12288,
+            "cpuPercent": 200
+          }
+        ]
+      },
+      "inputs": [
+        {
+          "key": "accept-factorio-terms",
+          "type": "agreement",
+          "label": {
+            "en": "Factorio Terms of Service",
+            "nl": "Factorio-gebruiksvoorwaarden",
+            "de": "Factorio-Nutzungsbedingungen"
+          },
+          "help": {
+            "en": "I have read and accept the official Factorio Terms of Service.",
+            "nl": "Ik heb de officiële Factorio-gebruiksvoorwaarden gelezen en accepteer deze.",
+            "de": "Ich habe die offiziellen Factorio-Nutzungsbedingungen gelesen und akzeptiert."
+          },
+          "required": true,
+          "defaultValue": "false",
+          "url": "https://www.factorio.com/terms-of-service",
+          "revision": "2024-10-10"
+        },
+        {
+          "key": "save-name",
+          "type": "string",
+          "label": {
+            "en": "Save name",
+            "nl": "Savenaam",
+            "de": "Spielstandname"
+          },
+          "help": {
+            "en": "Name used when a new save is generated.",
+            "nl": "Naam die wordt gebruikt bij het maken van een nieuwe save.",
+            "de": "Name für einen neu erzeugten Spielstand."
+          },
+          "required": true,
+          "defaultValue": "dauva",
+          "minLength": 3,
+          "maxLength": 64
+        }
+      ],
+      "secrets": [],
+      "lifecycle": {
+        "startOrder": [
+          "server"
+        ],
+        "stopOrder": [
+          "server"
+        ],
+        "stopTimeoutSeconds": 120
+      },
+      "capabilities": {
+        "backup": false,
+        "restore": false,
+        "update": false,
+        "console": false
+      },
+      "source": {
+        "kind": "oci",
+        "homepage": "https://www.factorio.com/",
+        "repository": "https://github.com/factoriotools/factorio-docker",
+        "imageRegistries": [
+          "docker.io"
+        ]
+      },
+      "trust": {
+        "level": "curated",
+        "reviewedAt": "2026-07-26",
+        "mutableRuntimeImagesAllowed": false
+      },
+      "storage": {
+        "class": "bulk",
+        "backupClass": "backup",
+        "estimatedDownloadMb": 500,
+        "estimatedInstallMb": 2048,
+        "estimatedMutableMb": 10240,
+        "backupPolicy": "optional"
+      },
+      "updatePolicy": {
+        "discovery": "oci-tag",
+        "automaticCheck": true,
+        "automaticInstall": false,
+        "requiresBackup": false,
+        "rollback": true
+      },
+      "proofPolicy": {
+        "requiredChecks": [
+          "images-pinned",
+          "healthy",
+          "ports",
+          "backup-if-supported",
+          "graceful-stop",
+          "restart",
+          "persistence",
+          "cleanup"
+        ],
+        "expiresAfterDays": 90
+      },
+      "manifestDigest": "sha256:08f45c8a532550030a3e579fb535f8fa43103f270aaafb0dca4637e8d4121148",
+      "proof": {
+        "state": "unproven",
+        "missingArchitectures": [
+          "amd64"
+        ]
+      }
+    },
+    {
+      "schemaVersion": "dauva.dev/seed/v1",
+      "id": "garrys-mod-construct",
+      "version": "1.0.0",
+      "status": "stable",
+      "podId": "garrys-mod",
+      "genres": [
+        "sandbox"
+      ],
+      "metadata": {
+        "title": {
+          "en": "Garry's Mod Construct",
+          "nl": "Garry's Mod Construct",
+          "de": "Garry's Mod Construct"
+        },
+        "description": {
+          "en": "A vanilla Sandbox Server that starts on gm_construct.",
+          "nl": "Een vanilla Sandbox-Server die start op gm_construct.",
+          "de": "Ein Vanilla-Sandbox-Server, der auf gm_construct startet."
+        },
+        "icon": "toolbox"
+      },
+      "compatibility": {
+        "operatingSystems": [
+          "linux"
+        ],
+        "architectures": [
+          "amd64"
+        ],
+        "leafCapabilities": [
+          "dynamic-ports",
+          "multi-port",
+          "oci",
+          "persistent-storage",
+          "resource-limits"
+        ]
+      },
+      "components": [
+        {
+          "id": "server",
+          "role": "primary",
+          "image": "docker.io/ceifa/garrysmod@sha256:08628a0c98cb545d56006294d86f02a64cd77f344ff4bc114e0a324045905841",
+          "imageUpdate": {
+            "reference": "docker.io/ceifa/garrysmod:ubuntu"
+          },
+          "environment": {
+            "GAMEMODE": "sandbox",
+            "MAP": "gm_construct",
+            "PRODUCTION": "1"
+          },
+          "optionEnvironment": {
+            "max-players": "MAXPLAYERS"
+          },
+          "agreementEnvironment": {},
+          "secretEnvironment": {},
+          "runtimeEnvironment": {
+            "serverName": "HOSTNAME"
+          },
+          "volumeMounts": [
+            {
+              "volumeId": "data",
+              "target": "/home/gmod/server/garrysmod/data",
+              "readOnly": false
+            },
+            {
+              "volumeId": "addons",
+              "target": "/home/gmod/server/garrysmod/addons",
+              "readOnly": false
+            }
+          ],
+          "dependsOn": [],
+          "health": {
+            "source": "container",
+            "startupGraceSeconds": 900
+          }
+        }
+      ],
+      "volumes": [
+        {
+          "id": "data",
+          "role": "save",
+          "retention": "delete-with-server",
+          "ownerUid": 1000,
+          "ownerGid": 1000,
+          "directoryMode": "0770"
+        },
+        {
+          "id": "addons",
+          "role": "data",
+          "retention": "delete-with-server",
+          "ownerUid": 1000,
+          "ownerGid": 1000,
+          "directoryMode": "0770"
+        }
+      ],
+      "ports": [
+        {
+          "id": "game",
+          "componentId": "server",
+          "containerPort": 27015,
+          "containerPortMode": "allocated",
+          "protocols": [
+            "tcp",
+            "udp"
+          ],
+          "exposure": "public",
+          "purpose": "game",
+          "primary": true,
+          "sharedHostPort": true,
+          "environment": "PORT"
+        },
+        {
+          "id": "client",
+          "componentId": "server",
+          "containerPort": 27005,
+          "containerPortMode": "fixed",
+          "protocols": [
+            "udp"
+          ],
+          "exposure": "public",
+          "purpose": "query",
+          "primary": false,
+          "sharedHostPort": true
+        }
+      ],
+      "resources": {
+        "defaultPresetId": "balanced",
+        "presets": [
+          {
+            "id": "balanced",
+            "title": {
+              "en": "Balanced",
+              "nl": "Gebalanceerd",
+              "de": "Ausgewogen"
+            },
+            "description": {
+              "en": "For a small vanilla Sandbox Server.",
+              "nl": "Voor een kleine vanilla Sandbox-Server.",
+              "de": "Für einen kleinen Vanilla-Sandbox-Server."
+            },
+            "memoryMb": 3072,
+            "diskMb": 12288,
+            "cpuPercent": 200
+          },
+          {
+            "id": "large",
+            "title": {
+              "en": "Large",
+              "nl": "Groot",
+              "de": "Groß"
+            },
+            "description": {
+              "en": "Extra headroom for persistent addons and more players.",
+              "nl": "Extra ruimte voor blijvende addons en meer spelers.",
+              "de": "Zusätzliche Reserven für persistente Addons und mehr Spieler."
+            },
+            "memoryMb": 6144,
+            "diskMb": 24576,
+            "cpuPercent": 300
+          }
+        ]
+      },
+      "inputs": [
+        {
+          "key": "accept-steam-agreement",
+          "type": "agreement",
+          "label": {
+            "en": "Steam Subscriber Agreement",
+            "nl": "Steam Subscriber Agreement",
+            "de": "Steam-Nutzungsvertrag"
+          },
+          "help": {
+            "en": "I have read and accept the Steam Subscriber Agreement and the applicable game terms.",
+            "nl": "Ik heb de Steam Subscriber Agreement en de toepasselijke gamevoorwaarden gelezen en accepteer deze.",
+            "de": "Ich habe den Steam-Nutzungsvertrag und die anwendbaren Spielbedingungen gelesen und akzeptiert."
+          },
+          "required": true,
+          "defaultValue": "false",
+          "url": "https://store.steampowered.com/subscriber_agreement/",
+          "revision": "official-current"
+        },
+        {
+          "key": "max-players",
+          "type": "integer",
+          "label": {
+            "en": "Maximum players",
+            "nl": "Maximumaantal spelers",
+            "de": "Maximale Spielerzahl"
+          },
+          "help": {
+            "en": "Maximum simultaneous players.",
+            "nl": "Maximaal aantal gelijktijdige spelers.",
+            "de": "Maximale Anzahl gleichzeitiger Spieler."
+          },
+          "required": true,
+          "defaultValue": "16",
+          "minLength": 1,
+          "maxLength": 3
+        }
+      ],
+      "secrets": [],
+      "lifecycle": {
+        "startOrder": [
+          "server"
+        ],
+        "stopOrder": [
+          "server"
+        ],
+        "stopTimeoutSeconds": 120
+      },
+      "capabilities": {
+        "backup": false,
+        "restore": false,
+        "update": false,
+        "console": false
+      },
+      "source": {
+        "kind": "oci",
+        "homepage": "https://gmod.facepunch.com/",
+        "repository": "https://github.com/ceifa/garrysmod-docker",
+        "imageRegistries": [
+          "docker.io"
+        ],
+        "upstreamId": "steam:4020"
+      },
+      "trust": {
+        "level": "curated",
+        "reviewedAt": "2026-07-26",
+        "mutableRuntimeImagesAllowed": false
+      },
+      "storage": {
+        "class": "fast",
+        "backupClass": "backup",
+        "estimatedDownloadMb": 5200,
+        "estimatedInstallMb": 9000,
+        "estimatedMutableMb": 8192,
+        "backupPolicy": "recommended"
+      },
+      "updatePolicy": {
+        "discovery": "oci-tag",
+        "automaticCheck": true,
+        "automaticInstall": false,
+        "requiresBackup": false,
+        "rollback": true
+      },
+      "proofPolicy": {
+        "requiredChecks": [
+          "images-pinned",
+          "healthy",
+          "ports",
+          "backup-if-supported",
+          "graceful-stop",
+          "restart",
+          "persistence",
+          "cleanup"
+        ],
+        "expiresAfterDays": 90
+      },
+      "manifestDigest": "sha256:1dd52a967be771169f45879328a2c2d653e295d845af93d1e39d8a2a9f2cb2aa",
+      "proof": {
+        "state": "unproven",
+        "missingArchitectures": [
+          "amd64"
+        ]
+      }
+    },
+    {
+      "schemaVersion": "dauva.dev/seed/v1",
+      "id": "garrys-mod-flatgrass",
+      "version": "1.0.0",
+      "status": "stable",
+      "podId": "garrys-mod",
+      "genres": [
+        "sandbox"
+      ],
+      "metadata": {
+        "title": {
+          "en": "Garry's Mod Flatgrass",
+          "nl": "Garry's Mod Flatgrass",
+          "de": "Garry's Mod Flatgrass"
+        },
+        "description": {
+          "en": "A vanilla Sandbox Server that starts on gm_flatgrass.",
+          "nl": "Een vanilla Sandbox-Server die start op gm_flatgrass.",
+          "de": "Ein Vanilla-Sandbox-Server, der auf gm_flatgrass startet."
+        },
+        "icon": "toolbox"
+      },
+      "compatibility": {
+        "operatingSystems": [
+          "linux"
+        ],
+        "architectures": [
+          "amd64"
+        ],
+        "leafCapabilities": [
+          "dynamic-ports",
+          "multi-port",
+          "oci",
+          "persistent-storage",
+          "resource-limits"
+        ]
+      },
+      "components": [
+        {
+          "id": "server",
+          "role": "primary",
+          "image": "docker.io/ceifa/garrysmod@sha256:08628a0c98cb545d56006294d86f02a64cd77f344ff4bc114e0a324045905841",
+          "imageUpdate": {
+            "reference": "docker.io/ceifa/garrysmod:ubuntu"
+          },
+          "environment": {
+            "GAMEMODE": "sandbox",
+            "MAP": "gm_flatgrass",
+            "PRODUCTION": "1"
+          },
+          "optionEnvironment": {
+            "max-players": "MAXPLAYERS"
+          },
+          "agreementEnvironment": {},
+          "secretEnvironment": {},
+          "runtimeEnvironment": {
+            "serverName": "HOSTNAME"
+          },
+          "volumeMounts": [
+            {
+              "volumeId": "data",
+              "target": "/home/gmod/server/garrysmod/data",
+              "readOnly": false
+            },
+            {
+              "volumeId": "addons",
+              "target": "/home/gmod/server/garrysmod/addons",
+              "readOnly": false
+            }
+          ],
+          "dependsOn": [],
+          "health": {
+            "source": "container",
+            "startupGraceSeconds": 900
+          }
+        }
+      ],
+      "volumes": [
+        {
+          "id": "data",
+          "role": "save",
+          "retention": "delete-with-server",
+          "ownerUid": 1000,
+          "ownerGid": 1000,
+          "directoryMode": "0770"
+        },
+        {
+          "id": "addons",
+          "role": "data",
+          "retention": "delete-with-server",
+          "ownerUid": 1000,
+          "ownerGid": 1000,
+          "directoryMode": "0770"
+        }
+      ],
+      "ports": [
+        {
+          "id": "game",
+          "componentId": "server",
+          "containerPort": 27015,
+          "containerPortMode": "allocated",
+          "protocols": [
+            "tcp",
+            "udp"
+          ],
+          "exposure": "public",
+          "purpose": "game",
+          "primary": true,
+          "sharedHostPort": true,
+          "environment": "PORT"
+        },
+        {
+          "id": "client",
+          "componentId": "server",
+          "containerPort": 27005,
+          "containerPortMode": "fixed",
+          "protocols": [
+            "udp"
+          ],
+          "exposure": "public",
+          "purpose": "query",
+          "primary": false,
+          "sharedHostPort": true
+        }
+      ],
+      "resources": {
+        "defaultPresetId": "balanced",
+        "presets": [
+          {
+            "id": "balanced",
+            "title": {
+              "en": "Balanced",
+              "nl": "Gebalanceerd",
+              "de": "Ausgewogen"
+            },
+            "description": {
+              "en": "For a small vanilla Sandbox Server.",
+              "nl": "Voor een kleine vanilla Sandbox-Server.",
+              "de": "Für einen kleinen Vanilla-Sandbox-Server."
+            },
+            "memoryMb": 3072,
+            "diskMb": 12288,
+            "cpuPercent": 200
+          },
+          {
+            "id": "large",
+            "title": {
+              "en": "Large",
+              "nl": "Groot",
+              "de": "Groß"
+            },
+            "description": {
+              "en": "Extra headroom for persistent addons and more players.",
+              "nl": "Extra ruimte voor blijvende addons en meer spelers.",
+              "de": "Zusätzliche Reserven für persistente Addons und mehr Spieler."
+            },
+            "memoryMb": 6144,
+            "diskMb": 24576,
+            "cpuPercent": 300
+          }
+        ]
+      },
+      "inputs": [
+        {
+          "key": "accept-steam-agreement",
+          "type": "agreement",
+          "label": {
+            "en": "Steam Subscriber Agreement",
+            "nl": "Steam Subscriber Agreement",
+            "de": "Steam-Nutzungsvertrag"
+          },
+          "help": {
+            "en": "I have read and accept the Steam Subscriber Agreement and the applicable game terms.",
+            "nl": "Ik heb de Steam Subscriber Agreement en de toepasselijke gamevoorwaarden gelezen en accepteer deze.",
+            "de": "Ich habe den Steam-Nutzungsvertrag und die anwendbaren Spielbedingungen gelesen und akzeptiert."
+          },
+          "required": true,
+          "defaultValue": "false",
+          "url": "https://store.steampowered.com/subscriber_agreement/",
+          "revision": "official-current"
+        },
+        {
+          "key": "max-players",
+          "type": "integer",
+          "label": {
+            "en": "Maximum players",
+            "nl": "Maximumaantal spelers",
+            "de": "Maximale Spielerzahl"
+          },
+          "help": {
+            "en": "Maximum simultaneous players.",
+            "nl": "Maximaal aantal gelijktijdige spelers.",
+            "de": "Maximale Anzahl gleichzeitiger Spieler."
+          },
+          "required": true,
+          "defaultValue": "16",
+          "minLength": 1,
+          "maxLength": 3
+        }
+      ],
+      "secrets": [],
+      "lifecycle": {
+        "startOrder": [
+          "server"
+        ],
+        "stopOrder": [
+          "server"
+        ],
+        "stopTimeoutSeconds": 120
+      },
+      "capabilities": {
+        "backup": false,
+        "restore": false,
+        "update": false,
+        "console": false
+      },
+      "source": {
+        "kind": "oci",
+        "homepage": "https://gmod.facepunch.com/",
+        "repository": "https://github.com/ceifa/garrysmod-docker",
+        "imageRegistries": [
+          "docker.io"
+        ],
+        "upstreamId": "steam:4020"
+      },
+      "trust": {
+        "level": "curated",
+        "reviewedAt": "2026-07-26",
+        "mutableRuntimeImagesAllowed": false
+      },
+      "storage": {
+        "class": "fast",
+        "backupClass": "backup",
+        "estimatedDownloadMb": 5200,
+        "estimatedInstallMb": 9000,
+        "estimatedMutableMb": 8192,
+        "backupPolicy": "recommended"
+      },
+      "updatePolicy": {
+        "discovery": "oci-tag",
+        "automaticCheck": true,
+        "automaticInstall": false,
+        "requiresBackup": false,
+        "rollback": true
+      },
+      "proofPolicy": {
+        "requiredChecks": [
+          "images-pinned",
+          "healthy",
+          "ports",
+          "backup-if-supported",
+          "graceful-stop",
+          "restart",
+          "persistence",
+          "cleanup"
+        ],
+        "expiresAfterDays": 90
+      },
+      "manifestDigest": "sha256:d92b50b953a8f0f9018e349b70a8ff05460cfd61efa69b55c9f761a0879e001f",
+      "proof": {
+        "state": "unproven",
+        "missingArchitectures": [
+          "amd64"
+        ]
+      }
+    },
+    {
+      "schemaVersion": "dauva.dev/seed/v1",
+      "id": "minecraft-fabric",
+      "version": "1.0.0",
+      "status": "stable",
+      "podId": "minecraft",
+      "genres": [
+        "sandbox",
+        "survival"
+      ],
+      "metadata": {
+        "title": {
+          "en": "Minecraft Fabric",
+          "nl": "Minecraft Fabric",
+          "de": "Minecraft Fabric"
+        },
+        "description": {
+          "en": "A mod-ready Minecraft Java Server with persistent data and an automatic backup companion.",
+          "nl": "Een modklare Minecraft Java-Server met blijvende data en een automatische back-upcomponent.",
+          "de": "Ein mod-fähiger Minecraft-Java-Server mit persistenten Daten und automatischer Backup-Komponente."
+        },
+        "icon": "shield"
+      },
+      "compatibility": {
+        "operatingSystems": [
+          "linux"
+        ],
+        "architectures": [
+          "amd64"
+        ],
+        "leafCapabilities": [
+          "dynamic-ports",
+          "multi-component",
+          "oci",
+          "persistent-storage",
+          "resource-limits"
+        ]
+      },
+      "components": [
+        {
+          "id": "server",
+          "role": "primary",
+          "image": "ghcr.io/itzg/minecraft-server@sha256:6ec1110e4d9236d00ae9436a3e4a5929583e5b19cc94b756a7c603f7cf647a77",
+          "imageUpdate": {
+            "reference": "ghcr.io/itzg/minecraft-server:stable"
+          },
+          "environment": {
+            "ALLOW_FLIGHT": "TRUE",
+            "ENABLE_RCON": "TRUE",
+            "ENABLE_WHITELIST": "FALSE",
+            "ENFORCE_WHITELIST": "FALSE",
+            "MODE": "survival",
+            "TYPE": "FABRIC"
+          },
+          "optionEnvironment": {
+            "difficulty": "DIFFICULTY",
+            "max-players": "MAX_PLAYERS",
+            "minecraft-version": "VERSION",
+            "motd": "MOTD",
+            "online-mode": "ONLINE_MODE",
+            "simulation-distance": "SIMULATION_DISTANCE",
+            "view-distance": "VIEW_DISTANCE"
+          },
+          "agreementEnvironment": {
+            "accept-minecraft-eula": {
+              "name": "EULA",
+              "acceptedValue": "TRUE"
+            }
+          },
+          "secretEnvironment": {
+            "rcon-password": "RCON_PASSWORD"
+          },
+          "runtimeEnvironment": {
+            "memoryMb": "MEMORY",
+            "serverName": "SERVER_NAME",
+            "timezone": "TZ"
+          },
+          "volumeMounts": [
+            {
+              "volumeId": "data",
+              "target": "/data",
+              "readOnly": false
+            }
+          ],
+          "dependsOn": [],
+          "health": {
+            "source": "container",
+            "startupGraceSeconds": 600
+          }
+        },
+        {
+          "id": "backups",
+          "role": "companion",
+          "image": "ghcr.io/itzg/mc-backup@sha256:db2bca9a54aac96e8db74be038b920cb549c8e3b3384067251aad5e178dd03cc",
+          "imageUpdate": {
+            "reference": "ghcr.io/itzg/mc-backup:stable"
+          },
+          "environment": {
+            "BACKUP_INTERVAL": "2h",
+            "BACKUP_ON_STARTUP": "FALSE",
+            "INITIAL_DELAY": "5m",
+            "PRUNE_BACKUPS_COUNT": "24",
+            "PRUNE_BACKUPS_DAYS": "14",
+            "RCON_HOST": "server"
+          },
+          "optionEnvironment": {},
+          "agreementEnvironment": {},
+          "secretEnvironment": {
+            "rcon-password": "RCON_PASSWORD"
+          },
+          "runtimeEnvironment": {
+            "serverName": "BACKUP_NAME",
+            "timezone": "TZ"
+          },
+          "volumeMounts": [
+            {
+              "volumeId": "data",
+              "target": "/data",
+              "readOnly": true
+            },
+            {
+              "volumeId": "backups",
+              "target": "/backups",
+              "readOnly": false
+            }
+          ],
+          "dependsOn": [
+            "server"
+          ],
+          "health": {
+            "source": "running",
+            "startupGraceSeconds": 60
+          }
+        }
+      ],
+      "volumes": [
+        {
+          "id": "data",
+          "role": "data",
+          "retention": "delete-with-server"
+        },
+        {
+          "id": "backups",
+          "role": "backup",
+          "retention": "delete-with-server"
+        }
+      ],
+      "ports": [
+        {
+          "id": "game",
+          "componentId": "server",
+          "containerPort": 25565,
+          "containerPortMode": "fixed",
+          "protocols": [
+            "tcp"
+          ],
+          "exposure": "public",
+          "purpose": "game",
+          "primary": true,
+          "sharedHostPort": true
+        }
+      ],
+      "resources": {
+        "defaultPresetId": "balanced",
+        "presets": [
+          {
+            "id": "small",
+            "title": {
+              "en": "Small",
+              "nl": "Klein",
+              "de": "Klein"
+            },
+            "description": {
+              "en": "For a disposable test or a few players with light mods.",
+              "nl": "Voor een tijdelijke test of enkele spelers met lichte mods.",
+              "de": "Für einen temporären Test oder wenige Spieler mit leichten Mods."
+            },
+            "memoryMb": 2048,
+            "diskMb": 12288,
+            "cpuPercent": 100
+          },
+          {
+            "id": "balanced",
+            "title": {
+              "en": "Balanced",
+              "nl": "Gebalanceerd",
+              "de": "Ausgewogen"
+            },
+            "description": {
+              "en": "Recommended for a persistent Fabric Server.",
+              "nl": "Aanbevolen voor een blijvende Fabric-Server.",
+              "de": "Für einen persistenten Fabric-Server empfohlen."
+            },
+            "memoryMb": 3072,
+            "diskMb": 20480,
+            "cpuPercent": 150
+          },
+          {
+            "id": "large",
+            "title": {
+              "en": "Large",
+              "nl": "Groot",
+              "de": "Groß"
+            },
+            "description": {
+              "en": "For larger modpacks after Leaf capacity has been checked.",
+              "nl": "Voor grotere modpacks nadat de Leaf-capaciteit is gecontroleerd.",
+              "de": "Für größere Modpacks nach Prüfung der Leaf-Kapazität."
+            },
+            "memoryMb": 6144,
+            "diskMb": 40960,
+            "cpuPercent": 200
+          }
+        ]
+      },
+      "inputs": [
+        {
+          "key": "accept-minecraft-eula",
+          "type": "agreement",
+          "label": {
+            "en": "Minecraft End User License Agreement",
+            "nl": "Minecraft-gebruikersovereenkomst",
+            "de": "Minecraft-Endbenutzerlizenzvertrag"
+          },
+          "help": {
+            "en": "I have read and accept the official Minecraft EULA and authorize Dauva to record EULA=TRUE for this Server.",
+            "nl": "Ik heb de officiële Minecraft-EULA gelezen en accepteer deze. Ik geef Dauva toestemming om EULA=TRUE voor deze Server vast te leggen.",
+            "de": "Ich habe die offizielle Minecraft-EULA gelesen und akzeptiere sie. Ich erlaube Dauva, EULA=TRUE für diesen Server festzulegen."
+          },
+          "required": true,
+          "defaultValue": "false",
+          "url": "https://www.minecraft.net/eula",
+          "revision": "official-current"
+        },
+        {
+          "key": "minecraft-version",
+          "type": "string",
+          "label": {
+            "en": "Minecraft version",
+            "nl": "Minecraft-versie",
+            "de": "Minecraft-Version"
+          },
+          "help": {
+            "en": "A Fabric-supported Minecraft version, or LATEST.",
+            "nl": "Een door Fabric ondersteunde Minecraft-versie, of LATEST.",
+            "de": "Eine von Fabric unterstützte Minecraft-Version oder LATEST."
+          },
+          "required": true,
+          "defaultValue": "26.2",
+          "minLength": 3,
+          "maxLength": 24
+        },
+        {
+          "key": "motd",
+          "type": "string",
+          "label": {
+            "en": "Message of the day",
+            "nl": "Welkomstbericht",
+            "de": "Servernachricht"
+          },
+          "help": {
+            "en": "The text shown in the multiplayer Server list.",
+            "nl": "De tekst die in de multiplayer-Serverlijst wordt getoond.",
+            "de": "Der Text, der in der Multiplayer-Serverliste angezeigt wird."
+          },
+          "required": true,
+          "defaultValue": "A Dauva Server",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        {
+          "key": "max-players",
+          "type": "integer",
+          "label": {
+            "en": "Maximum players",
+            "nl": "Maximumaantal spelers",
+            "de": "Maximale Spielerzahl"
+          },
+          "help": {
+            "en": "Maximum simultaneous players.",
+            "nl": "Maximaal aantal gelijktijdige spelers.",
+            "de": "Maximale Anzahl gleichzeitiger Spieler."
+          },
+          "required": true,
+          "defaultValue": "10",
+          "minLength": 1,
+          "maxLength": 3
+        },
+        {
+          "key": "difficulty",
+          "type": "string",
+          "label": {
+            "en": "Difficulty",
+            "nl": "Moeilijkheid",
+            "de": "Schwierigkeit"
+          },
+          "help": {
+            "en": "Minecraft difficulty: peaceful, easy, normal, or hard.",
+            "nl": "Minecraft-moeilijkheid: peaceful, easy, normal of hard.",
+            "de": "Minecraft-Schwierigkeit: peaceful, easy, normal oder hard."
+          },
+          "required": true,
+          "defaultValue": "normal",
+          "minLength": 4,
+          "maxLength": 8
+        },
+        {
+          "key": "online-mode",
+          "type": "boolean",
+          "label": {
+            "en": "Online authentication",
+            "nl": "Online authenticatie",
+            "de": "Online-Authentifizierung"
+          },
+          "help": {
+            "en": "Verify player accounts with Mojang.",
+            "nl": "Controleer spelersaccounts via Mojang.",
+            "de": "Spielerkonten über Mojang überprüfen."
+          },
+          "required": true,
+          "defaultValue": "true"
+        },
+        {
+          "key": "view-distance",
+          "type": "integer",
+          "label": {
+            "en": "View distance",
+            "nl": "Kijkafstand",
+            "de": "Sichtweite"
+          },
+          "help": {
+            "en": "Maximum chunk view distance.",
+            "nl": "Maximale kijkafstand in chunks.",
+            "de": "Maximale Sichtweite in Chunks."
+          },
+          "required": true,
+          "defaultValue": "10",
+          "minLength": 1,
+          "maxLength": 2
+        },
+        {
+          "key": "simulation-distance",
+          "type": "integer",
+          "label": {
+            "en": "Simulation distance",
+            "nl": "Simulatieafstand",
+            "de": "Simulationsdistanz"
+          },
+          "help": {
+            "en": "Maximum ticking distance in chunks.",
+            "nl": "Maximale actieve simulatieafstand in chunks.",
+            "de": "Maximale aktive Simulationsdistanz in Chunks."
+          },
+          "required": true,
+          "defaultValue": "8",
+          "minLength": 1,
+          "maxLength": 2
+        }
+      ],
+      "secrets": [
+        {
+          "key": "rcon-password",
+          "source": "generated",
+          "generatedBytes": 32
+        }
+      ],
+      "lifecycle": {
+        "startOrder": [
+          "server",
+          "backups"
+        ],
+        "stopOrder": [
+          "backups",
+          "server"
+        ],
+        "stopTimeoutSeconds": 60
+      },
+      "capabilities": {
+        "backup": true,
+        "restore": false,
+        "update": false,
+        "console": false
+      },
+      "source": {
+        "kind": "oci",
+        "homepage": "https://www.minecraft.net/",
+        "repository": "https://github.com/itzg/docker-minecraft-server",
+        "imageRegistries": [
+          "ghcr.io"
+        ]
+      },
+      "trust": {
+        "level": "curated",
+        "reviewedAt": "2026-07-26",
+        "mutableRuntimeImagesAllowed": false
+      },
+      "storage": {
+        "class": "bulk",
+        "backupClass": "backup",
+        "estimatedDownloadMb": 800,
+        "estimatedInstallMb": 3072,
+        "estimatedMutableMb": 12288,
+        "backupPolicy": "recommended"
+      },
+      "updatePolicy": {
+        "discovery": "oci-tag",
+        "automaticCheck": true,
+        "automaticInstall": false,
+        "requiresBackup": true,
+        "rollback": true
+      },
+      "proofPolicy": {
+        "requiredChecks": [
+          "images-pinned",
+          "healthy",
+          "ports",
+          "backup-if-supported",
+          "graceful-stop",
+          "restart",
+          "persistence",
+          "cleanup"
+        ],
+        "expiresAfterDays": 90
+      },
+      "manifestDigest": "sha256:6ebbd77db5dee22c6b428f256aeb88635f06a33b1f125bb83f467d6e6c0ae94d",
+      "proof": {
+        "state": "unproven",
+        "missingArchitectures": [
+          "amd64"
+        ]
+      }
+    },
+    {
+      "schemaVersion": "dauva.dev/seed/v1",
+      "id": "minecraft-paper",
+      "version": "1.0.0",
+      "status": "stable",
+      "podId": "minecraft",
+      "genres": [
+        "sandbox",
+        "survival"
+      ],
+      "metadata": {
+        "title": {
+          "en": "Minecraft Paper",
+          "nl": "Minecraft Paper",
+          "de": "Minecraft Paper"
+        },
+        "description": {
+          "en": "A performance-focused Minecraft Paper Server with automatic backups.",
+          "nl": "Een prestatiegerichte Minecraft Paper-Server met automatische back-ups.",
+          "de": "Ein leistungsorientierter Minecraft-Paper-Server mit automatischen Backups."
+        },
+        "icon": "shield"
+      },
+      "compatibility": {
+        "operatingSystems": [
+          "linux"
+        ],
+        "architectures": [
+          "amd64"
+        ],
+        "leafCapabilities": [
+          "dynamic-ports",
+          "multi-component",
+          "oci",
+          "persistent-storage",
+          "resource-limits"
+        ]
+      },
+      "components": [
+        {
+          "id": "server",
+          "role": "primary",
+          "image": "ghcr.io/itzg/minecraft-server@sha256:6ec1110e4d9236d00ae9436a3e4a5929583e5b19cc94b756a7c603f7cf647a77",
+          "imageUpdate": {
+            "reference": "ghcr.io/itzg/minecraft-server:stable"
+          },
+          "environment": {
+            "ALLOW_FLIGHT": "TRUE",
+            "ENABLE_RCON": "TRUE",
+            "ENABLE_WHITELIST": "FALSE",
+            "ENFORCE_WHITELIST": "FALSE",
+            "MODE": "survival",
+            "TYPE": "PAPER"
+          },
+          "optionEnvironment": {
+            "difficulty": "DIFFICULTY",
+            "max-players": "MAX_PLAYERS",
+            "minecraft-version": "VERSION",
+            "motd": "MOTD",
+            "online-mode": "ONLINE_MODE",
+            "simulation-distance": "SIMULATION_DISTANCE",
+            "view-distance": "VIEW_DISTANCE"
+          },
+          "agreementEnvironment": {
+            "accept-minecraft-eula": {
+              "name": "EULA",
+              "acceptedValue": "TRUE"
+            }
+          },
+          "secretEnvironment": {
+            "rcon-password": "RCON_PASSWORD"
+          },
+          "runtimeEnvironment": {
+            "memoryMb": "MEMORY",
+            "serverName": "SERVER_NAME",
+            "timezone": "TZ"
+          },
+          "volumeMounts": [
+            {
+              "volumeId": "data",
+              "target": "/data",
+              "readOnly": false
+            }
+          ],
+          "dependsOn": [],
+          "health": {
+            "source": "container",
+            "startupGraceSeconds": 600
+          }
+        },
+        {
+          "id": "backups",
+          "role": "companion",
+          "image": "ghcr.io/itzg/mc-backup@sha256:db2bca9a54aac96e8db74be038b920cb549c8e3b3384067251aad5e178dd03cc",
+          "imageUpdate": {
+            "reference": "ghcr.io/itzg/mc-backup:stable"
+          },
+          "environment": {
+            "BACKUP_INTERVAL": "2h",
+            "BACKUP_ON_STARTUP": "FALSE",
+            "INITIAL_DELAY": "5m",
+            "PRUNE_BACKUPS_COUNT": "24",
+            "PRUNE_BACKUPS_DAYS": "14",
+            "RCON_HOST": "server"
+          },
+          "optionEnvironment": {},
+          "agreementEnvironment": {},
+          "secretEnvironment": {
+            "rcon-password": "RCON_PASSWORD"
+          },
+          "runtimeEnvironment": {
+            "serverName": "BACKUP_NAME",
+            "timezone": "TZ"
+          },
+          "volumeMounts": [
+            {
+              "volumeId": "data",
+              "target": "/data",
+              "readOnly": true
+            },
+            {
+              "volumeId": "backups",
+              "target": "/backups",
+              "readOnly": false
+            }
+          ],
+          "dependsOn": [
+            "server"
+          ],
+          "health": {
+            "source": "running",
+            "startupGraceSeconds": 60
+          }
+        }
+      ],
+      "volumes": [
+        {
+          "id": "data",
+          "role": "data",
+          "retention": "delete-with-server"
+        },
+        {
+          "id": "backups",
+          "role": "backup",
+          "retention": "delete-with-server"
+        }
+      ],
+      "ports": [
+        {
+          "id": "game",
+          "componentId": "server",
+          "containerPort": 25565,
+          "containerPortMode": "fixed",
+          "protocols": [
+            "tcp"
+          ],
+          "exposure": "public",
+          "purpose": "game",
+          "primary": true,
+          "sharedHostPort": true
+        }
+      ],
+      "resources": {
+        "defaultPresetId": "balanced",
+        "presets": [
+          {
+            "id": "small",
+            "title": {
+              "en": "Small",
+              "nl": "Klein",
+              "de": "Klein"
+            },
+            "description": {
+              "en": "For a disposable test or a few players with light mods.",
+              "nl": "Voor een tijdelijke test of enkele spelers met lichte mods.",
+              "de": "Für einen temporären Test oder wenige Spieler mit leichten Mods."
+            },
+            "memoryMb": 2048,
+            "diskMb": 12288,
+            "cpuPercent": 100
+          },
+          {
+            "id": "balanced",
+            "title": {
+              "en": "Balanced",
+              "nl": "Gebalanceerd",
+              "de": "Ausgewogen"
+            },
+            "description": {
+              "en": "Recommended for a persistent Paper Server.",
+              "nl": "Aanbevolen voor een blijvende Paper-Server.",
+              "de": "Für einen persistenten Paper-Server empfohlen."
+            },
+            "memoryMb": 3072,
+            "diskMb": 20480,
+            "cpuPercent": 150
+          },
+          {
+            "id": "large",
+            "title": {
+              "en": "Large",
+              "nl": "Groot",
+              "de": "Groß"
+            },
+            "description": {
+              "en": "For larger modpacks after Leaf capacity has been checked.",
+              "nl": "Voor grotere modpacks nadat de Leaf-capaciteit is gecontroleerd.",
+              "de": "Für größere Modpacks nach Prüfung der Leaf-Kapazität."
+            },
+            "memoryMb": 6144,
+            "diskMb": 40960,
+            "cpuPercent": 200
+          }
+        ]
+      },
+      "inputs": [
+        {
+          "key": "accept-minecraft-eula",
+          "type": "agreement",
+          "label": {
+            "en": "Minecraft End User License Agreement",
+            "nl": "Minecraft-gebruikersovereenkomst",
+            "de": "Minecraft-Endbenutzerlizenzvertrag"
+          },
+          "help": {
+            "en": "I have read and accept the official Minecraft EULA and authorize Dauva to record EULA=TRUE for this Server.",
+            "nl": "Ik heb de officiële Minecraft-EULA gelezen en accepteer deze. Ik geef Dauva toestemming om EULA=TRUE voor deze Server vast te leggen.",
+            "de": "Ich habe die offizielle Minecraft-EULA gelesen und akzeptiere sie. Ich erlaube Dauva, EULA=TRUE für diesen Server festzulegen."
+          },
+          "required": true,
+          "defaultValue": "false",
+          "url": "https://www.minecraft.net/eula",
+          "revision": "official-current"
+        },
+        {
+          "key": "minecraft-version",
+          "type": "string",
+          "label": {
+            "en": "Minecraft version",
+            "nl": "Minecraft-versie",
+            "de": "Minecraft-Version"
+          },
+          "help": {
+            "en": "A Paper-supported Minecraft version, or LATEST.",
+            "nl": "Een door Paper ondersteunde Minecraft-versie, of LATEST.",
+            "de": "Eine von Paper unterstützte Minecraft-Version oder LATEST."
+          },
+          "required": true,
+          "defaultValue": "26.2",
+          "minLength": 3,
+          "maxLength": 24
+        },
+        {
+          "key": "motd",
+          "type": "string",
+          "label": {
+            "en": "Message of the day",
+            "nl": "Welkomstbericht",
+            "de": "Servernachricht"
+          },
+          "help": {
+            "en": "The text shown in the multiplayer Server list.",
+            "nl": "De tekst die in de multiplayer-Serverlijst wordt getoond.",
+            "de": "Der Text, der in der Multiplayer-Serverliste angezeigt wird."
+          },
+          "required": true,
+          "defaultValue": "A Dauva Server",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        {
+          "key": "max-players",
+          "type": "integer",
+          "label": {
+            "en": "Maximum players",
+            "nl": "Maximumaantal spelers",
+            "de": "Maximale Spielerzahl"
+          },
+          "help": {
+            "en": "Maximum simultaneous players.",
+            "nl": "Maximaal aantal gelijktijdige spelers.",
+            "de": "Maximale Anzahl gleichzeitiger Spieler."
+          },
+          "required": true,
+          "defaultValue": "10",
+          "minLength": 1,
+          "maxLength": 3
+        },
+        {
+          "key": "difficulty",
+          "type": "string",
+          "label": {
+            "en": "Difficulty",
+            "nl": "Moeilijkheid",
+            "de": "Schwierigkeit"
+          },
+          "help": {
+            "en": "Minecraft difficulty: peaceful, easy, normal, or hard.",
+            "nl": "Minecraft-moeilijkheid: peaceful, easy, normal of hard.",
+            "de": "Minecraft-Schwierigkeit: peaceful, easy, normal oder hard."
+          },
+          "required": true,
+          "defaultValue": "normal",
+          "minLength": 4,
+          "maxLength": 8
+        },
+        {
+          "key": "online-mode",
+          "type": "boolean",
+          "label": {
+            "en": "Online authentication",
+            "nl": "Online authenticatie",
+            "de": "Online-Authentifizierung"
+          },
+          "help": {
+            "en": "Verify player accounts with Mojang.",
+            "nl": "Controleer spelersaccounts via Mojang.",
+            "de": "Spielerkonten über Mojang überprüfen."
+          },
+          "required": true,
+          "defaultValue": "true"
+        },
+        {
+          "key": "view-distance",
+          "type": "integer",
+          "label": {
+            "en": "View distance",
+            "nl": "Kijkafstand",
+            "de": "Sichtweite"
+          },
+          "help": {
+            "en": "Maximum chunk view distance.",
+            "nl": "Maximale kijkafstand in chunks.",
+            "de": "Maximale Sichtweite in Chunks."
+          },
+          "required": true,
+          "defaultValue": "10",
+          "minLength": 1,
+          "maxLength": 2
+        },
+        {
+          "key": "simulation-distance",
+          "type": "integer",
+          "label": {
+            "en": "Simulation distance",
+            "nl": "Simulatieafstand",
+            "de": "Simulationsdistanz"
+          },
+          "help": {
+            "en": "Maximum ticking distance in chunks.",
+            "nl": "Maximale actieve simulatieafstand in chunks.",
+            "de": "Maximale aktive Simulationsdistanz in Chunks."
+          },
+          "required": true,
+          "defaultValue": "8",
+          "minLength": 1,
+          "maxLength": 2
+        }
+      ],
+      "secrets": [
+        {
+          "key": "rcon-password",
+          "source": "generated",
+          "generatedBytes": 32
+        }
+      ],
+      "lifecycle": {
+        "startOrder": [
+          "server",
+          "backups"
+        ],
+        "stopOrder": [
+          "backups",
+          "server"
+        ],
+        "stopTimeoutSeconds": 60
+      },
+      "capabilities": {
+        "backup": true,
+        "restore": false,
+        "update": false,
+        "console": false
+      },
+      "source": {
+        "kind": "oci",
+        "homepage": "https://www.minecraft.net/",
+        "repository": "https://github.com/itzg/docker-minecraft-server",
+        "imageRegistries": [
+          "ghcr.io"
+        ]
+      },
+      "trust": {
+        "level": "curated",
+        "reviewedAt": "2026-07-26",
+        "mutableRuntimeImagesAllowed": false
+      },
+      "storage": {
+        "class": "bulk",
+        "backupClass": "backup",
+        "estimatedDownloadMb": 800,
+        "estimatedInstallMb": 3072,
+        "estimatedMutableMb": 12288,
+        "backupPolicy": "recommended"
+      },
+      "updatePolicy": {
+        "discovery": "oci-tag",
+        "automaticCheck": true,
+        "automaticInstall": false,
+        "requiresBackup": true,
+        "rollback": true
+      },
+      "proofPolicy": {
+        "requiredChecks": [
+          "images-pinned",
+          "healthy",
+          "ports",
+          "backup-if-supported",
+          "graceful-stop",
+          "restart",
+          "persistence",
+          "cleanup"
+        ],
+        "expiresAfterDays": 90
+      },
+      "manifestDigest": "sha256:31e06e591bfa4afb6f6f11ad3f02dab1bfbd4c80255bdda3aa9b333cac3d40fb",
+      "proof": {
+        "state": "unproven",
+        "missingArchitectures": [
+          "amd64"
+        ]
+      }
+    },
+    {
+      "schemaVersion": "dauva.dev/seed/v1",
       "id": "satisfactory",
       "version": "1.0.0",
       "status": "stable",
@@ -6540,5 +9410,5 @@
       "upstreamId": "1690800"
     }
   ],
-  "registryDigest": "sha256:9d46054b4f33f9b6e6cb452d341e5b2f18d48834a318f8470b2d804c32aee403"
+  "registryDigest": "sha256:11194c98f280f3f403f63ecdcaab7c130f30228e98f6b1658132cfa628f60a7e"
 }

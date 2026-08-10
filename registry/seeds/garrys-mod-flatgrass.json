@@ -1,8 +1,8 @@
 {
   "schemaVersion": "dauva.dev/seed/v1",
   "id": "garrys-mod-flatgrass",
-  "version": "1.0.0",
-  "status": "stable",
+  "version": "1.0.1-rc.1",
+  "status": "candidate",
   "podId": "garrys-mod",
   "genres": [
     "sandbox"
@@ -39,7 +39,7 @@
     {
       "id": "server",
       "role": "primary",
-      "image": "docker.io/ceifa/garrysmod@sha256:08628a0c98cb545d56006294d86f02a64cd77f344ff4bc114e0a324045905841",
+      "image": "docker.io/ceifa/garrysmod@sha256:e3494a218ee06e82ea7d80fcf7530a22fd833a6720f81b70e05b8e18d12b933c",
       "imageUpdate": {
         "reference": "docker.io/ceifa/garrysmod:ubuntu"
       },

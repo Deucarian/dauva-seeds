@@ -1,8 +1,8 @@
 {
   "schemaVersion": "dauva.dev/seed/v1",
   "id": "enshrouded-wine",
-  "version": "1.0.1-rc.1",
-  "status": "candidate",
+  "version": "1.0.0",
+  "status": "stable",
   "podId": "enshrouded",
   "genres": [
     "adventure",
@@ -40,7 +40,7 @@
     {
       "id": "server",
       "role": "primary",
-      "image": "docker.io/mornedhels/enshrouded-server@sha256:6bd473b78e5331a0fc86553d9e9ddef5c712d7e9b356af385aa90e772f931019",
+      "image": "docker.io/mornedhels/enshrouded-server@sha256:6e7eb94c52a2bbd0aa3c462edf0412dbf8fbf181984d94199cc4adf42085bdda",
       "imageUpdate": {
         "reference": "docker.io/mornedhels/enshrouded-server:stable-wine"
       },

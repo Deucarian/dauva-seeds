@@ -1,8 +1,8 @@
 {
   "schemaVersion": "dauva.dev/seed/v1",
-  "id": "factorio-stable",
-  "version": "1.0.1-rc.1",
-  "status": "candidate",
+  "id": "factorio",
+  "version": "1.0.1",
+  "status": "stable",
   "podId": "factorio",
   "genres": [
     "automation",
@@ -10,14 +10,14 @@
   ],
   "metadata": {
     "title": {
-      "en": "Factorio Stable",
-      "nl": "Factorio Stable",
-      "de": "Factorio Stable"
+      "en": "Factorio Latest",
+      "nl": "Factorio Latest",
+      "de": "Factorio Latest"
     },
     "description": {
-      "en": "A Factorio Server pinned to the stable release channel.",
-      "nl": "Een Factorio-Server vastgezet op het stabiele releasekanaal.",
-      "de": "Ein Factorio-Server auf dem stabilen Veröffentlichungskanal."
+      "en": "A Factorio Server that follows the newest available release channel.",
+      "nl": "Een Factorio-Server die het nieuwste beschikbare releasekanaal volgt.",
+      "de": "Ein Factorio-Server auf dem neuesten verfügbaren Veröffentlichungskanal."
     },
     "icon": "settings"
   },
@@ -39,9 +39,9 @@
     {
       "id": "server",
       "role": "primary",
-      "image": "docker.io/factoriotools/factorio@sha256:c21d798e75a8333ddca2f7029290325b3f2085841c72ab31cc64f7a916872841",
+      "image": "docker.io/factoriotools/factorio@sha256:f7942281d7d3a54fd7e5b1aca57428fce4f035aabdb1cb798473f7b78778fb49",
       "imageUpdate": {
-        "reference": "docker.io/factoriotools/factorio:stable"
+        "reference": "docker.io/factoriotools/factorio:latest"
       },
       "environment": {
         "GENERATE_NEW_SAVE": "true",
