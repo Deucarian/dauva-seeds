@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "dauva.dev/seed-studio-publication-test-vectors/v1",
+  "publicKey": "11qYAYKxCrfVS_7TyWQHOg7hcvPapiMlrwIaaPcHURo",
+  "statement": {
+    "schemaVersion": "dauva.dev/seed-publication/v1",
+    "publicationPayload": {
+      "publicationId": "423e4567-e89b-42d3-a456-426614174003",
+      "exportId": "123e4567-e89b-42d3-a456-426614174000",
+      "exportDigest": "sha256:9999999999999999999999999999999999999999999999999999999999999999",
+      "archiveDigest": "sha256:8888888888888888888888888888888888888888888888888888888888888888",
+      "sourceEnvironment": "develop",
+      "repositoryId": 1311366821,
+      "repository": "Deucarian/dauva-seeds",
+      "targetRef": "refs/heads/develop",
+      "baseGitCommit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "baseRegistryDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expectedRegistryDigest": "sha256:7777777777777777777777777777777777777777777777777777777777777777",
+      "createdAtUtc": "2026-08-10T10:00:00.000Z",
+      "claimBeforeUtc": "2026-08-10T11:00:00.000Z"
+    },
+    "publicationDigest": "sha256:548c9af10f02ea4c7bb57d9b861ad69fb6de380352d122198908049ca79dbb07",
+    "studioAttestation": {
+      "algorithm": "Ed25519",
+      "keyId": "sha256:21fe31dfa154a261626bf854046fd2271b7bed4b6abe45aa58877ef47f9721b9",
+      "signature": "NTJk5AwItSPEwsSzJGGYxuKmLy5iIGgHwSRYTX2FKkmemRtTHdsL-s2EkxLwb-tgp8dM2DeXNaorGxOnxZvaBw"
+    }
+  },
+  "deployment": {
+    "schemaVersion": "dauva.dev/seed-registry-deployment-receipt/v1",
+    "deploymentPayload": {
+      "deploymentId": "523e4567-e89b-42d3-a456-426614174004",
+      "publicationId": "423e4567-e89b-42d3-a456-426614174003",
+      "environment": "develop",
+      "repositoryId": 1311366821,
+      "repository": "Deucarian/dauva-seeds",
+      "targetRef": "refs/heads/develop",
+      "commitSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "previousCommitSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "registryDigest": "sha256:7777777777777777777777777777777777777777777777777777777777777777",
+      "registryFileDigest": "sha256:6666666666666666666666666666666666666666666666666666666666666666",
+      "workflowRunId": 30826362679,
+      "workflowRunAttempt": 1,
+      "jobWorkflowRef": "Deucarian/dauva-seeds/.github/workflows/_seed-registry-deploy.yml@refs/heads/main",
+      "deployedAtUtc": "2026-08-10T10:20:00.000Z",
+      "verifiedAtUtc": "2026-08-10T10:21:00.000Z",
+      "health": {
+        "apiCommitSha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "apiRegistryDigest": "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+      }
+    },
+    "deploymentDigest": "sha256:acae50d8d60f983988615d4781e68e5071eb43e0c982b77d9f5a462d21b879d2"
+  }
+}

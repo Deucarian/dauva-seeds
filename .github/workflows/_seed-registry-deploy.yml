@@ -1,0 +1,127 @@
+name: Seed Registry deployment
+
+on:
+  workflow_call:
+    inputs:
+      publication_id:
+        required: true
+        type: string
+      environment:
+        required: true
+        type: string
+      target_ref:
+        required: true
+        type: string
+      registry_commit:
+        required: true
+        type: string
+      previous_commit:
+        required: true
+        type: string
+      api_origin:
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    environment: ${{ inputs.environment }}
+    runs-on: [self-hosted, Linux, X64, dauva-seed-deploy]
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Check out trusted deployment code from protected main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          path: trusted
+          persist-credentials: false
+      - name: Check out exact merged Registry commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.registry_commit }}
+          path: registry
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Use the pinned Node runtime
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: trusted/package-lock.json
+      - name: Install trusted deployment dependencies
+        working-directory: trusted
+        run: npm ci --ignore-scripts
+      - name: Read exact repository and target protection
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_REF: ${{ inputs.target_ref }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${{ github.repository_id }}" = "1311366821"
+          test "${{ github.repository }}" = "Deucarian/dauva-seeds"
+          test "$(git -C registry rev-parse HEAD)" = "${{ inputs.registry_commit }}"
+          gh api "repos/${{ github.repository }}" > "$RUNNER_TEMP/repository.json"
+          branch="${TARGET_REF#refs/heads/}"
+          gh api "repos/${{ github.repository }}/branches/$branch/protection" > "$RUNNER_TEMP/protection.json"
+      - name: Prove activation, target, review, and trust boundaries
+        env:
+          DAUVA_SEED_PUBLICATION_ACTIVATION: ${{ vars.DAUVA_SEED_PUBLICATION_ACTIVATION }}
+        run: >-
+          node trusted/tools/publication-preconditions.mjs
+          --phase activation
+          --environment "${{ inputs.environment }}"
+          --target-ref "${{ inputs.target_ref }}"
+          --api-origin "${{ inputs.api_origin }}"
+          --activation "$DAUVA_SEED_PUBLICATION_ACTIVATION"
+          --repository "$RUNNER_TEMP/repository.json"
+          --protection "$RUNNER_TEMP/protection.json"
+          --verification-roots trusted/trust/seed-studio-verification-roots.json
+      - name: Prove exact merged Registry tree
+        working-directory: registry
+        run: |
+          npm ci --ignore-scripts
+          npm run check
+      - name: Deploy exact Registry through the host-owned command
+        id: deploy
+        shell: bash
+        run: |
+          set -euo pipefail
+          deployed_at="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+          printf 'deployed-at=%s\n' "$deployed_at" >> "$GITHUB_OUTPUT"
+          sudo --non-interactive /usr/local/sbin/dauva-seed-registry-deploy \
+            "${{ inputs.environment }}" \
+            "${{ inputs.registry_commit }}" \
+            "${{ inputs.previous_commit }}" \
+            > "$RUNNER_TEMP/registry-health.json"
+      - name: Verify public Registry health independently
+        id: health
+        shell: bash
+        run: |
+          set -euo pipefail
+          for _ in $(seq 1 30); do
+            if curl --fail --silent --show-error \
+                "${{ inputs.api_origin }}/api/health/seed-registry" \
+                > "$RUNNER_TEMP/public-registry-health.json" &&
+               cmp --silent "$RUNNER_TEMP/registry-health.json" "$RUNNER_TEMP/public-registry-health.json"; then
+              break
+            fi
+            sleep 2
+          done
+          cmp --silent "$RUNNER_TEMP/registry-health.json" "$RUNNER_TEMP/public-registry-health.json"
+          verified_at="$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"
+          printf 'verified-at=%s\n' "$verified_at" >> "$GITHUB_OUTPUT"
+      - name: Record exact durable deployment receipt
+        run: >-
+          node trusted/tools/publication-workflow-client.mjs deployment
+          --publication-id "${{ inputs.publication_id }}"
+          --environment "${{ inputs.environment }}"
+          --commit-sha "${{ inputs.registry_commit }}"
+          --previous-commit-sha "${{ inputs.previous_commit }}"
+          --health "$RUNNER_TEMP/public-registry-health.json"
+          --deployed-at "${{ steps.deploy.outputs.deployed-at }}"
+          --verified-at "${{ steps.health.outputs.verified-at }}"

@@ -1,0 +1,56 @@
+name: Seed Registry deploy - Develop
+
+on:
+  push:
+    branches: [develop]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: seed-registry-deploy-develop
+  cancel-in-progress: false
+
+jobs:
+  identify:
+    runs-on: ubuntu-latest
+    outputs:
+      publication_id: ${{ steps.resolve.outputs.publication-id }}
+      commit_sha: ${{ steps.resolve.outputs.commit-sha }}
+      previous_commit_sha: ${{ steps.resolve.outputs.previous-commit-sha }}
+    steps:
+      - name: Check out trusted merge resolver from main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          path: trusted
+          persist-credentials: false
+      - name: Read pull requests attached to exact pushed commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh api -H 'Accept: application/vnd.github+json'
+          "repos/${{ github.repository }}/commits/${{ github.sha }}/pulls"
+          > "$RUNNER_TEMP/pulls.json"
+      - name: Resolve exact publication marker
+        id: resolve
+        env:
+          DAUVA_PULL_REQUESTS_PATH: ${{ runner.temp }}/pulls.json
+        run: node trusted/tools/resolve-publication-merge.mjs
+
+  deploy:
+    needs: identify
+    if: needs.identify.outputs.publication_id != ''
+    permissions:
+      contents: read
+      id-token: write
+    uses: Deucarian/dauva-seeds/.github/workflows/_seed-registry-deploy.yml@main
+    with:
+      publication_id: ${{ needs.identify.outputs.publication_id }}
+      environment: develop
+      target_ref: refs/heads/develop
+      registry_commit: ${{ needs.identify.outputs.commit_sha }}
+      previous_commit: ${{ needs.identify.outputs.previous_commit_sha }}
+      api_origin: https://develop.jorishoef.nl
+    secrets: inherit

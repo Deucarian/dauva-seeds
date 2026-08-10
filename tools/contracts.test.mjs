@@ -4,7 +4,14 @@ import path from "node:path";
 import test from "node:test";
 import Ajv2020 from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
-import { readJson, repositoryRoot } from "./registry-lib.mjs";
+import {
+  canonicalJson,
+  readJson,
+  repositoryRoot,
+  sha256,
+} from "./registry-lib.mjs";
+import { ed25519PublicKeyFromRaw } from "./proof-crypto.mjs";
+import { verifySignedPublicationStatement } from "./release-engine.mjs";
 
 const schemaDirectory = path.join(repositoryRoot, "schemas");
 const documents = Object.fromEntries(
@@ -16,8 +23,11 @@ const documents = Object.fromEntries(
       "seed-proof-bundle-v1.schema.json",
       "seed-proof-v2.schema.json",
       "seed-release-bundle-v1.schema.json",
+      "seed-studio-publication-v1.schema.json",
+      "seed-registry-deployment-receipt-v1.schema.json",
       "seed-studio-api-v1.openapi.json",
       "seed-studio-leaf-v2.openapi.json",
+      "seed-studio-publication-internal-v1.openapi.json",
     ].map(async (name) => [name, await readJson(path.join(schemaDirectory, name))]),
   ),
 );
@@ -32,7 +42,15 @@ const validateProof = ajv.compile(documents["seed-proof-v2.schema.json"]);
 const validateBundle = ajv.compile(
   documents["seed-release-bundle-v1.schema.json"],
 );
+const validatePublication = ajv.compile(
+  documents["seed-studio-publication-v1.schema.json"],
+);
+const validateDeployment = ajv.compile(
+  documents["seed-registry-deployment-receipt-v1.schema.json"],
+);
 const studioApi = documents["seed-studio-api-v1.openapi.json"];
+const publicationApi =
+  documents["seed-studio-publication-internal-v1.openapi.json"];
 const validateCreateWorkspace = ajv.compile({
   $id: "https://dauva.dev/schemas/seed-studio-create-workspace-test.json",
   ...resolveStudioComponent(studioApi, "CreateWorkspaceRequest"),
@@ -40,6 +58,14 @@ const validateCreateWorkspace = ajv.compile({
 const validateWorkingSeedDocument = ajv.compile({
   $id: "https://dauva.dev/schemas/seed-studio-working-seed-test.json",
   ...resolveStudioComponent(studioApi, "WorkingSeedDocument"),
+});
+const validatePublicationClaimRequest = ajv.compile({
+  $id: "https://dauva.dev/schemas/seed-publication-claim-request-test.json",
+  ...resolveStudioComponent(publicationApi, "ClaimRequest"),
+});
+const validatePublicationClaimResponse = ajv.compile({
+  $id: "https://dauva.dev/schemas/seed-publication-claim-response-test.json",
+  ...resolveStudioComponent(publicationApi, "ClaimResponse"),
 });
 
 const uuid = "123e4567-e89b-42d3-a456-426614174000";
@@ -222,6 +248,78 @@ test("contract schemas accept the frozen valid fixtures", () => {
   );
 });
 
+test("publication and deployment contracts match the frozen signed vectors", async () => {
+  const vectors = await readJson(
+    path.join(repositoryRoot, "test-vectors", "seed-studio-publication-v1.json"),
+  );
+  assert.equal(
+    validatePublication(vectors.statement),
+    true,
+    JSON.stringify(validatePublication.errors),
+  );
+  assert.equal(
+    validateDeployment(vectors.deployment),
+    true,
+    JSON.stringify(validateDeployment.errors),
+  );
+  const publicKey = Buffer.from(vectors.publicKey, "base64url");
+  assert.doesNotThrow(() => ed25519PublicKeyFromRaw(publicKey));
+  assert.equal(
+    verifySignedPublicationStatement({
+      statement: vectors.statement,
+      studioPublicKey: publicKey,
+      validationTime: "2026-08-10T10:30:00.000Z",
+    }),
+    vectors.statement.publicationDigest,
+  );
+  assert.equal(
+    vectors.deployment.deploymentDigest,
+    sha256(canonicalJson(vectors.deployment.deploymentPayload)),
+  );
+
+  const crossedEnvironment = structuredClone(vectors.statement);
+  crossedEnvironment.publicationPayload.sourceEnvironment = "production";
+  assert.equal(validatePublication(crossedEnvironment), false);
+});
+
+test("publication claim contract binds the durable attempt and never echoes its token", async () => {
+  const vectors = await readJson(
+    path.join(
+      repositoryRoot,
+      "test-vectors",
+      "seed-studio-publication-claim-v1.json",
+    ),
+  );
+  for (const claim of Object.values(vectors.claims)) {
+    assert.equal(
+      validatePublicationClaimRequest(claim.request),
+      true,
+      JSON.stringify(validatePublicationClaimRequest.errors),
+    );
+  }
+  assert.equal(
+    validatePublicationClaimResponse(vectors.claimResponse),
+    true,
+    JSON.stringify(validatePublicationClaimResponse.errors),
+  );
+  assert.equal("attemptToken" in vectors.claimResponse, false);
+
+  const legacyClaim = structuredClone(vectors.claims.current.request);
+  delete legacyClaim.publicationAttempt;
+  delete legacyClaim.attemptToken;
+  assert.equal(validatePublicationClaimRequest(legacyClaim), false);
+
+  const paddedToken = structuredClone(vectors.claims.current.request);
+  paddedToken.attemptToken += "=";
+  assert.equal(validatePublicationClaimRequest(paddedToken), false);
+
+  const echoedToken = {
+    ...vectors.claimResponse,
+    attemptToken: vectors.claims.current.request.attemptToken,
+  };
+  assert.equal(validatePublicationClaimResponse(echoedToken), false);
+});
+
 test("contract schemas reject commands, extension fields, and unsafe paths", () => {
   const commandPlan = structuredClone(proofPlan);
   commandPlan.checks[0] = { kind: "shell", command: "echo unsafe" };
@@ -237,7 +335,7 @@ test("contract schemas reject commands, extension fields, and unsafe paths", () 
 });
 
 test("Studio OpenAPI accepts only the exact guided workspace starter shapes", () => {
-  assert.equal(studioApi.info.version, "1.1.0");
+  assert.equal(studioApi.info.version, "1.2.0");
   const existing = {
     mode: "new",
     source: "guided",
@@ -401,10 +499,14 @@ test("OpenAPI contracts expose only the approved Studio and Leaf operations", as
     "/workspaces/{workspaceId}/exports",
     "/exports/{exportId}",
     "/exports/{exportId}/download",
+    "/exports/{exportId}/publications",
+    "/publications/{publicationId}",
+    "/publications/{publicationId}/events",
+    "/publications/{publicationId}/resume",
   ];
   assert.deepEqual(Object.keys(api.paths).sort(), requiredApiPaths.sort());
   assert.equal(
-    Object.keys(api.paths).some((route) => /publish|merge|deploy/i.test(route)),
+    Object.keys(api.paths).some((route) => /\/registry|\/merge|\/deploy/i.test(route)),
     false,
   );
   assert.deepEqual(api.security, [{ portalSession: [] }]);
@@ -441,7 +543,42 @@ test("OpenAPI contracts expose only the approved Studio and Leaf operations", as
     "/v2/seed-proof-runs/{runId}/attempts/{attemptId}/finalize",
   ]);
 
-  for (const document of [api, leaf]) {
+  assert.equal(publicationApi.info.version, "1.1.0");
+  assert.deepEqual(Object.keys(publicationApi.paths).sort(), [
+    "/seed-publications/{publicationId}/bundle",
+    "/seed-publications/{publicationId}/claim",
+    "/seed-publications/{publicationId}/events",
+    "/seed-publications/{publicationId}/statement",
+    "/seed-registry-deployments",
+  ]);
+  assert.deepEqual(publicationApi.security, [{ githubOidc: [] }]);
+  assert.equal(
+    publicationApi.components.securitySchemes.githubOidc.type,
+    "http",
+  );
+  assert.equal(
+    publicationApi.components.securitySchemes.githubOidc.scheme,
+    "bearer",
+  );
+  for (const item of Object.values(publicationApi.paths)) {
+    for (const method of ["post", "put", "patch", "delete"]) {
+      if (!item[method]) continue;
+      const parameterReferences = (item[method].parameters ?? []).map(
+        (parameter) => parameter.$ref,
+      );
+      const expectedIdempotencyParameter =
+        item[method].operationId === "claimSeedPublication"
+          ? "#/components/parameters/ClaimIdempotencyKey"
+          : "#/components/parameters/IdempotencyKey";
+      assert.equal(
+        parameterReferences.includes(expectedIdempotencyParameter),
+        true,
+        `Internal ${method.toUpperCase()} is missing its exact Idempotency-Key contract`,
+      );
+    }
+  }
+
+  for (const document of [api, leaf, publicationApi]) {
     for (const reference of collectExternalReferences(document)) {
       await access(path.resolve(schemaDirectory, reference));
     }

@@ -1,4 +1,41 @@
 {
   "schemaVersion": "dauva.dev/seed-studio-verification-roots/v1",
-  "keys": []
+  "keys": [
+    {
+      "purpose": "studio_export",
+      "keyId": "sha256:452a47f345fe57ae1d50b97ef105905fef642f7f0e6d408f2076b47ebbe80b26",
+      "publicKey": "PTG8t2iMeM4J3hXSEhig-ZCmq-r_d3GYKy1MBPz6RS4",
+      "subjects": [
+        "env:develop",
+        "repo:deucarian.dauva-seeds",
+        "target:develop"
+      ],
+      "status": "active",
+      "addedAt": "2026-08-10T14:30:16.557Z",
+      "revokedAt": null
+    },
+    {
+      "purpose": "proof_api",
+      "keyId": "sha256:452a47f345fe57ae1d50b97ef105905fef642f7f0e6d408f2076b47ebbe80b26",
+      "publicKey": "PTG8t2iMeM4J3hXSEhig-ZCmq-r_d3GYKy1MBPz6RS4",
+      "subjects": [
+        "env:develop"
+      ],
+      "status": "active",
+      "addedAt": "2026-08-10T14:30:16.557Z",
+      "revokedAt": null
+    },
+    {
+      "purpose": "proof_leaf",
+      "keyId": "sha256:23aba8e706af2e71bd740ff3bba305e50e447edb9b642c803b8ca6c309db8327",
+      "publicKey": "T80umHmnMAxIiVqIOg1dtTMv57swT9AXeniwRKPAqMo",
+      "subjects": [
+        "env:develop",
+        "leaf:develop-proof-leaf"
+      ],
+      "status": "active",
+      "addedAt": "2026-08-10T14:30:16.557Z",
+      "revokedAt": null
+    }
+  ]
 }

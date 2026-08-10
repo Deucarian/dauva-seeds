@@ -2,9 +2,9 @@
 
 Status: **approved normative specification**
 
-Specification version: **1.1.0**
+Specification version: **1.2.2**
 
-Approved and last updated: **2026-08-04**
+Approved and last updated: **2026-08-10**
 
 This document defines the first production release of Dauva's internal Seed
 Studio and the production-ready Seed Creator behind it. It is intentionally
@@ -22,6 +22,9 @@ Related canonical contracts:
 - [Seed v1 schema](../../schemas/seed-v1.schema.json)
 - [Pod v1 schema](../../schemas/pod-v1.schema.json)
 - [Seed proof v1 schema](../../schemas/seed-proof-v1.schema.json)
+- [Protected-publication statement](../../schemas/seed-studio-publication-v1.schema.json)
+- [Registry deployment receipt](../../schemas/seed-registry-deployment-receipt-v1.schema.json)
+- [Workflow-only publication API](../../schemas/seed-studio-publication-internal-v1.openapi.json)
 
 ## 1. Normative language and precedence
 
@@ -59,11 +62,15 @@ The first release uses the following decisions:
   governed by Deucarian.
 - Working drafts, immutable revisions, validation runs, proof runs, and export
   records **MUST** live outside the stable Registry.
-- The Studio **MUST NOT** write to the deployed Registry, push Git commits,
-  merge a pull request, or publish a stable Seed directly.
-- The Studio's final output is a deterministic, commit-ready release bundle.
-  An internal developer reviews and applies that bundle through the existing
-  protected Git workflow.
+- The Studio **MUST NOT** write to the deployed Registry, push a protected
+  target branch, merge a pull request, or publish a stable Seed directly.
+- The Studio's final mutation is a durable target-bound publication proposal.
+  A trusted workflow verifies and transactionally applies its deterministic
+  release bundle to a proposal branch, then opens or resumes a protected pull
+  request. A human review and protected merge remain mandatory.
+- Develop proposals target only `Deucarian/dauva-seeds:develop`; Production
+  proposals target only `Deucarian/dauva-seeds:main`. Content, credentials,
+  receipts, state, or callbacks may never cross those environments.
 - Candidate code may execute only on an explicitly enrolled, dedicated
   non-production Proof Leaf.
 - Public accounts, public submissions, community moderation, third-party trust
@@ -87,8 +94,10 @@ The release **MUST** let an authorized internal author:
 9. freeze an immutable release-candidate or stable-reproof revision;
 10. run and follow a durable disposable lifecycle proof;
 11. review a human-readable diff and exact canonical JSON;
-12. export an atomic release bundle that passes all repository checks; and
-13. resume safely after a browser, API, worker, or Proof Leaf restart.
+12. export an atomic release bundle that passes all repository checks;
+13. submit and follow that exact export through protected Git review and
+    Registry deployment without downloading a ZIP or running a command; and
+14. resume safely after a browser, API, worker, workflow, or Proof Leaf restart.
 
 The Creator **MUST** cover every current stable Seed without semantic loss. A
 field that exists in a current manifest may not require a raw-file workaround.
@@ -107,7 +116,8 @@ The first release **MUST NOT** include:
 - arbitrary commands, entrypoints, host scripts, host paths, devices,
   capabilities, namespaces, or Docker socket access;
 - automatic legal or EULA acceptance;
-- automatic merging or deployment of an exported Registry change;
+- automatic approval or merge of an exported Registry change;
+- deployment before an exact protected merge;
 - proof execution on a production Leaf, Windows Leaf, or outbound-only Leaf;
 - a replacement for the existing normal Garden Sprout experience; or
 - cryptographic distribution signing beyond the separately governed Registry
@@ -169,9 +179,13 @@ flowchart LR
     ProofLeaf --> Worker
     Engine --> Export["Deterministic release bundle"]
     Drafts --> Export
-    Author --> Review["Protected Git review"]
-    Export --> Review
+    Export --> Publication["Durable publication proposal"]
+    Publication --> Workflow["Trusted target-bound workflow"]
+    Workflow --> Review["Protected Git review"]
+    Author --> Review
     Review --> Registry["Official stable Registry"]
+    Registry --> Receipt["Exact deployment receipt"]
+    Receipt --> Publication
     Registry --> Garden
 ```
 
@@ -826,8 +840,32 @@ Section 7.
 | `POST /proof-runs/{runId}/cancel` | Request cancel; final only after cleanup proof |
 | `POST /workspaces/{id}/exports` | Generate deterministic commit-ready release bundle |
 | `GET /exports/{exportId}` | Export status, digest, file list, and authorized download |
+| `GET /exports/{exportId}/publications` | Publications bound to this exact export |
+| `POST /exports/{exportId}/publications` | Durably accept one environment-bound publication proposal |
+| `GET /publications/{publicationId}` | Current durable publication and protected-review state |
+| `GET /publications/{publicationId}/events?after={sequence}` | Monotonic publication progress |
+| `POST /publications/{publicationId}/resume` | Reconcile or resume the same accepted publication identity |
 
-There is no direct stable-publish or live-Registry mutation endpoint.
+There is no direct stable-publish, merge, deploy, or live-Registry CRUD
+endpoint. Publication creates a proposal identity; it does not make a Seed
+official.
+
+`POST /exports/{exportId}/publications` requires a client-stable idempotency
+key. The API persists `publicationId` before dispatch and returns the same
+resource for every exact replay. A timeout after acceptance means unknown,
+never failure. Garden follows that exact identity and never offers a blind
+retry. `resume` reuses the publication, export, target, and idempotency
+boundary; it reconciles external state before dispatching any missing step.
+
+The normative publication states are `accepted`, `running`,
+`awaiting_review`, `registry_syncing`, `blocked`, `succeeded`, `failed`,
+`cancelled`, and `expired`. Monotonic phases are `dispatching`, `claiming`,
+`verifying_bundle`, `applying_bundle`, `checking`, `opening_review`,
+`waiting_for_review`, `merged`, `deploying_registry`, `verifying_registry`,
+and `available`. Only a verified deployment receipt may produce `succeeded`.
+Transport loss, GitHub queueing, or an observation timeout remains a
+non-terminal state. A stale observation cannot move confirmed progress
+backwards.
 
 Creating a proof run names exactly one immutable Seed revision, architecture,
 and proof-plan digest. A workspace with multiple Seeds or architectures queues
@@ -878,6 +916,14 @@ The API database **MUST** persist at least:
 - monotonic proof events with stable localized codes and typed safe parameters;
 - release exports, their exact files, artifact digest, Studio signature/key
   ID, and status; and
+- publications with actor, source environment, exact export and archive
+  digests, repository numeric ID and name, target ref, base commit and Registry
+  digest, idempotency key, every durable publication-attempt number, its
+  immutable environment-scoped attempt-token PRF key ID, and only the SHA-256
+  hash of its 256-bit attempt token, dispatch/run/attempt and protected-PR
+  identities,
+  monotonic state/phase/event sequence, reconciliation lease, deadlines,
+  failure code, merged commit, deployed digest, and deployment receipt; and
 - immutable audit events with actor, action, affected IDs, old/new digests,
   request ID, and timestamp.
 
@@ -1184,7 +1230,9 @@ compiled Registry, required package/lock semantic-version increment, and
 bundle metadata/attestation. It **MUST NOT** rewrite the unchanged stable Seed,
 Pod, or history files.
 
-Applying a bundle is a separate local developer operation. The apply tool
+Applying a bundle is a separate trusted-workflow operation. The same tool may
+be used by a developer for diagnosis, but Garden never asks an author to
+download, extract, or run it. The apply tool
 **MUST**:
 
 1. verify the bundle digest and each file digest;
@@ -1198,15 +1246,181 @@ Applying a bundle is a separate local developer operation. The apply tool
 6. preserve immutable history with create-only semantics;
 7. run the complete repository check;
 8. recheck proof freshness and the seven-day remaining-validity gate; and
-9. leave changes uncommitted for human diff review.
+9. leave changes uncommitted for the workflow to inspect before it creates the
+   proposal commit.
 
-The developer then uses the normal protected branch and pull-request process.
-No Garden action is equivalent to merge or official publication.
+The workflow may create or update only its deterministic proposal branch and
+open or resume its publication-bound pull request. It **MUST NOT** push the
+protected target, approve, merge, or deploy. No Garden action is equivalent to
+merge or official publication.
 Repository CI and the final release/deployment gate **MUST** recheck exact proof
 binding, signatures, and at least seven full remaining days using their
 recorded run time. Branch protection must require that fresh check; a proof
 inside the seven-day window blocks merge/deployment even when the bundle was
 valid when exported.
+
+### 19.1 Signed publication statement
+
+Every dispatch is bound by
+`dauva.dev/seed-publication/v1`. Its payload names the publication/export IDs,
+export and archive digests, source environment, numeric repository ID and
+canonical name, exact target ref, base Git commit, base and expected Registry
+digests, creation time, and short claim deadline. Its Studio Ed25519 signature
+uses domain `dauva.seed-publication.v1`. The workflow accepts no client-authored
+repository, ref, commit, digest, URL, or file path.
+
+The claim window is strictly after creation and at most one hour. A workflow
+must claim before, not at, `claimBeforeUtc`; expiry is authoritative and a
+resume creates a new signed attempt for the same publication identity rather
+than extending or replaying an expired statement.
+
+Each environment has a separate attempt-token PRF key ring. Every key contains
+exactly 32 cryptographically random bytes and is configured as canonical
+unpadded RFC 4648 base64url. Its non-secret key ID is the lowercase
+`sha256:<hex>` SHA-256 hash of those raw 32 bytes. Key material and IDs may not
+be shared between environments or reused for Studio Ed25519 signing, proof,
+deployment, encryption, or any other protocol. When publication is enabled,
+startup configuration validation requires exactly one valid active key for
+that environment and unique computed IDs for every retained key.
+
+Before each initial dispatch or resume, the API atomically creates the next
+positive `publicationAttempt`, binds it to the environment's active key ID,
+and derives this exact 32-byte pseudorandom token:
+
+`HMAC-SHA256(key, UTF-8("dauva.seed-publication-attempt-token.v1") || 0x00 || UTF-8(JCS({environment, publicationAttempt, publicationId})))`
+
+`environment` is exactly `develop` or `production`, `publicationId` is its
+canonical lowercase UUID, and `publicationAttempt` is the positive durable
+attempt number. The token uses canonical unpadded RFC 4648 base64url on the
+wire. The API atomically persists the attempt number, key ID, and lowercase
+`sha256:<hex>` SHA-256 hash of the decoded token bytes, but never the raw token
+or PRF key. Non-canonical trailing bits are rejected before hashing. The fixed
+`repository_dispatch` payload contains exactly the existing `publication_id`
+plus `publication_attempt` and `attempt_token`. The environment entry workflow
+passes the number as a typed reusable-workflow input and the token only as a
+required reusable-workflow secret. It masks the token before its first shell
+use and never writes or echoes it. Workflows for the same publication retain
+one publication-ID concurrency group with `cancel-in-progress: false`, so
+an already-running attempt is not cancelled and two attempts cannot execute
+concurrently. GitHub may replace a still-pending delivery; durable API state
+and reconciliation remain authoritative and may redispatch only the same
+current attempt identity.
+
+Redispatch after process restart derives the byte-identical token using the
+attempt's immutable stored key ID. Rotation makes a new key active and retains
+older keys as derivation-only until no attempt that is both non-terminal and
+unexpired references them. Rotation never changes an existing attempt. A
+missing or revoked referenced key blocks redispatch without advancing or
+reissuing that attempt. It does not invalidate a token already delivered to
+GitHub: claim
+verification needs only the persisted token hash plus OIDC and remains
+constant-time. Only authoritative expiry and external-state reconciliation
+may permit a new numbered attempt under the active key.
+
+The token's presence in the repository-internal dispatch event is accepted
+only as short-lived correlation transport: it expires with the attempt, never
+authorizes an API call by itself, is not exposed as a normal workflow input,
+and may be consumed only by the fixed trusted workflow.
+
+The token is correlation-only and never authentication. Every claim still
+requires a fresh GitHub Actions OIDC identity satisfying Section 19.2. The
+claim body carries `publicationAttempt`, `attemptToken`, `runId`, and
+`runAttempt`. Before binding any run, the API atomically verifies the exact
+current unclaimed durable attempt number and the token hash in constant time.
+A delayed prior workflow, a right number with a wrong token, an expired token,
+or an already-owned attempt returns conflict without mutation. An exact replay
+by the already-bound run returns its original claim. The response repeats the
+claimed `publicationAttempt` but never the token.
+
+The claim idempotency key is the 90-character ASCII value
+`seed-publication-claim.v1:<hex>`. `<hex>` is lowercase SHA-256 over this exact
+byte sequence:
+
+`UTF-8("dauva.seed-publication-claim.v1") || 0x00 || UTF-8(JCS({attemptToken, publicationAttempt, publicationId, runAttempt, runId}))`
+
+The correlation object contains exactly those five members with the same
+integer and token rules as the claim. This binds an idempotency replay to the
+publication path, durable attempt, opaque token, GitHub run, and GitHub run
+attempt without exposing the token in the header.
+
+The workflow downloads the statement and archive only from the environment's
+authenticated internal API after atomically claiming the publication for the
+exact GitHub run and attempt. Claim, event, and receipt mutations are
+idempotent. The workflow rejects an expired claim, wrong origin, wrong
+environment/ref, wrong repository numeric identity, non-main trusted workflow,
+unknown/revoked key, changed archive bytes, dirty/stale base, or any unsigned
+input.
+
+### 19.2 GitHub identity and credential boundary
+
+The Dauva API dispatches only the fixed environment entry workflow through a
+least-privilege Deucarian GitHub App installation. No App private key or
+installation token enters Garden, the release archive, repository variables,
+or a Leaf. Workflow-to-API calls use fresh GitHub Actions OIDC tokens with an
+environment-specific audience. The API requires exact repository ID/name,
+workflow ref on `refs/heads/main`, environment, ref, actor, run ID, and attempt
+claims. Browser sessions are invalid on `/api/internal/seed-publications/**`.
+
+The apply/check job has read-only repository permission. A later isolated
+proposal job may receive only `contents: write` and `pull-requests: write`
+after verification succeeds. Protected target branches require current strict
+`validate`, at least one non-stale approval, conversation resolution, admin
+enforcement, and disabled force-push/deletion. Missing or unreadable protection
+is a hard block, not a warning.
+
+### 19.3 Merge, deployment, and Registry/API synchronization
+
+A protected merge is necessary but not sufficient for success. An
+environment-fixed deployment workflow checks out the exact merged commit,
+repeats the full repository/proof check with a recorded validation time,
+deploys that commit's immutable `dist/registry.json`, and health-checks the
+environment API until it reports both the exact commit and Registry digest.
+It then submits `dauva.dev/seed-registry-deployment-receipt/v1`. Production
+accepts only `main`; Develop accepts only `develop`.
+
+The API reconciler independently reads the protected PR/merge state and the
+environment's deployed Registry identity. Callbacks accelerate observation but
+are never authoritative by themselves. `succeeded` requires an authenticated
+receipt whose repository, workflow ref, environment, target, commit, file
+digest, Registry digest, run/attempt, and API health result all match the
+publication and whose `publicationId` is that exact durable identity. A
+closed-unmerged PR is terminal `cancelled`; an unresolved
+external error is `blocked` and resumable; an explicit verified apply/check
+rejection is `failed`.
+
+### 19.4 Environment activation boundary
+
+The 0.16.0 publication route is activated one environment at a time. Develop
+may activate only after every condition below is proven. Production keeps the
+same code and contract but remains physically disabled until it separately
+passes the identical gate:
+
+- readable enforced protection on both `develop` and `main` with the controls
+  in Section 19.2;
+- active environment-, repository-, target-, API-, and Proof-Leaf-scoped
+  verification roots;
+- the API publication store, GitHub App dispatch, OIDC verifier, callbacks,
+  reconciler, and exact Registry identity health contract deployed separately
+  in Develop and Production;
+- a protected deployment implementation and retained receipts; and
+- current exact proof-v2 coverage for every Seed that the official catalog may
+  offer.
+
+The repository is public so GitHub can enforce the protected-review contract
+without a paid private-repository exception. Publication and proposal jobs run
+only on GitHub-hosted runners. Proposal writes use one repository-installed
+GitHub App token only after verification; the workflow can neither approve nor
+merge. Deployment runs on a separate self-hosted runner registration in a
+runner group that admits only the protected deployment workflow. Its service
+account has no Docker or host group membership and may elevate only to the
+root-owned Registry deploy command, which accepts the exact environment,
+merged commit, and signed base commit. No public SSH port or reusable
+interactive host credential is exposed. Missing activation variables, secrets,
+roots, protection, proof, or health evidence fail closed.
+
+Activation does not waive proof debt. A Pod or Seed becomes official only for
+the exact proof-v2-backed export that passes this route. Unproven Seeds remain
+unavailable to publication even while the Develop route itself is enabled.
 
 ## 20. Semantic versioning
 
@@ -1379,6 +1593,19 @@ Studio access attempts. Alerts contain no secret or raw manifest data.
   stale approvals cannot satisfy freeze/proof/export.
 - Base commit or any target-file digest mismatch blocks apply/export without
   overwriting package, lock, history, or Registry files.
+- A delayed workflow for publication attempt N cannot claim after durable
+  attempt N+1 exists, even if it arrives before N+1 runs. The right attempt
+  number with the wrong token also fails without mutation, while an exact
+  same-run replay returns the original claim. Entry workflows for one
+  publication share one concurrency group that never cancels an already
+  running attempt; replacement of a pending delivery cannot replace the
+  durable attempt identity.
+- An API restart after durable attempt creation but before or during uncertain
+  dispatch re-derives the byte-identical token and idempotency key. Key
+  rotation leaves that attempt unchanged. Missing or revoked historical key
+  material blocks redispatch without advancing the attempt, while a token
+  already delivered before revocation can still claim through its persisted
+  hash and exact OIDC identity.
 
 ### 24.3 Proof runner
 

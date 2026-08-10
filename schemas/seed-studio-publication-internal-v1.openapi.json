@@ -1,0 +1,429 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Dauva Seed publication workflow API",
+    "version": "1.1.0",
+    "description": "GitHub-OIDC-only claim, material download, monotonic callback, and Registry deployment receipt boundary. Browser sessions are never accepted."
+  },
+  "servers": [
+    {
+      "url": "/api/internal"
+    }
+  ],
+  "security": [
+    {
+      "githubOidc": []
+    }
+  ],
+  "paths": {
+    "/seed-publications/{publicationId}/claim": {
+      "post": {
+        "operationId": "claimSeedPublication",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PublicationId"
+          },
+          {
+            "$ref": "#/components/parameters/ClaimIdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClaimRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The exact workflow run atomically owns the exact durable publication attempt. The response never echoes its correlation token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClaimResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem",
+            "description": "The publication attempt or token is stale, mismatched, expired, or already owned by a different workflow run. No claim state changes."
+          }
+        }
+      }
+    },
+    "/seed-publications/{publicationId}/statement": {
+      "get": {
+        "operationId": "getSeedPublicationStatement",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PublicationId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Signed target-bound publication statement.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./seed-studio-publication-v1.schema.json"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/seed-publications/{publicationId}/bundle": {
+      "get": {
+        "operationId": "downloadSeedPublicationBundle",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PublicationId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Immutable signed release bundle bound by the publication statement.",
+            "content": {
+              "application/zip": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary",
+                  "maxLength": 314572800
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/seed-publications/{publicationId}/events": {
+      "post": {
+        "operationId": "recordSeedPublicationEvent",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PublicationId"
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkflowEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "The event was durably accepted or was an exact idempotent replay."
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/seed-registry-deployments": {
+      "post": {
+        "operationId": "recordSeedRegistryDeployment",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "./seed-registry-deployment-receipt-v1.schema.json"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "The deployment receipt was durably accepted or was an exact replay."
+          },
+          "401": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "409": {
+            "$ref": "#/components/responses/Problem"
+          },
+          "422": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "githubOidc": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "A fresh GitHub Actions OIDC token with the environment-specific audience and exact repository, actor, workflow, ref, run, and attempt claims."
+      }
+    },
+    "parameters": {
+      "PublicationId": {
+        "name": "publicationId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "$ref": "#/components/schemas/Uuid"
+        }
+      },
+      "IdempotencyKey": {
+        "name": "Idempotency-Key",
+        "in": "header",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "minLength": 16,
+          "maxLength": 128,
+          "pattern": "^[A-Za-z0-9._:-]+$"
+        }
+      },
+      "ClaimIdempotencyKey": {
+        "name": "Idempotency-Key",
+        "in": "header",
+        "required": true,
+        "description": "Exactly seed-publication-claim.v1:<hex>, where <hex> is lowercase SHA-256 over UTF8(dauva.seed-publication-claim.v1), NUL, and RFC 8785 JCS of {attemptToken, publicationAttempt, publicationId, runAttempt, runId}. The raw token never appears in this header.",
+        "schema": {
+          "type": "string",
+          "minLength": 90,
+          "maxLength": 90,
+          "pattern": "^seed-publication-claim\\.v1:[a-f0-9]{64}$"
+        }
+      }
+    },
+    "responses": {
+      "Problem": {
+        "description": "Safe typed failure without workflow logs, credentials, tokens, or paths.",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problem"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "Uuid": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+      },
+      "Digest": {
+        "type": "string",
+        "pattern": "^sha256:[a-f0-9]{64}$"
+      },
+      "ClaimRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "runId",
+          "runAttempt",
+          "publicationAttempt",
+          "attemptToken"
+        ],
+        "properties": {
+          "runId": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "runAttempt": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000
+          },
+          "publicationAttempt": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000,
+            "description": "The API-issued durable attempt number carried unchanged by repository_dispatch."
+          },
+          "attemptToken": {
+            "type": "string",
+            "minLength": 43,
+            "maxLength": 43,
+            "pattern": "^[A-Za-z0-9_-]{42}[AEIMQUYcgkosw048]$",
+            "description": "Opaque canonical unpadded RFC 4648 base64url encoding of 32 pseudorandom bytes. The API derives it with a dedicated environment-scoped 32-byte HMAC-SHA256 key over UTF8(dauva.seed-publication-attempt-token.v1), NUL, and RFC 8785 JCS of {environment, publicationAttempt, publicationId}. The durable attempt stores the immutable key ID (SHA-256 of the raw key) and SHA-256 of the decoded token, never raw key or token. Redispatch re-derives with that key ID; claim comparison uses only the stored token hash plus OIDC. It is correlation-only and never replaces GitHub OIDC authentication."
+          }
+        }
+      },
+      "ClaimResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "schemaVersion",
+          "publicationId",
+          "publicationAttempt",
+          "environment",
+          "targetRef",
+          "statementPath",
+          "bundlePath",
+          "archiveDigest"
+        ],
+        "properties": {
+          "schemaVersion": {
+            "const": "dauva.dev/seed-publication-claim/v1"
+          },
+          "publicationId": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "publicationAttempt": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000,
+            "description": "The exact durable attempt that was atomically claimed."
+          },
+          "environment": {
+            "enum": [
+              "develop",
+              "production"
+            ]
+          },
+          "targetRef": {
+            "enum": [
+              "refs/heads/develop",
+              "refs/heads/main"
+            ]
+          },
+          "statementPath": {
+            "type": "string",
+            "pattern": "^/api/internal/seed-publications/[0-9a-f-]{36}/statement$"
+          },
+          "bundlePath": {
+            "type": "string",
+            "pattern": "^/api/internal/seed-publications/[0-9a-f-]{36}/bundle$"
+          },
+          "archiveDigest": {
+            "$ref": "#/components/schemas/Digest"
+          }
+        }
+      },
+      "WorkflowEvent": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "externalEventId",
+          "phase",
+          "outcome",
+          "code",
+          "parameters"
+        ],
+        "properties": {
+          "externalEventId": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 160,
+            "pattern": "^[A-Za-z0-9._:-]+$"
+          },
+          "phase": {
+            "enum": [
+              "claiming",
+              "verifying_bundle",
+              "applying_bundle",
+              "checking",
+              "opening_review",
+              "waiting_for_review"
+            ]
+          },
+          "outcome": {
+            "enum": [
+              "started",
+              "succeeded",
+              "blocked",
+              "failed"
+            ]
+          },
+          "code": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$",
+            "maxLength": 128
+          },
+          "parameters": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "maxProperties": 16
+          }
+        }
+      },
+      "Problem": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "type",
+          "title",
+          "status",
+          "code",
+          "requestId"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "format": "uri",
+            "maxLength": 2048
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "status": {
+            "type": "integer",
+            "minimum": 400,
+            "maximum": 599
+          },
+          "code": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$",
+            "maxLength": 128
+          },
+          "requestId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        }
+      }
+    }
+  }
+}
