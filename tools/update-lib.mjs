@@ -182,6 +182,7 @@ export async function createUpdateReport(seedEntries, resolveDigest) {
 export async function dockerDigestResolver(
   reference,
   {
+    resolveDockerHub = dockerHubTagDigestResolver,
     inspect = inspectDockerManifest,
     sleep = (delayMs) => new Promise((resolve) => setTimeout(resolve, delayMs)),
     retryDelaysMs = registryRetryDelaysMs,
@@ -189,8 +190,26 @@ export async function dockerDigestResolver(
       console.warn(
         `Registry lookup for '${reference}' was temporarily unavailable; retrying in ${delayMs} ms.`,
       ),
+    onMetadataFallback = () =>
+      console.warn(
+        `Docker Hub tag metadata for '${reference}' was unavailable; falling back to OCI inspection.`,
+      ),
   } = {},
 ) {
+  try {
+    const dockerHubDigest = await resolveDockerHub(reference);
+    if (dockerHubDigest != null) {
+      if (!digestPattern.test(dockerHubDigest)) {
+        throw new Error(
+          `Docker Hub returned an invalid OCI digest for '${reference}'.`,
+        );
+      }
+      return dockerHubDigest;
+    }
+  } catch {
+    onMetadataFallback();
+  }
+
   for (let attempt = 0; ; attempt += 1) {
     try {
       return await inspect(reference);
@@ -203,6 +222,40 @@ export async function dockerDigestResolver(
       await sleep(retryDelay);
     }
   }
+}
+
+export async function dockerHubTagDigestResolver(
+  reference,
+  { request = globalThis.fetch } = {},
+) {
+  const { repository, tag } = parseUpdateReference(reference);
+  const dockerHubPrefix = "docker.io/";
+  if (!repository.startsWith(dockerHubPrefix)) {
+    return undefined;
+  }
+  let repositoryPath = repository.slice(dockerHubPrefix.length);
+  if (!repositoryPath.includes("/")) {
+    repositoryPath = `library/${repositoryPath}`;
+  }
+  const encodedRepository = repositoryPath
+    .split("/")
+    .map((segment) => encodeURIComponent(segment))
+    .join("/");
+  const url =
+    `https://hub.docker.com/v2/repositories/${encodedRepository}/tags/` +
+    encodeURIComponent(tag);
+  const response = await request(url, {
+    headers: { accept: "application/json" },
+    signal: AbortSignal.timeout(10_000),
+  });
+  if (!response.ok) {
+    throw new Error(`Docker Hub tag metadata returned HTTP ${response.status}.`);
+  }
+  const document = await response.json();
+  if (!digestPattern.test(document?.digest)) {
+    throw new Error("Docker Hub tag metadata contained no OCI digest.");
+  }
+  return document.digest;
 }
 
 function inspectDockerManifest(reference) {
