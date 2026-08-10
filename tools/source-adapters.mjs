@@ -32,11 +32,6 @@ export function sourceRuntimeDefaults(source) {
   const normalized = normalizeSource(source);
   return {
     source: normalized,
-    trust: {
-      level: normalized.kind === "dauva" ? "verified" : "community",
-      reviewedAt: new Date().toISOString().slice(0, 10),
-      mutableRuntimeImagesAllowed: false,
-    },
     updatePolicy: {
       discovery:
         normalized.kind === "steamcmd" || normalized.kind === "linuxgsm"

@@ -8,7 +8,7 @@ import {
   steamCmdDescriptor,
 } from "./source-adapters.mjs";
 
-test("LinuxGSM adapter produces a curated draft source without mutable images", () => {
+test("LinuxGSM adapter produces source and update defaults without asserting trust", () => {
   const source = linuxGsmDescriptor({
     gameId: "terraria",
     homepage: "https://terraria.org/",
@@ -18,7 +18,7 @@ test("LinuxGSM adapter produces a curated draft source without mutable images", 
   assert.equal(defaults.source.upstreamId, "terraria");
   assert.equal(defaults.updatePolicy.discovery, "steamcmd");
   assert.equal(defaults.updatePolicy.automaticInstall, false);
-  assert.equal(defaults.trust.mutableRuntimeImagesAllowed, false);
+  assert.equal("trust" in defaults, false);
 });
 
 test("SteamCMD adapter requires a numeric app id", () => {
@@ -32,7 +32,7 @@ test("SteamCMD adapter requires a numeric app id", () => {
   );
 });
 
-test("OCI and Dauva adapters retain curated source ownership", () => {
+test("OCI and Dauva adapters retain source ownership without assigning trust", () => {
   const oci = ociDescriptor({
     homepage: "https://example.com/game",
     repository: "https://github.com/example/game-server",
@@ -44,7 +44,17 @@ test("OCI and Dauva adapters retain curated source ownership", () => {
   });
 
   assert.equal(oci.kind, "oci");
-  assert.equal(sourceRuntimeDefaults(oci).trust.level, "community");
+  assert.equal("trust" in sourceRuntimeDefaults(oci), false);
   assert.equal(dauva.kind, "dauva");
-  assert.equal(sourceRuntimeDefaults(dauva).trust.level, "verified");
+  assert.equal("trust" in sourceRuntimeDefaults(dauva), false);
+});
+
+test("source defaults never invent review metadata", () => {
+  const source = ociDescriptor({
+    homepage: "https://example.com/game",
+    repository: "https://github.com/example/game-server",
+  });
+  const defaults = sourceRuntimeDefaults(source);
+  assert.equal("trust" in defaults, false);
+  assert.equal("reviewedAt" in defaults, false);
 });

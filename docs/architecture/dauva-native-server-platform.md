@@ -2,7 +2,7 @@
 
 Status: **Phase 5 complete; Phase 4 adoption complete with retirement burn-in active; Phase 6 Leaf delivery acceptance in progress**
 
-Last updated: 2026-07-31
+Last updated: 2026-08-09
 
 This document is the canonical product and architecture design for Dauva's
 native game-server platform. Keep it current when the Seed format, registry,
@@ -236,15 +236,16 @@ the Server, Seed, agreement, accepting user, URL, revision, and timestamp.
 
 Seed v1 is implemented as JSON Schema plus stricter policy validation. The
 registry contains nine game-family Pods and eighteen sanitized Seeds: two
-meaningful variants per Pod. Factorio Stable, Valheim BepInEx, both
-Satisfactory branches, and both Enshrouded runtimes passed fresh native
-lifecycle proofs and joined the original stable Seeds. Minecraft Paper then
-passed its EULA-gated Paper 26.2 lifecycle proof with persistent world data,
-ordered restart, and native RCON backups. All twelve original Seeds are stable.
-Terraria, Project Zomboid, and Garry's Mod add six stable Seeds. All six passed
-fresh disposable lifecycle proofs on the Debian Leaf; their exact
-release-candidate versions, manifest digests, agreement revisions, checks, and
-proof expiry are retained in committed receipts.
+meaningful variants per Pod. Factorio Latest, Valheim Vanilla, Satisfactory
+Stable, and both Enshrouded runtimes passed native lifecycle proofs. Minecraft
+Paper then passed its EULA-gated Paper 26.2 lifecycle proof with persistent
+world data, ordered restart, and native RCON backups. Core Keeper Normal and
+Hard also carry lifecycle receipts. All twelve original Seeds are stable, but
+Minecraft Fabric, Factorio Stable, Satisfactory Experimental, and Valheim
+BepInEx have no receipt. Terraria, Project Zomboid, and Garry's Mod add six
+stable Seeds, all with disposable Debian Leaf lifecycle receipts. The fourteen
+receipts are legacy proof-v1 evidence; none satisfies the authenticated,
+exactly bound proof-v2 gate.
 
 The separately deployable Leaf Agent now owns every privileged host operation.
 The API has no Docker socket and Pterodactyl is removed. Newly Sprouted Servers
@@ -297,6 +298,52 @@ contract. The API persists an immutable operation timeline, groups sanitized
 incident occurrences, preserves precise Leaf failure stages, and correlates
 Portal/API/Leaf traces without depending on a telemetry vendor.
 
+#### Durable asynchronous operation invariant
+
+Any state-changing operation whose completion depends on a Leaf, provider,
+installer, or another external runtime is a durable asynchronous operation,
+even when it usually completes quickly. This includes Leaf installation and
+pairing, Sprouting, lifecycle commands, backup, restore, update, migration,
+adoption, and deletion.
+
+Before the first request, every initiating mutation has either an already-known
+resource identity or a client-stable idempotency key. The control plane uses it
+to persist the intended mutation and returns a stable resource or operation
+identity before background work continues. This makes a lost initiating
+response recoverable without repeating the mutation. Once accepted, that
+mutation is authoritative. A client, HTTP, reverse-proxy, polling, or
+observation timeout is transport uncertainty; it is never proof that the
+accepted operation failed.
+
+Clients follow the exact identity through server-owned state, polling or
+subscription, and resume after refresh, reconnect, process restart, or a lost
+response. They never wait for a full Garden refresh or a complete observation
+of unrelated resources before acknowledging acceptance. One slow or
+unreachable Leaf or Server cannot block observation of healthy siblings.
+
+Retry and resume reuse the same identity and idempotency boundary. They never
+blindly repeat a state-changing create or command. Before acceptance, an
+explicit authoritative validation, authorization, or conflict rejection may
+be reported immediately; a timeout remains unknown. **Accepted** or **Queued**
+may be reported as soon as the mutation is durable. After acceptance, only an
+explicit, durable terminal state from the authoritative control plane may
+establish final completion/readiness, failure, cancellation, or expiry. Late
+or stale observations cannot move confirmed progress backwards.
+
+Transport requests retain short bounded timeouts. Those timeouts bound one
+delivery or observation attempt, not the lifetime or outcome of the underlying
+operation. Business deadlines are explicit, persisted, operation-specific,
+and reconciled by the control plane.
+
+With controllable clocks and request deadlines, acceptance tests for every
+durable operation cross every configured transport boundary. They retain 10-,
+20-, and 100-second boundaries as named regression cases without requiring real
+waits, and also cover loss of the initiating response after acceptance;
+refresh and reconnect; service restart; repeated clicks; and stale
+out-of-order responses. The proof must show that exactly one mutation is
+created, the same identity remains recoverable, and unrelated Garden state
+stays responsive.
+
 ### Dauva Seed Registry
 
 The initial registry should be Git-backed and compiled by CI into a validated,
@@ -310,10 +357,21 @@ Servers from being managed.
 The registry can later be distributed as signed OCI artifacts and support
 multiple trusted sources. The Seed Library remains the user-facing name.
 
-The control plane exposes read-only administrator routes for the compiled
-Registry, individual Pods, and individual Seeds. Registry mutation remains a
-reviewed Git workflow: a portal request cannot silently rewrite trusted Seed
-material.
+The control plane exposes lossless read-only administrator routes for the
+compiled Registry, individual Pods, and individual Seeds. Management views
+must be able to display the complete official Pod and Seed detail, including
+the exact version, manifest digest, proof state and evidence summary, and
+immutable release history. A friendly Garden view may progressively disclose
+that detail, but the API must not discard it or substitute a reduced parallel
+catalog model.
+
+Official Registry mutation has one governed path: **Seed Studio workspace →
+validation and proof → deterministic signed export → protected Registry
+review**. The reviewed export is applied through the protected Git workflow
+and compiled into the immutable Registry. There is deliberately no direct
+CRUD endpoint that edits or deletes a stable Pod, Seed, proof receipt, or
+historical release in place; a portal request cannot silently rewrite trusted
+Seed material.
 
 Every Seed records:
 
@@ -1018,10 +1076,12 @@ An update-capable Seed must declare backup, restore, and update capabilities,
 require backup and rollback, and pass explicit runtime-version,
 managed-update, and rollback proof checks. It also requires the
 `managed-game-updates-v1` Leaf capability so a Leaf that only understands the
-older lifecycle contract cannot accept it. The Satisfactory Stable `1.0.1`
-recipe remains a release candidate until that end-to-end proof is stored; the
-observed live Satisfactory 1.2 runtime is baseline evidence, not a substitute
-for the managed-update proof.
+older lifecycle contract cannot accept it. Satisfactory Stable `1.0.1` is the
+current stable Registry recipe and its exact managed-update lifecycle is
+retained in a legacy proof-v1 receipt. It remains unavailable to proof-v2-gated
+Studio release and new Sprouts until an authenticated, exactly bound proof-v2
+reproof is stored. The observed live Satisfactory 1.2 runtime remains useful
+baseline evidence, not a substitute for that proof-v2 receipt.
 
 Proof credentials and required administrator secrets are supplied only for the
 disposable request. They are neither written to the Seed nor copied into the
