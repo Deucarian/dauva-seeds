@@ -2,7 +2,7 @@
 
 Status: **approved normative specification**
 
-Specification version: **1.2.0**
+Specification version: **1.2.2**
 
 Approved and last updated: **2026-08-10**
 
@@ -918,7 +918,10 @@ The API database **MUST** persist at least:
   ID, and status; and
 - publications with actor, source environment, exact export and archive
   digests, repository numeric ID and name, target ref, base commit and Registry
-  digest, idempotency key, dispatch/run/attempt and protected-PR identities,
+  digest, idempotency key, every durable publication-attempt number, its
+  immutable environment-scoped attempt-token PRF key ID, and only the SHA-256
+  hash of its 256-bit attempt token, dispatch/run/attempt and protected-PR
+  identities,
   monotonic state/phase/event sequence, reconciliation lease, deadlines,
   failure code, merged commit, deployed digest, and deployment receipt; and
 - immutable audit events with actor, action, affected IDs, old/new digests,
@@ -1271,6 +1274,75 @@ must claim before, not at, `claimBeforeUtc`; expiry is authoritative and a
 resume creates a new signed attempt for the same publication identity rather
 than extending or replaying an expired statement.
 
+Each environment has a separate attempt-token PRF key ring. Every key contains
+exactly 32 cryptographically random bytes and is configured as canonical
+unpadded RFC 4648 base64url. Its non-secret key ID is the lowercase
+`sha256:<hex>` SHA-256 hash of those raw 32 bytes. Key material and IDs may not
+be shared between environments or reused for Studio Ed25519 signing, proof,
+deployment, encryption, or any other protocol. When publication is enabled,
+startup configuration validation requires exactly one valid active key for
+that environment and unique computed IDs for every retained key.
+
+Before each initial dispatch or resume, the API atomically creates the next
+positive `publicationAttempt`, binds it to the environment's active key ID,
+and derives this exact 32-byte pseudorandom token:
+
+`HMAC-SHA256(key, UTF-8("dauva.seed-publication-attempt-token.v1") || 0x00 || UTF-8(JCS({environment, publicationAttempt, publicationId})))`
+
+`environment` is exactly `develop` or `production`, `publicationId` is its
+canonical lowercase UUID, and `publicationAttempt` is the positive durable
+attempt number. The token uses canonical unpadded RFC 4648 base64url on the
+wire. The API atomically persists the attempt number, key ID, and lowercase
+`sha256:<hex>` SHA-256 hash of the decoded token bytes, but never the raw token
+or PRF key. Non-canonical trailing bits are rejected before hashing. The fixed
+`repository_dispatch` payload contains exactly the existing `publication_id`
+plus `publication_attempt` and `attempt_token`. The environment entry workflow
+passes the number as a typed reusable-workflow input and the token only as a
+required reusable-workflow secret. It masks the token before its first shell
+use and never writes or echoes it. Workflows for the same publication retain
+one publication-ID concurrency group with `cancel-in-progress: false`, so
+an already-running attempt is not cancelled and two attempts cannot execute
+concurrently. GitHub may replace a still-pending delivery; durable API state
+and reconciliation remain authoritative and may redispatch only the same
+current attempt identity.
+
+Redispatch after process restart derives the byte-identical token using the
+attempt's immutable stored key ID. Rotation makes a new key active and retains
+older keys as derivation-only until no attempt that is both non-terminal and
+unexpired references them. Rotation never changes an existing attempt. A
+missing or revoked referenced key blocks redispatch without advancing or
+reissuing that attempt. It does not invalidate a token already delivered to
+GitHub: claim
+verification needs only the persisted token hash plus OIDC and remains
+constant-time. Only authoritative expiry and external-state reconciliation
+may permit a new numbered attempt under the active key.
+
+The token's presence in the repository-internal dispatch event is accepted
+only as short-lived correlation transport: it expires with the attempt, never
+authorizes an API call by itself, is not exposed as a normal workflow input,
+and may be consumed only by the fixed trusted workflow.
+
+The token is correlation-only and never authentication. Every claim still
+requires a fresh GitHub Actions OIDC identity satisfying Section 19.2. The
+claim body carries `publicationAttempt`, `attemptToken`, `runId`, and
+`runAttempt`. Before binding any run, the API atomically verifies the exact
+current unclaimed durable attempt number and the token hash in constant time.
+A delayed prior workflow, a right number with a wrong token, an expired token,
+or an already-owned attempt returns conflict without mutation. An exact replay
+by the already-bound run returns its original claim. The response repeats the
+claimed `publicationAttempt` but never the token.
+
+The claim idempotency key is the 90-character ASCII value
+`seed-publication-claim.v1:<hex>`. `<hex>` is lowercase SHA-256 over this exact
+byte sequence:
+
+`UTF-8("dauva.seed-publication-claim.v1") || 0x00 || UTF-8(JCS({attemptToken, publicationAttempt, publicationId, runAttempt, runId}))`
+
+The correlation object contains exactly those five members with the same
+integer and token rules as the claim. This binds an idempotency replay to the
+publication path, durable attempt, opaque token, GitHub run, and GitHub run
+attempt without exposing the token in the header.
+
 The workflow downloads the statement and archive only from the environment's
 authenticated internal API after atomically claiming the publication for the
 exact GitHub run and attempt. Claim, event, and receipt mutations are
@@ -1511,6 +1583,19 @@ Studio access attempts. Alerts contain no secret or raw manifest data.
   stale approvals cannot satisfy freeze/proof/export.
 - Base commit or any target-file digest mismatch blocks apply/export without
   overwriting package, lock, history, or Registry files.
+- A delayed workflow for publication attempt N cannot claim after durable
+  attempt N+1 exists, even if it arrives before N+1 runs. The right attempt
+  number with the wrong token also fails without mutation, while an exact
+  same-run replay returns the original claim. Entry workflows for one
+  publication share one concurrency group that never cancels an already
+  running attempt; replacement of a pending delivery cannot replace the
+  durable attempt identity.
+- An API restart after durable attempt creation but before or during uncertain
+  dispatch re-derives the byte-identical token and idempotency key. Key
+  rotation leaves that attempt unchanged. Missing or revoked historical key
+  material blocks redispatch without advancing the attempt, while a token
+  already delivered before revocation can still claim through its persisted
+  hash and exact OIDC identity.
 
 ### 24.3 Proof runner
 

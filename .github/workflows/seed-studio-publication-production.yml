@@ -17,6 +17,9 @@ jobs:
     uses: Deucarian/dauva-seeds/.github/workflows/_seed-studio-publication.yml@main
     with:
       publication_id: ${{ github.event.client_payload.publication_id }}
+      publication_attempt: ${{ github.event.client_payload.publication_attempt }}
       environment: production
       target_ref: refs/heads/main
       api_origin: https://jorishoef.nl
+    secrets:
+      publication_attempt_token: ${{ github.event.client_payload.attempt_token }}
