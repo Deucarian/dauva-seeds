@@ -373,6 +373,17 @@ CRUD endpoint that edits or deletes a stable Pod, Seed, proof receipt, or
 historical release in place; a portal request cannot silently rewrite trusted
 Seed material.
 
+Submitting an export creates a durable publication proposal, not an official
+Seed. Develop is bound to the Registry `develop` branch and Develop API;
+Production is bound to `main` and the Production API. A trusted workflow
+verifies the signed statement and bundle, applies it transactionally on a
+proposal branch, and opens a protected pull request. It cannot push the target,
+approve, or merge. After human review and protected merge, an independent
+environment-fixed deployment must prove that the API serves the exact merged
+commit and Registry digest. Only that deployment receipt completes the
+publication. Lost HTTP responses, workflow queue delays, and callback failure
+remain recoverable non-terminal observations of the same publication ID.
+
 Every Seed records:
 
 - its upstream delivery kind (`oci`, `steamcmd`, `linuxgsm`, or `dauva`);

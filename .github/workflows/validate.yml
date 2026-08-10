@@ -13,10 +13,56 @@ jobs:
   validate:
     runs-on: [self-hosted, Linux, X64, deucarian]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Check out the proposed revision
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.0.2
+        with:
+          fetch-depth: 0
+          path: proposed
+      - name: Check out the immutable pull-request base
+        if: github.event_name == 'pull_request'
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.0.2
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: stable-base
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: "22"
           cache: npm
-      - run: npm ci
-      - run: npm run check
+          cache-dependency-path: proposed/package-lock.json
+      - name: Select the fail-closed validation profile
+        id: profile
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "profile=full" >> "$GITHUB_OUTPUT"
+            echo "reason=not-a-pull-request" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git -C proposed diff --name-status \
+            "${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}" \
+            > "$RUNNER_TEMP/seed-registry-changes.txt"
+          node stable-base/tools/ci-validation-profile.mjs \
+            --event "$GITHUB_EVENT_PATH" \
+            --changes "$RUNNER_TEMP/seed-registry-changes.txt" \
+            --base-repository stable-base \
+            --candidate-repository proposed \
+            --github-output "$GITHUB_OUTPUT"
+      - name: Install proposed dependencies
+        run: npm ci
+        working-directory: proposed
+      - name: Run the complete proposed-Registry check
+        if: steps.profile.outputs.profile == 'full'
+        run: npm run check
+        working-directory: proposed
+      - name: Prove the immutable stable base
+        if: steps.profile.outputs.profile == 'candidate'
+        run: |
+          npm ci
+          npm run check
+        working-directory: stable-base
+      - name: Validate and compile-check the generated candidate
+        if: steps.profile.outputs.profile == 'candidate'
+        run: |
+          npm run validate
+          npm run compile -- --check
+        working-directory: proposed

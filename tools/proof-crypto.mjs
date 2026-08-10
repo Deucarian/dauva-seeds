@@ -17,6 +17,7 @@ const signaturePattern = /^[A-Za-z0-9_-]{86}$/;
 export const proofLeafDomain = "dauva.seed-proof.v2/leaf";
 export const proofApiDomain = "dauva.seed-proof.v2/api";
 export const releaseBundleDomain = "dauva.seed-release-bundle.v1";
+export const publicationStatementDomain = "dauva.seed-publication.v1";
 
 export function digestCanonicalJson(value) {
   return sha256(canonicalJson(value));
