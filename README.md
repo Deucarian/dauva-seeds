@@ -11,6 +11,8 @@ store live worlds, saves, secrets, backups, or large game installations.
 - [Native server platform design](docs/architecture/dauva-native-server-platform.md)
 - [Internal Seed Studio specification](docs/architecture/internal-seed-studio.md)
 - [Registry layout](registry/README.md)
+- [Dauva event source conventions](docs/architecture/dauva-event-source-conventions.md)
+- [Dauva Events & Notifications architecture](docs/architecture/dauva-events-and-notifications.md)
 
 ## Layout
 

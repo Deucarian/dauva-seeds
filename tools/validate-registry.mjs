@@ -51,8 +51,14 @@ const verificationRootsSchema = await readJson(
     "seed-studio-verification-roots-v1.schema.json",
   ),
 );
+const eventCatalogSchema = await readJson(
+  path.join(repositoryRoot, "schemas", "dauva-event-catalog-v1.schema.json"),
+);
 const verificationRoots = await readJson(
   path.join(repositoryRoot, "trust", "seed-studio-verification-roots.json"),
+);
+const eventCatalog = await readJson(
+  path.join(repositoryRoot, "registry", "dauva-events.json"),
 );
 const validatePod = ajv.compile(podSchema);
 const validateSeed = ajv.compile(seedSchema);
@@ -61,6 +67,7 @@ const validateProofPlan = ajv.compile(proofPlanSchema);
 const validateProofV2 = ajv.compile(proofV2Schema);
 const validateReleaseBundle = ajv.compile(releaseBundleSchema);
 const validateVerificationRoots = ajv.compile(verificationRootsSchema);
+const validateEventCatalog = ajv.compile(eventCatalogSchema);
 void validateProofPlan;
 void validateReleaseBundle;
 const podFiles = await readManifestDirectory("registry/pods");
@@ -81,6 +88,13 @@ validateSchema(
   false,
 );
 validateVerificationRootKeys(verificationRoots);
+validateSchema(
+  { name: "registry/dauva-events.json", value: eventCatalog },
+  validateEventCatalog,
+  "Dauva event catalog",
+  false,
+);
+validateEventCatalogPolicy(eventCatalog);
 
 for (const entry of podFiles) {
   validateSchema(entry, validatePod, "Pod");
@@ -165,6 +179,37 @@ function validateUniqueReleaseIds(entries) {
       errors.push(`${entry.name}: duplicate historical Seed '${key}'.`);
     }
     seen.add(key);
+  }
+}
+
+function validateEventCatalogPolicy(catalog) {
+  const applicationIds = new Set();
+  const applicationSlugs = new Set();
+  const componentIds = new Set();
+  for (const application of catalog.applications ?? []) {
+    if (applicationIds.has(application.id)) {
+      errors.push(`registry/dauva-events.json: duplicate application id '${application.id}'.`);
+    }
+    if (applicationSlugs.has(application.slug)) {
+      errors.push(`registry/dauva-events.json: duplicate application slug '${application.slug}'.`);
+    }
+    applicationIds.add(application.id);
+    applicationSlugs.add(application.slug);
+    const componentSlugs = new Set();
+    for (const component of application.components ?? []) {
+      if (componentIds.has(component.id)) {
+        errors.push(`registry/dauva-events.json: duplicate component id '${component.id}'.`);
+      }
+      if (componentSlugs.has(component.slug)) {
+        errors.push(`registry/dauva-events.json: duplicate component '${application.slug}/${component.slug}'.`);
+      }
+      componentIds.add(component.id);
+      componentSlugs.add(component.slug);
+    }
+  }
+  const eventTypes = (catalog.eventTypes ?? []).map((eventType) => eventType.type);
+  if (new Set(eventTypes).size !== eventTypes.length) {
+    errors.push("registry/dauva-events.json: event type names must be unique.");
   }
 }
 

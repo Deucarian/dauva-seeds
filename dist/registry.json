@@ -3,6 +3,173 @@
   "source": {
     "repository": "Deucarian/dauva-seeds"
   },
+  "eventCatalog": {
+    "schemaVersion": "dauva.dev/event-catalog/v1",
+    "contractVersion": "1.0",
+    "environments": [
+      "acceptance",
+      "ci",
+      "development",
+      "local",
+      "production"
+    ],
+    "applications": [
+      {
+        "id": "11d75750-5fdc-47f8-a351-3ef5bb4d1001",
+        "slug": "jorishoef-portal",
+        "displayName": "Jorishoef Portal",
+        "iconIdentifier": "portal",
+        "components": [
+          {
+            "id": "11d75750-5fdc-47f8-a351-3ef5bb4d1101",
+            "slug": "api",
+            "displayName": "Portal API",
+            "repositories": [
+              "Deucarian/jorishoef-portal-api"
+            ]
+          },
+          {
+            "id": "11d75750-5fdc-47f8-a351-3ef5bb4d1102",
+            "slug": "flutter-web",
+            "displayName": "Portal Flutter",
+            "repositories": [
+              "Deucarian/jorishoef-portal-flutter"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "11d75750-5fdc-47f8-a351-3ef5bb4d2001",
+        "slug": "workout",
+        "displayName": "Workout",
+        "iconIdentifier": "fitness_center",
+        "components": [
+          {
+            "id": "11d75750-5fdc-47f8-a351-3ef5bb4d2101",
+            "slug": "api",
+            "displayName": "Workout API",
+            "repositories": [
+              "Deucarian/jorishoef-workout-api"
+            ]
+          },
+          {
+            "id": "11d75750-5fdc-47f8-a351-3ef5bb4d2102",
+            "slug": "web",
+            "displayName": "Workout Web",
+            "repositories": []
+          }
+        ]
+      },
+      {
+        "id": "11d75750-5fdc-47f8-a351-3ef5bb4d3001",
+        "slug": "dauva",
+        "displayName": "Dauva",
+        "iconIdentifier": "eco",
+        "components": [
+          {
+            "id": "11d75750-5fdc-47f8-a351-3ef5bb4d3101",
+            "slug": "control-plane",
+            "displayName": "Control Plane",
+            "repositories": [
+              "Deucarian/jorishoef-portal-api"
+            ]
+          },
+          {
+            "id": "11d75750-5fdc-47f8-a351-3ef5bb4d3102",
+            "slug": "leaf",
+            "displayName": "Leaf",
+            "repositories": [
+              "Deucarian/jorishoef-portal-api"
+            ]
+          },
+          {
+            "id": "11d75750-5fdc-47f8-a351-3ef5bb4d3103",
+            "slug": "seed-registry",
+            "displayName": "Seed Registry",
+            "repositories": [
+              "Deucarian/dauva-seeds"
+            ]
+          },
+          {
+            "id": "11d75750-5fdc-47f8-a351-3ef5bb4d3104",
+            "slug": "seed-studio",
+            "displayName": "Seed Studio",
+            "repositories": [
+              "Deucarian/jorishoef-portal-api"
+            ]
+          }
+        ]
+      }
+    ],
+    "eventTypes": [
+      {
+        "type": "ci.workflow-run.completed",
+        "category": "ci",
+        "source": "github-actions",
+        "description": "A GitHub Actions workflow run reached a terminal conclusion."
+      },
+      {
+        "type": "incident.escalated",
+        "category": "incident",
+        "source": "incident-store",
+        "description": "A correlated Dauva incident crossed a higher operator notification threshold."
+      },
+      {
+        "type": "incident.opened",
+        "category": "incident",
+        "source": "incident-store",
+        "description": "A new correlated Dauva incident was opened."
+      },
+      {
+        "type": "incident.reopened",
+        "category": "incident",
+        "source": "incident-store",
+        "description": "A previously resolved incident fingerprint regressed into a new open incident."
+      },
+      {
+        "type": "incident.repeated",
+        "category": "incident",
+        "source": "incident-store",
+        "description": "An unresolved Dauva incident reached the repeated-failure attention threshold."
+      },
+      {
+        "type": "incident.resolved",
+        "category": "incident",
+        "source": "incident-store",
+        "description": "The authoritative operation recovered and resolved its linked incident."
+      },
+      {
+        "type": "notification.test",
+        "category": "notification",
+        "source": "portal-test",
+        "description": "A user explicitly requested a destination test."
+      },
+      {
+        "type": "service.request.failed",
+        "category": "incident",
+        "source": "workout-api",
+        "description": "A safe, redacted Workout API failure requires operator attention."
+      },
+      {
+        "type": "workout.session.abandoned",
+        "category": "workout",
+        "source": "workout-api",
+        "description": "A user abandoned an in-progress workout session."
+      },
+      {
+        "type": "workout.session.completed",
+        "category": "workout",
+        "source": "workout-api",
+        "description": "A user completed a workout session."
+      },
+      {
+        "type": "world.status.changed",
+        "category": "worlds",
+        "source": "world-monitor",
+        "description": "A game world changed between an available and unavailable state."
+      }
+    ]
+  },
   "pods": [
     {
       "schemaVersion": "dauva.dev/pod/v1",
@@ -6540,5 +6707,5 @@
       "upstreamId": "1690800"
     }
   ],
-  "registryDigest": "sha256:9d46054b4f33f9b6e6cb452d341e5b2f18d48834a318f8470b2d804c32aee403"
+  "registryDigest": "sha256:8216f9eaa62ac0e5cf23b5f075215561a552dce8477adea6440aa926f0da2851"
 }

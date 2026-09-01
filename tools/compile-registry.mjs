@@ -4,6 +4,7 @@ import process from "node:process";
 import {
   compiledRegistry,
   normalizeTextLineEndings,
+  readJson,
   readManifestDirectory,
   repositoryRoot,
 } from "./registry-lib.mjs";
@@ -14,11 +15,15 @@ const releaseFiles = await readManifestDirectory("registry/history", {
   allowMissing: true,
 });
 const proofFiles = await readManifestDirectory("proofs");
+const eventCatalog = await readJson(
+  path.join(repositoryRoot, "registry", "dauva-events.json"),
+);
 const registry = compiledRegistry(
   podFiles.map((entry) => entry.value),
   seedFiles.map((entry) => entry.value),
   proofFiles.map((entry) => entry.value),
   releaseFiles.map((entry) => entry.value),
+  eventCatalog,
 );
 const rendered = `${JSON.stringify(registry, null, 2)}\n`;
 const outputPath = path.join(repositoryRoot, "dist", "registry.json");

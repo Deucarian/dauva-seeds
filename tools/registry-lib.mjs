@@ -123,7 +123,13 @@ export function assertRegistryDigest(registry) {
   return actual;
 }
 
-export function compiledRegistry(pods, seeds, proofs = [], releases = []) {
+export function compiledRegistry(
+  pods,
+  seeds,
+  proofs = [],
+  releases = [],
+  eventCatalog = null,
+) {
   const compiledProofs = proofs
     .map((proof) =>
       proof.schemaVersion === "dauva.dev/seed-proof/v2"
@@ -244,6 +250,7 @@ export function compiledRegistry(pods, seeds, proofs = [], releases = []) {
     source: {
       repository: "Deucarian/dauva-seeds",
     },
+    ...(eventCatalog == null ? {} : { eventCatalog }),
     pods: compiledPods,
     seeds: compiledSeeds,
     releases: compiledReleases,

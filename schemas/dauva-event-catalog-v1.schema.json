@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dauva.dev/schemas/dauva-event-catalog-v1.schema.json",
+  "title": "Dauva event catalog v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "contractVersion", "environments", "applications", "eventTypes"],
+  "properties": {
+    "schemaVersion": { "const": "dauva.dev/event-catalog/v1" },
+    "contractVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+$" },
+    "environments": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/slug" }
+    },
+    "applications": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/application" }
+    },
+    "eventTypes": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/eventType" }
+    }
+  },
+  "$defs": {
+    "slug": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80,
+      "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+    },
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "slug", "displayName", "repositories"],
+      "properties": {
+        "id": { "type": "string", "format": "uuid" },
+        "slug": { "$ref": "#/$defs/slug" },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "repositories": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$" }
+        }
+      }
+    },
+    "application": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "slug", "displayName", "iconIdentifier", "components"],
+      "properties": {
+        "id": { "type": "string", "format": "uuid" },
+        "slug": { "$ref": "#/$defs/slug" },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "iconIdentifier": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "components": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/component" }
+        }
+      }
+    },
+    "eventType": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "category", "source", "description"],
+      "properties": {
+        "type": { "$ref": "#/$defs/slug" },
+        "category": { "$ref": "#/$defs/slug" },
+        "source": { "$ref": "#/$defs/slug" },
+        "description": { "type": "string", "minLength": 1, "maxLength": 300 }
+      }
+    }
+  }
+}

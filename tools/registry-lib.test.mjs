@@ -193,3 +193,17 @@ test("Registry digests are recalculated instead of trusted", () => {
   assert.equal(verifyRegistryDigest(tampered), false);
   assert.throws(() => assertRegistryDigest(tampered), /digest mismatch/);
 });
+
+test("the compiled Registry carries the versioned Dauva event catalog", () => {
+  const eventCatalog = {
+    schemaVersion: "dauva.dev/event-catalog/v1",
+    contractVersion: "1.0",
+    environments: ["production"],
+    applications: [],
+    eventTypes: [],
+  };
+  const registry = compiledRegistry([], [], [], [], eventCatalog);
+
+  assert.deepEqual(registry.eventCatalog, eventCatalog);
+  assert.equal(verifyRegistryDigest(registry), true);
+});

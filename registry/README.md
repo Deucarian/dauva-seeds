@@ -3,6 +3,11 @@
 This directory contains the reviewed Pod and Seed manifests compiled into
 `../dist/registry.json`.
 
+It also contains the versioned Dauva application, component, environment, and
+event-type catalog in `dauva-events.json`. Source onboarding and delivery
+identity rules are documented in
+[`docs/architecture/dauva-event-source-conventions.md`](../docs/architecture/dauva-event-source-conventions.md).
+
 Rules already fixed by the canonical design:
 
 - A Pod represents one game family and groups at least two related Seed

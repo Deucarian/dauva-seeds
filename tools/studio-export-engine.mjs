@@ -32,17 +32,18 @@ export async function renderStudioExport({
     throw new Error("Export semantic impact is invalid.");
   }
   const now = requireTimestamp(validationTime, "validationTime");
-  const [podEntries, seedEntries, proofEntries, historyEntries] = await Promise.all([
+  const [podEntries, seedEntries, proofEntries, historyEntries, eventCatalog] = await Promise.all([
     readManifestDirectory("registry/pods"),
     readManifestDirectory("registry/seeds"),
     readManifestDirectory("proofs"),
     readManifestDirectory("registry/history", { allowMissing: true }),
+    readJson(path.join(repositoryRoot, "registry", "dauva-events.json")),
   ]);
   const basePods = podEntries.map((entry) => entry.value);
   const baseSeeds = seedEntries.map((entry) => entry.value);
   const baseProofs = proofEntries.map((entry) => entry.value);
   const history = historyEntries.map((entry) => entry.value);
-  const currentRegistry = compiledRegistry(basePods, baseSeeds, baseProofs, history);
+  const currentRegistry = compiledRegistry(basePods, baseSeeds, baseProofs, history, eventCatalog);
   if (currentRegistry.registryDigest !== baseRegistryDigest) {
     throw new Error("The export base Registry is stale.");
   }
@@ -170,7 +171,7 @@ export async function renderStudioExport({
     targetFiles.push(await releaseFile(receiptPath, renderJson(receipt), true));
   }
   const nextProofs = [...baseProofs, ...receipts];
-  const compiled = compiledRegistry(nextPods, nextSeeds, nextProofs, nextHistory);
+  const compiled = compiledRegistry(nextPods, nextSeeds, nextProofs, nextHistory, eventCatalog);
   targetFiles.push(await releaseFile("dist/registry.json", renderJson(compiled)));
 
   const packageDocument = await readJson(path.join(repositoryRoot, "package.json"));
