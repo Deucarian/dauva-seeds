@@ -360,6 +360,14 @@ function validateSeedPolicy(entry, podIds) {
       errors.push(`${entry.name}: secret '${secret.key}' is never consumed.`);
     }
     if (
+      secret.source === "generated" &&
+      secret.required === false
+    ) {
+      errors.push(
+        `${entry.name}: generated secret '${secret.key}' cannot be optional.`,
+      );
+    }
+    if (
       secret.source === "admin" &&
       secret.minLength != null &&
       secret.maxLength != null &&

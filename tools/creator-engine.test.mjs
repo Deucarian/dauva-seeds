@@ -223,7 +223,7 @@ test("all current Pods and Seeds round-trip through canonical bytes without loss
     ...(await readManifestDirectory("registry/pods")),
     ...(await readManifestDirectory("registry/seeds")),
   ];
-  assert.equal(entries.length, 27);
+  assert.equal(entries.length, 30);
   for (const entry of entries) {
     const canonical = canonicalDocument(entry.value);
     assert.deepEqual(JSON.parse(canonical.json), entry.value, entry.name);

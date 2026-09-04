@@ -1,0 +1,72 @@
+name: Build V Rising runtime
+
+on:
+  push:
+    branches:
+      - develop
+      - feature/vrising-dedicated-server
+      - main
+    paths:
+      - ".github/workflows/vrising-runtime.yml"
+      - "runtime/vrising/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+  attestations: write
+  id-token: write
+
+concurrency:
+  group: vrising-runtime-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the governed revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Sign in to the GitHub Container Registry
+        shell: bash
+        run: |
+          printf '%s' "${{ github.token }}" | \
+            docker login ghcr.io --username "${{ github.actor }}" --password-stdin
+      - name: Build and publish the immutable runtime
+        shell: bash
+        env:
+          IMAGE: ghcr.io/deucarian/dauva-vrising-runtime
+        run: |
+          version="$(tr -d '[:space:]' < runtime/vrising/VERSION)"
+          runtime_revision="$(git rev-parse HEAD:runtime/vrising)"
+          test -n "$version"
+          docker buildx create \
+            --name vrising-builder \
+            --driver docker-container \
+            --use
+          docker buildx inspect --bootstrap
+          docker buildx build \
+            --file runtime/vrising/Dockerfile \
+            --platform linux/amd64 \
+            --load \
+            --tag dauva-vrising-runtime:test \
+            runtime/vrising
+          bash runtime/vrising/test-runtime.sh dauva-vrising-runtime:test
+          docker buildx build \
+            --file runtime/vrising/Dockerfile \
+            --platform linux/amd64 \
+            --provenance=mode=max \
+            --sbom=true \
+            --label "org.opencontainers.image.revision=${runtime_revision}" \
+            --tag "${IMAGE}:${version}" \
+            --tag "${IMAGE}:sha-${GITHUB_SHA}" \
+            --push \
+            runtime/vrising
+      - name: Verify the Leaf runtime is anonymously pullable
+        shell: bash
+        env:
+          IMAGE: ghcr.io/deucarian/dauva-vrising-runtime
+        run: |
+          version="$(tr -d '[:space:]' < runtime/vrising/VERSION)"
+          docker logout ghcr.io
+          docker buildx imagetools inspect "${IMAGE}:${version}"

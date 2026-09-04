@@ -35,7 +35,7 @@ test("Seed engine service shares the exact Registry reference and clone bytes", 
   });
 
   assert.match(reference.registryDigest, /^sha256:[a-f0-9]{64}$/);
-  assert.equal(reference.pods.length, 9);
+  assert.equal(reference.pods.length, 10);
   assert.equal(reference.seeds.length, 18);
   assert.equal(reference.seeds.every((seed) => seed.status === "stable"), true);
   assert.equal(
