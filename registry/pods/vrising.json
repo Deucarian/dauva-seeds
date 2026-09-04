@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "dauva.dev/pod/v1",
+  "id": "vrising",
+  "status": "stable",
+  "recommendedSeedId": "vrising-pve",
+  "metadata": {
+    "title": {
+      "en": "V Rising",
+      "nl": "V Rising",
+      "de": "V Rising"
+    },
+    "description": {
+      "en": "Persistent V Rising worlds with private co-op and clearly separated competitive variants.",
+      "nl": "Blijvende V Rising-werelden met privé co-op en duidelijk gescheiden competitieve varianten.",
+      "de": "Persistente V-Rising-Welten mit privatem Koop und klar getrennten kompetitiven Varianten."
+    },
+    "icon": "shield"
+  }
+}

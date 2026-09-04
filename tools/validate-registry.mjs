@@ -360,6 +360,14 @@ function validateSeedPolicy(entry, podIds) {
       errors.push(`${entry.name}: secret '${secret.key}' is never consumed.`);
     }
     if (
+      secret.source === "generated" &&
+      secret.required === false
+    ) {
+      errors.push(
+        `${entry.name}: generated secret '${secret.key}' cannot be optional.`,
+      );
+    }
+    if (
       secret.source === "admin" &&
       secret.minLength != null &&
       secret.maxLength != null &&
@@ -886,7 +894,7 @@ function validateProofSignatures(fileName, proof, roots) {
     roots,
     "proof_leaf",
     proof.leafAttestation?.keyId,
-    proof.receiptPayload.runner.leafId,
+    `leaf:${proof.receiptPayload.runner.leafId}`,
   );
   if (!leafKey) {
     errors.push(`${fileName}: Leaf attestation key is unknown, revoked, or unbound.`);
