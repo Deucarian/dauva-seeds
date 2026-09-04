@@ -894,7 +894,7 @@ function validateProofSignatures(fileName, proof, roots) {
     roots,
     "proof_leaf",
     proof.leafAttestation?.keyId,
-    proof.receiptPayload.runner.leafId,
+    `leaf:${proof.receiptPayload.runner.leafId}`,
   );
   if (!leafKey) {
     errors.push(`${fileName}: Leaf attestation key is unknown, revoked, or unbound.`);
