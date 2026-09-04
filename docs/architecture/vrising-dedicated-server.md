@@ -54,9 +54,9 @@ It is wrapped rather than used directly because it lacks a container health
 check and a secret-to-`adminlist.txt` materialization contract.
 
 The exact derived linux/amd64 image manifest is
-`ghcr.io/deucarian/dauva-vrising-runtime@sha256:98c7e877c173dd7aa5435c6b8ea3a97de2848cb1beeaae9c340ad6d422b45595`.
+`ghcr.io/deucarian/dauva-vrising-runtime@sha256:f3acad2a3b05c4b7f9e39806f7d1d82e8f5a01ca731f9a087e8c6518ac8023c4`.
 The attested tag index is
-`sha256:d600d8f79040aeef67eeb60576fa02d7bb4e86d5655df5251543d64d2e2040cc`;
+`sha256:aa1bee9732daa7899920464ada0ca89195bae17e57f50644d082f12aa8f4af46`;
 Seeds intentionally pin the platform manifest rather than its mutable tag or
 attestation index.
 

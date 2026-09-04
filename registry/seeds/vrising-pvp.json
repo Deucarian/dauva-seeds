@@ -48,7 +48,7 @@
     {
       "id": "server",
       "role": "primary",
-      "image": "ghcr.io/deucarian/dauva-vrising-runtime@sha256:98c7e877c173dd7aa5435c6b8ea3a97de2848cb1beeaae9c340ad6d422b45595",
+      "image": "ghcr.io/deucarian/dauva-vrising-runtime@sha256:f3acad2a3b05c4b7f9e39806f7d1d82e8f5a01ca731f9a087e8c6518ac8023c4",
       "imageUpdate": {
         "reference": "ghcr.io/deucarian/dauva-vrising-runtime:1.1.0"
       },
