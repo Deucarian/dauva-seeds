@@ -5658,7 +5658,7 @@
     {
       "schemaVersion": "dauva.dev/seed/v1",
       "id": "vrising-pve",
-      "version": "1.0.0",
+      "version": "1.0.0-rc.1",
       "status": "candidate",
       "podId": "vrising",
       "genres": [
@@ -6067,7 +6067,7 @@
         ],
         "expiresAfterDays": 90
       },
-      "manifestDigest": "sha256:cb83edd9affb9640cfc8686170228a5fb796d3ae9c723ff573d3e8beec32064f",
+      "manifestDigest": "sha256:234c3e09867e346922cc7c46075fbb27365aeb67c73b349bda24eb6d3a4b7074",
       "proof": {
         "state": "unproven",
         "missingArchitectures": [
@@ -6078,7 +6078,7 @@
     {
       "schemaVersion": "dauva.dev/seed/v1",
       "id": "vrising-pvp",
-      "version": "1.0.0",
+      "version": "1.0.0-rc.1",
       "status": "candidate",
       "podId": "vrising",
       "genres": [
@@ -6487,7 +6487,7 @@
         ],
         "expiresAfterDays": 90
       },
-      "manifestDigest": "sha256:3f10d15db890d20d10d45d3f33f3d1115af465c82afcf6f19eb38a581b62dc0d",
+      "manifestDigest": "sha256:00d6a1eeb380bb7772979f7209f725c10b2e1656e357458a44a418517b571972",
       "proof": {
         "state": "unproven",
         "missingArchitectures": [
@@ -7408,5 +7408,5 @@
       "upstreamId": "1690800"
     }
   ],
-  "registryDigest": "sha256:99f3e697e7174abd5c4b54bdff8a8dd450d6945d881dbb2b3e21faa199a93ba1"
+  "registryDigest": "sha256:887000f1772be51a9b3fad472edb2e9d690a943cbad011acb6d4f84def34f598"
 }

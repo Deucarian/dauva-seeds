@@ -109,7 +109,7 @@ with a focused parity test enforcing that only identity, explanatory copy, and
 `VR_PRESET` differ. `vrising-pve` is the recommended private co-op recipe;
 `vrising-pvp` is visibly competitive and is never implied to be recommended.
 
-Both enter as `candidate` version `1.0.0`. Stable promotion requires a real
+Both enter as `candidate` version `1.0.0-rc.1`. Stable promotion requires a real
 proof-v2 receipt for the exact manifest and amd64 runtime, including image,
 health, ports, backup/restore, runtime build, managed update/rollback, graceful
 stop, restart, persistence, and cleanup. Publication success additionally
