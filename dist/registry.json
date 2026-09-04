@@ -174,6 +174,25 @@
         },
         "icon": "shield"
       }
+    },
+    {
+      "schemaVersion": "dauva.dev/pod/v1",
+      "id": "vrising",
+      "status": "candidate",
+      "recommendedSeedId": "vrising-pve",
+      "metadata": {
+        "title": {
+          "en": "V Rising",
+          "nl": "V Rising",
+          "de": "V Rising"
+        },
+        "description": {
+          "en": "Persistent V Rising worlds with private co-op and clearly separated competitive variants.",
+          "nl": "Blijvende V Rising-werelden met privé co-op en duidelijk gescheiden competitieve varianten.",
+          "de": "Persistente V-Rising-Welten mit privatem Koop und klar getrennten kompetitiven Varianten."
+        },
+        "icon": "shield"
+      }
     }
   ],
   "seeds": [
@@ -5635,6 +5654,846 @@
           "amd64"
         ]
       }
+    },
+    {
+      "schemaVersion": "dauva.dev/seed/v1",
+      "id": "vrising-pve",
+      "version": "1.0.0",
+      "status": "candidate",
+      "podId": "vrising",
+      "genres": [
+        "action",
+        "survival"
+      ],
+      "metadata": {
+        "title": {
+          "en": "V Rising PvE",
+          "nl": "V Rising PvE",
+          "de": "V Rising PvE"
+        },
+        "description": {
+          "en": "Recommended private cooperative world: unlisted by default, persistent, backed up, and managed by Dauva.",
+          "nl": "Aanbevolen privé-coöperatieve wereld: standaard niet vermeld, blijvend, geback-upt en beheerd door Dauva.",
+          "de": "Empfohlene private Koop-Welt: standardmäßig ungelistet, persistent, gesichert und von Dauva verwaltet."
+        },
+        "icon": "shield"
+      },
+      "compatibility": {
+        "operatingSystems": [
+          "linux"
+        ],
+        "architectures": [
+          "amd64"
+        ],
+        "leafCapabilities": [
+          "dynamic-ports",
+          "managed-game-updates-v1",
+          "multi-port",
+          "oci",
+          "persistent-storage",
+          "resource-limits"
+        ]
+      },
+      "runtimeVersion": {
+        "strategy": "steam-app-manifest",
+        "componentId": "server",
+        "volumeId": "install",
+        "path": "steamapps/appmanifest_1829350.acf",
+        "channel": "stable"
+      },
+      "components": [
+        {
+          "id": "server",
+          "role": "primary",
+          "image": "ghcr.io/deucarian/dauva-vrising-runtime@sha256:98c7e877c173dd7aa5435c6b8ea3a97de2848cb1beeaae9c340ad6d422b45595",
+          "imageUpdate": {
+            "reference": "ghcr.io/deucarian/dauva-vrising-runtime:1.0.0"
+          },
+          "environment": {
+            "AUTO_ANNOUNCE_ENABLED": "false",
+            "AUTO_REBOOT_ENABLED": "false",
+            "AUTO_UPDATE_ENABLED": "false",
+            "COMPILE_GAME_SETTINGS": "false",
+            "COMPILE_HOST_SETTINGS": "false",
+            "PGID": "1000",
+            "PUID": "1000",
+            "SKIPUPDATE": "true",
+            "UPDATE_ON_BOOT": "false",
+            "VR_AUTOSAVESMARTKEEP": "10:1:1,30:0:1,60:0:1,120:0:1,180:0:1,240:0:1,360:0:1,720:0:1,1440:0:1,2880:0:1,52560000:99:0",
+            "VR_LAN_MODE": "false",
+            "VR_MAX_ADMINS": "4",
+            "VR_PRESET": "StandardPvE",
+            "VR_RCON_ENABLED": "false",
+            "VR_RESET_DAYS_INTERVAL": "0",
+            "VR_SAVE_COUNT": "20",
+            "VR_SAVE_INTERVAL": "120",
+            "VR_SAVE_NAME": "dauva-world",
+            "VR_SECURE": "true"
+          },
+          "optionEnvironment": {
+            "description": "VR_DESCRIPTION",
+            "difficulty": "DAUVA_VRISING_DIFFICULTY",
+            "max-players": "VR_MAX_USERS",
+            "password-protected": "DAUVA_VRISING_PASSWORD_ENABLED",
+            "public-listing": "DAUVA_VRISING_PUBLIC_LISTING"
+          },
+          "agreementEnvironment": {},
+          "secretEnvironment": {
+            "initial-administrators": "DAUVA_VRISING_INITIAL_ADMINS",
+            "join-password": "VR_PASSWORD"
+          },
+          "runtimeEnvironment": {
+            "primaryPort": "VR_GAME_PORT",
+            "serverName": "VR_NAME",
+            "timezone": "TZ"
+          },
+          "volumeMounts": [
+            {
+              "volumeId": "install",
+              "target": "/vrising/server",
+              "readOnly": false
+            },
+            {
+              "volumeId": "persistent-data",
+              "target": "/vrising/data",
+              "readOnly": false
+            }
+          ],
+          "dependsOn": [],
+          "health": {
+            "source": "container",
+            "startupGraceSeconds": 1800
+          }
+        }
+      ],
+      "volumes": [
+        {
+          "id": "install",
+          "role": "data",
+          "retention": "delete-with-server",
+          "ownerUid": 1000,
+          "ownerGid": 1000,
+          "directoryMode": "0750"
+        },
+        {
+          "id": "persistent-data",
+          "role": "save",
+          "retention": "delete-with-server",
+          "ownerUid": 1000,
+          "ownerGid": 1000,
+          "directoryMode": "0750"
+        }
+      ],
+      "ports": [
+        {
+          "id": "game",
+          "componentId": "server",
+          "containerPort": 9876,
+          "containerPortMode": "allocated",
+          "protocols": [
+            "udp"
+          ],
+          "exposure": "public",
+          "purpose": "game",
+          "primary": true,
+          "sharedHostPort": false,
+          "environment": "VR_GAME_PORT"
+        },
+        {
+          "id": "query",
+          "componentId": "server",
+          "containerPort": 9877,
+          "containerPortMode": "allocated",
+          "protocols": [
+            "udp"
+          ],
+          "exposure": "public",
+          "purpose": "query",
+          "primary": false,
+          "sharedHostPort": false,
+          "environment": "VR_QUERY_PORT"
+        }
+      ],
+      "resources": {
+        "defaultPresetId": "friends",
+        "presets": [
+          {
+            "id": "friends",
+            "title": {
+              "en": "Friends",
+              "nl": "Vrienden",
+              "de": "Freunde"
+            },
+            "description": {
+              "en": "8 GB RAM for a small private group.",
+              "nl": "8 GB RAM voor een kleine privégroep.",
+              "de": "8 GB RAM für eine kleine private Gruppe."
+            },
+            "memoryMb": 8192,
+            "diskMb": 51200,
+            "cpuPercent": 300
+          },
+          {
+            "id": "clan",
+            "title": {
+              "en": "Clan",
+              "nl": "Clan",
+              "de": "Clan"
+            },
+            "description": {
+              "en": "12 GB RAM and more CPU headroom for a larger group.",
+              "nl": "12 GB RAM en meer CPU-ruimte voor een grotere groep.",
+              "de": "12 GB RAM und mehr CPU-Spielraum für eine größere Gruppe."
+            },
+            "memoryMb": 12288,
+            "diskMb": 76800,
+            "cpuPercent": 400
+          }
+        ]
+      },
+      "inputs": [
+        {
+          "key": "accept-steam-agreement",
+          "type": "agreement",
+          "label": {
+            "en": "Steam Subscriber Agreement",
+            "nl": "Steam Subscriber Agreement",
+            "de": "Steam-Nutzungsvertrag"
+          },
+          "help": {
+            "en": "I have read and accept the Steam Subscriber Agreement and the applicable V Rising terms.",
+            "nl": "Ik heb de Steam Subscriber Agreement en de toepasselijke V Rising-voorwaarden gelezen en accepteer deze.",
+            "de": "Ich habe den Steam-Nutzungsvertrag und die geltenden V-Rising-Bedingungen gelesen und akzeptiert."
+          },
+          "required": true,
+          "defaultValue": "false",
+          "url": "https://store.steampowered.com/subscriber_agreement/",
+          "revision": "official-current"
+        },
+        {
+          "key": "description",
+          "type": "string",
+          "label": {
+            "en": "Server description",
+            "nl": "Serverbeschrijving",
+            "de": "Serverbeschreibung"
+          },
+          "help": {
+            "en": "Shown to players in the V Rising server details.",
+            "nl": "Wordt aan spelers getoond in de V Rising-serverdetails.",
+            "de": "Wird Spielern in den V-Rising-Serverdetails angezeigt."
+          },
+          "required": false,
+          "defaultValue": "A private Dauva-managed V Rising Server.",
+          "minLength": 0,
+          "maxLength": 200
+        },
+        {
+          "key": "max-players",
+          "type": "integer",
+          "label": {
+            "en": "Maximum players",
+            "nl": "Maximumaantal spelers",
+            "de": "Maximale Spielerzahl"
+          },
+          "help": {
+            "en": "Simultaneous player limit from 1 through 128.",
+            "nl": "Limiet voor gelijktijdige spelers van 1 tot en met 128.",
+            "de": "Limit gleichzeitiger Spieler von 1 bis 128."
+          },
+          "required": true,
+          "defaultValue": "10",
+          "minLength": 1,
+          "maxLength": 3
+        },
+        {
+          "key": "difficulty",
+          "type": "string",
+          "label": {
+            "en": "Difficulty",
+            "nl": "Moeilijkheid",
+            "de": "Schwierigkeit"
+          },
+          "help": {
+            "en": "Choose easy, normal, or brutal.",
+            "nl": "Kies easy, normal of brutal.",
+            "de": "Wähle easy, normal oder brutal."
+          },
+          "required": true,
+          "defaultValue": "normal",
+          "minLength": 4,
+          "maxLength": 6
+        },
+        {
+          "key": "password-protected",
+          "type": "boolean",
+          "label": {
+            "en": "Password protection",
+            "nl": "Wachtwoordbeveiliging",
+            "de": "Passwortschutz"
+          },
+          "help": {
+            "en": "Turn on to require the protected join password; turn off to allow direct joins without it.",
+            "nl": "Zet aan om het beschermde toegangswachtwoord te vereisen; zet uit voor directe toegang zonder wachtwoord.",
+            "de": "Einschalten, um das geschützte Beitrittspasswort zu verlangen; ausschalten für Direktbeitritt ohne Passwort."
+          },
+          "required": true,
+          "defaultValue": "false",
+          "minLength": 4,
+          "maxLength": 5
+        },
+        {
+          "key": "public-listing",
+          "type": "boolean",
+          "label": {
+            "en": "Public server listing",
+            "nl": "Openbare serverlijst",
+            "de": "Öffentliche Serverliste"
+          },
+          "help": {
+            "en": "Off keeps the world out of both EOS and Steam lists; direct connections still work.",
+            "nl": "Uit houdt de wereld uit zowel de EOS- als Steam-lijst; directe verbindingen blijven werken.",
+            "de": "Aus blendet die Welt in EOS- und Steam-Listen aus; Direktverbindungen funktionieren weiter."
+          },
+          "required": true,
+          "defaultValue": "false",
+          "minLength": 4,
+          "maxLength": 5
+        }
+      ],
+      "secrets": [
+        {
+          "key": "initial-administrators",
+          "source": "admin",
+          "required": true,
+          "label": {
+            "en": "Initial administrators",
+            "nl": "Eerste beheerders",
+            "de": "Erste Administratoren"
+          },
+          "help": {
+            "en": "Enter semicolon-separated Name=SteamID64 pairs, for example Sproeikoei=your 17-digit SteamID64. Values stay protected and can be extended later in Server settings.",
+            "nl": "Voer met puntkomma's gescheiden Naam=SteamID64-paren in, bijvoorbeeld Sproeikoei=jouw 17-cijferige SteamID64. Waarden blijven beschermd en kunnen later in de Serverinstellingen worden uitgebreid.",
+            "de": "Gib durch Semikolon getrennte Name=SteamID64-Paare ein, zum Beispiel Sproeikoei=deine 17-stellige SteamID64. Werte bleiben geschützt und können später in den Servereinstellungen erweitert werden."
+          },
+          "minLength": 19,
+          "maxLength": 4096
+        },
+        {
+          "key": "join-password",
+          "source": "admin",
+          "required": false,
+          "label": {
+            "en": "Join password (optional)",
+            "nl": "Toegangswachtwoord (optioneel)",
+            "de": "Beitrittspasswort (optional)"
+          },
+          "help": {
+            "en": "Leave blank for no join password. The value is protected and is never shown in ordinary Server records.",
+            "nl": "Laat leeg voor geen toegangswachtwoord. De waarde wordt beschermd en nooit in gewone Servergegevens getoond.",
+            "de": "Leer lassen für kein Beitrittspasswort. Der Wert wird geschützt und nie in normalen Serverdaten angezeigt."
+          },
+          "minLength": 4,
+          "maxLength": 128
+        }
+      ],
+      "lifecycle": {
+        "startOrder": [
+          "server"
+        ],
+        "stopOrder": [
+          "server"
+        ],
+        "stopTimeoutSeconds": 300
+      },
+      "capabilities": {
+        "backup": true,
+        "restore": true,
+        "update": true,
+        "console": false
+      },
+      "source": {
+        "kind": "steamcmd",
+        "homepage": "https://playvrising.com/",
+        "repository": "https://github.com/StunlockStudios/vrising-dedicated-server-instructions",
+        "imageRegistries": [
+          "ghcr.io"
+        ],
+        "upstreamId": "1829350"
+      },
+      "trust": {
+        "level": "curated",
+        "reviewedAt": "2026-09-04",
+        "mutableRuntimeImagesAllowed": false
+      },
+      "storage": {
+        "class": "bulk",
+        "backupClass": "backup",
+        "estimatedDownloadMb": 12288,
+        "estimatedInstallMb": 20480,
+        "estimatedMutableMb": 30720,
+        "backupPolicy": "required"
+      },
+      "updatePolicy": {
+        "discovery": "steamcmd",
+        "automaticCheck": true,
+        "automaticInstall": false,
+        "requiresBackup": true,
+        "rollback": true,
+        "strategy": "steamcmd",
+        "executable": "/home/steam/steamcmd/steamcmd.sh",
+        "homeDirectory": "/home/steam",
+        "user": "1000:1000",
+        "componentId": "server",
+        "volumeId": "install",
+        "installDirectory": "/vrising/server",
+        "appId": "1829350",
+        "branch": "public",
+        "validate": true
+      },
+      "proofPolicy": {
+        "requiredChecks": [
+          "images-pinned",
+          "healthy",
+          "ports",
+          "backup-if-supported",
+          "runtime-version",
+          "managed-update",
+          "rollback",
+          "graceful-stop",
+          "restart",
+          "persistence",
+          "cleanup"
+        ],
+        "expiresAfterDays": 90
+      },
+      "manifestDigest": "sha256:cb83edd9affb9640cfc8686170228a5fb796d3ae9c723ff573d3e8beec32064f",
+      "proof": {
+        "state": "unproven",
+        "missingArchitectures": [
+          "amd64"
+        ]
+      }
+    },
+    {
+      "schemaVersion": "dauva.dev/seed/v1",
+      "id": "vrising-pvp",
+      "version": "1.0.0",
+      "status": "candidate",
+      "podId": "vrising",
+      "genres": [
+        "action",
+        "survival"
+      ],
+      "metadata": {
+        "title": {
+          "en": "V Rising PvP",
+          "nl": "V Rising PvP",
+          "de": "V Rising PvP"
+        },
+        "description": {
+          "en": "Competitive player-versus-player world with raids and direct player conflict. Not the recommended default.",
+          "nl": "Competitieve speler-tegen-spelerwereld met raids en direct conflict. Niet de aanbevolen standaard.",
+          "de": "Kompetitive Spieler-gegen-Spieler-Welt mit Raids und direktem Konflikt. Nicht die empfohlene Vorgabe."
+        },
+        "icon": "flame"
+      },
+      "compatibility": {
+        "operatingSystems": [
+          "linux"
+        ],
+        "architectures": [
+          "amd64"
+        ],
+        "leafCapabilities": [
+          "dynamic-ports",
+          "managed-game-updates-v1",
+          "multi-port",
+          "oci",
+          "persistent-storage",
+          "resource-limits"
+        ]
+      },
+      "runtimeVersion": {
+        "strategy": "steam-app-manifest",
+        "componentId": "server",
+        "volumeId": "install",
+        "path": "steamapps/appmanifest_1829350.acf",
+        "channel": "stable"
+      },
+      "components": [
+        {
+          "id": "server",
+          "role": "primary",
+          "image": "ghcr.io/deucarian/dauva-vrising-runtime@sha256:98c7e877c173dd7aa5435c6b8ea3a97de2848cb1beeaae9c340ad6d422b45595",
+          "imageUpdate": {
+            "reference": "ghcr.io/deucarian/dauva-vrising-runtime:1.0.0"
+          },
+          "environment": {
+            "AUTO_ANNOUNCE_ENABLED": "false",
+            "AUTO_REBOOT_ENABLED": "false",
+            "AUTO_UPDATE_ENABLED": "false",
+            "COMPILE_GAME_SETTINGS": "false",
+            "COMPILE_HOST_SETTINGS": "false",
+            "PGID": "1000",
+            "PUID": "1000",
+            "SKIPUPDATE": "true",
+            "UPDATE_ON_BOOT": "false",
+            "VR_AUTOSAVESMARTKEEP": "10:1:1,30:0:1,60:0:1,120:0:1,180:0:1,240:0:1,360:0:1,720:0:1,1440:0:1,2880:0:1,52560000:99:0",
+            "VR_LAN_MODE": "false",
+            "VR_MAX_ADMINS": "4",
+            "VR_PRESET": "StandardPvP",
+            "VR_RCON_ENABLED": "false",
+            "VR_RESET_DAYS_INTERVAL": "0",
+            "VR_SAVE_COUNT": "20",
+            "VR_SAVE_INTERVAL": "120",
+            "VR_SAVE_NAME": "dauva-world",
+            "VR_SECURE": "true"
+          },
+          "optionEnvironment": {
+            "description": "VR_DESCRIPTION",
+            "difficulty": "DAUVA_VRISING_DIFFICULTY",
+            "max-players": "VR_MAX_USERS",
+            "password-protected": "DAUVA_VRISING_PASSWORD_ENABLED",
+            "public-listing": "DAUVA_VRISING_PUBLIC_LISTING"
+          },
+          "agreementEnvironment": {},
+          "secretEnvironment": {
+            "initial-administrators": "DAUVA_VRISING_INITIAL_ADMINS",
+            "join-password": "VR_PASSWORD"
+          },
+          "runtimeEnvironment": {
+            "primaryPort": "VR_GAME_PORT",
+            "serverName": "VR_NAME",
+            "timezone": "TZ"
+          },
+          "volumeMounts": [
+            {
+              "volumeId": "install",
+              "target": "/vrising/server",
+              "readOnly": false
+            },
+            {
+              "volumeId": "persistent-data",
+              "target": "/vrising/data",
+              "readOnly": false
+            }
+          ],
+          "dependsOn": [],
+          "health": {
+            "source": "container",
+            "startupGraceSeconds": 1800
+          }
+        }
+      ],
+      "volumes": [
+        {
+          "id": "install",
+          "role": "data",
+          "retention": "delete-with-server",
+          "ownerUid": 1000,
+          "ownerGid": 1000,
+          "directoryMode": "0750"
+        },
+        {
+          "id": "persistent-data",
+          "role": "save",
+          "retention": "delete-with-server",
+          "ownerUid": 1000,
+          "ownerGid": 1000,
+          "directoryMode": "0750"
+        }
+      ],
+      "ports": [
+        {
+          "id": "game",
+          "componentId": "server",
+          "containerPort": 9876,
+          "containerPortMode": "allocated",
+          "protocols": [
+            "udp"
+          ],
+          "exposure": "public",
+          "purpose": "game",
+          "primary": true,
+          "sharedHostPort": false,
+          "environment": "VR_GAME_PORT"
+        },
+        {
+          "id": "query",
+          "componentId": "server",
+          "containerPort": 9877,
+          "containerPortMode": "allocated",
+          "protocols": [
+            "udp"
+          ],
+          "exposure": "public",
+          "purpose": "query",
+          "primary": false,
+          "sharedHostPort": false,
+          "environment": "VR_QUERY_PORT"
+        }
+      ],
+      "resources": {
+        "defaultPresetId": "friends",
+        "presets": [
+          {
+            "id": "friends",
+            "title": {
+              "en": "Friends",
+              "nl": "Vrienden",
+              "de": "Freunde"
+            },
+            "description": {
+              "en": "8 GB RAM for a small private group.",
+              "nl": "8 GB RAM voor een kleine privégroep.",
+              "de": "8 GB RAM für eine kleine private Gruppe."
+            },
+            "memoryMb": 8192,
+            "diskMb": 51200,
+            "cpuPercent": 300
+          },
+          {
+            "id": "clan",
+            "title": {
+              "en": "Clan",
+              "nl": "Clan",
+              "de": "Clan"
+            },
+            "description": {
+              "en": "12 GB RAM and more CPU headroom for a larger group.",
+              "nl": "12 GB RAM en meer CPU-ruimte voor een grotere groep.",
+              "de": "12 GB RAM und mehr CPU-Spielraum für eine größere Gruppe."
+            },
+            "memoryMb": 12288,
+            "diskMb": 76800,
+            "cpuPercent": 400
+          }
+        ]
+      },
+      "inputs": [
+        {
+          "key": "accept-steam-agreement",
+          "type": "agreement",
+          "label": {
+            "en": "Steam Subscriber Agreement",
+            "nl": "Steam Subscriber Agreement",
+            "de": "Steam-Nutzungsvertrag"
+          },
+          "help": {
+            "en": "I have read and accept the Steam Subscriber Agreement and the applicable V Rising terms.",
+            "nl": "Ik heb de Steam Subscriber Agreement en de toepasselijke V Rising-voorwaarden gelezen en accepteer deze.",
+            "de": "Ich habe den Steam-Nutzungsvertrag und die geltenden V-Rising-Bedingungen gelesen und akzeptiert."
+          },
+          "required": true,
+          "defaultValue": "false",
+          "url": "https://store.steampowered.com/subscriber_agreement/",
+          "revision": "official-current"
+        },
+        {
+          "key": "description",
+          "type": "string",
+          "label": {
+            "en": "Server description",
+            "nl": "Serverbeschrijving",
+            "de": "Serverbeschreibung"
+          },
+          "help": {
+            "en": "Shown to players in the V Rising server details.",
+            "nl": "Wordt aan spelers getoond in de V Rising-serverdetails.",
+            "de": "Wird Spielern in den V-Rising-Serverdetails angezeigt."
+          },
+          "required": false,
+          "defaultValue": "A private Dauva-managed V Rising Server.",
+          "minLength": 0,
+          "maxLength": 200
+        },
+        {
+          "key": "max-players",
+          "type": "integer",
+          "label": {
+            "en": "Maximum players",
+            "nl": "Maximumaantal spelers",
+            "de": "Maximale Spielerzahl"
+          },
+          "help": {
+            "en": "Simultaneous player limit from 1 through 128.",
+            "nl": "Limiet voor gelijktijdige spelers van 1 tot en met 128.",
+            "de": "Limit gleichzeitiger Spieler von 1 bis 128."
+          },
+          "required": true,
+          "defaultValue": "10",
+          "minLength": 1,
+          "maxLength": 3
+        },
+        {
+          "key": "difficulty",
+          "type": "string",
+          "label": {
+            "en": "Difficulty",
+            "nl": "Moeilijkheid",
+            "de": "Schwierigkeit"
+          },
+          "help": {
+            "en": "Choose easy, normal, or brutal.",
+            "nl": "Kies easy, normal of brutal.",
+            "de": "Wähle easy, normal oder brutal."
+          },
+          "required": true,
+          "defaultValue": "normal",
+          "minLength": 4,
+          "maxLength": 6
+        },
+        {
+          "key": "password-protected",
+          "type": "boolean",
+          "label": {
+            "en": "Password protection",
+            "nl": "Wachtwoordbeveiliging",
+            "de": "Passwortschutz"
+          },
+          "help": {
+            "en": "Turn on to require the protected join password; turn off to allow direct joins without it.",
+            "nl": "Zet aan om het beschermde toegangswachtwoord te vereisen; zet uit voor directe toegang zonder wachtwoord.",
+            "de": "Einschalten, um das geschützte Beitrittspasswort zu verlangen; ausschalten für Direktbeitritt ohne Passwort."
+          },
+          "required": true,
+          "defaultValue": "false",
+          "minLength": 4,
+          "maxLength": 5
+        },
+        {
+          "key": "public-listing",
+          "type": "boolean",
+          "label": {
+            "en": "Public server listing",
+            "nl": "Openbare serverlijst",
+            "de": "Öffentliche Serverliste"
+          },
+          "help": {
+            "en": "Off keeps the world out of both EOS and Steam lists; direct connections still work.",
+            "nl": "Uit houdt de wereld uit zowel de EOS- als Steam-lijst; directe verbindingen blijven werken.",
+            "de": "Aus blendet die Welt in EOS- und Steam-Listen aus; Direktverbindungen funktionieren weiter."
+          },
+          "required": true,
+          "defaultValue": "false",
+          "minLength": 4,
+          "maxLength": 5
+        }
+      ],
+      "secrets": [
+        {
+          "key": "initial-administrators",
+          "source": "admin",
+          "required": true,
+          "label": {
+            "en": "Initial administrators",
+            "nl": "Eerste beheerders",
+            "de": "Erste Administratoren"
+          },
+          "help": {
+            "en": "Enter semicolon-separated Name=SteamID64 pairs, for example Sproeikoei=your 17-digit SteamID64. Values stay protected and can be extended later in Server settings.",
+            "nl": "Voer met puntkomma's gescheiden Naam=SteamID64-paren in, bijvoorbeeld Sproeikoei=jouw 17-cijferige SteamID64. Waarden blijven beschermd en kunnen later in de Serverinstellingen worden uitgebreid.",
+            "de": "Gib durch Semikolon getrennte Name=SteamID64-Paare ein, zum Beispiel Sproeikoei=deine 17-stellige SteamID64. Werte bleiben geschützt und können später in den Servereinstellungen erweitert werden."
+          },
+          "minLength": 19,
+          "maxLength": 4096
+        },
+        {
+          "key": "join-password",
+          "source": "admin",
+          "required": false,
+          "label": {
+            "en": "Join password (optional)",
+            "nl": "Toegangswachtwoord (optioneel)",
+            "de": "Beitrittspasswort (optional)"
+          },
+          "help": {
+            "en": "Leave blank for no join password. The value is protected and is never shown in ordinary Server records.",
+            "nl": "Laat leeg voor geen toegangswachtwoord. De waarde wordt beschermd en nooit in gewone Servergegevens getoond.",
+            "de": "Leer lassen für kein Beitrittspasswort. Der Wert wird geschützt und nie in normalen Serverdaten angezeigt."
+          },
+          "minLength": 4,
+          "maxLength": 128
+        }
+      ],
+      "lifecycle": {
+        "startOrder": [
+          "server"
+        ],
+        "stopOrder": [
+          "server"
+        ],
+        "stopTimeoutSeconds": 300
+      },
+      "capabilities": {
+        "backup": true,
+        "restore": true,
+        "update": true,
+        "console": false
+      },
+      "source": {
+        "kind": "steamcmd",
+        "homepage": "https://playvrising.com/",
+        "repository": "https://github.com/StunlockStudios/vrising-dedicated-server-instructions",
+        "imageRegistries": [
+          "ghcr.io"
+        ],
+        "upstreamId": "1829350"
+      },
+      "trust": {
+        "level": "curated",
+        "reviewedAt": "2026-09-04",
+        "mutableRuntimeImagesAllowed": false
+      },
+      "storage": {
+        "class": "bulk",
+        "backupClass": "backup",
+        "estimatedDownloadMb": 12288,
+        "estimatedInstallMb": 20480,
+        "estimatedMutableMb": 30720,
+        "backupPolicy": "required"
+      },
+      "updatePolicy": {
+        "discovery": "steamcmd",
+        "automaticCheck": true,
+        "automaticInstall": false,
+        "requiresBackup": true,
+        "rollback": true,
+        "strategy": "steamcmd",
+        "executable": "/home/steam/steamcmd/steamcmd.sh",
+        "homeDirectory": "/home/steam",
+        "user": "1000:1000",
+        "componentId": "server",
+        "volumeId": "install",
+        "installDirectory": "/vrising/server",
+        "appId": "1829350",
+        "branch": "public",
+        "validate": true
+      },
+      "proofPolicy": {
+        "requiredChecks": [
+          "images-pinned",
+          "healthy",
+          "ports",
+          "backup-if-supported",
+          "runtime-version",
+          "managed-update",
+          "rollback",
+          "graceful-stop",
+          "restart",
+          "persistence",
+          "cleanup"
+        ],
+        "expiresAfterDays": 90
+      },
+      "manifestDigest": "sha256:3f10d15db890d20d10d45d3f33f3d1115af465c82afcf6f19eb38a581b62dc0d",
+      "proof": {
+        "state": "unproven",
+        "missingArchitectures": [
+          "amd64"
+        ]
+      }
     }
   ],
   "releases": [
@@ -6532,6 +7391,15 @@
     },
     {
       "kind": "steamcmd",
+      "homepage": "https://playvrising.com/",
+      "repository": "https://github.com/StunlockStudios/vrising-dedicated-server-instructions",
+      "imageRegistries": [
+        "ghcr.io"
+      ],
+      "upstreamId": "1829350"
+    },
+    {
+      "kind": "steamcmd",
       "homepage": "https://www.satisfactorygame.com/",
       "repository": "https://github.com/wolveix/satisfactory-server",
       "imageRegistries": [
@@ -6540,5 +7408,5 @@
       "upstreamId": "1690800"
     }
   ],
-  "registryDigest": "sha256:9d46054b4f33f9b6e6cb452d341e5b2f18d48834a318f8470b2d804c32aee403"
+  "registryDigest": "sha256:99f3e697e7174abd5c4b54bdff8a8dd450d6945d881dbb2b3e21faa199a93ba1"
 }

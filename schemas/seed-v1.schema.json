@@ -839,6 +839,10 @@
             "admin"
           ]
         },
+        "required": {
+          "type": "boolean",
+          "default": true
+        },
         "generatedBytes": {
           "type": "integer",
           "minimum": 16,
