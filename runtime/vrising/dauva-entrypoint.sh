@@ -20,6 +20,13 @@ VR_LIST_ON_EOS="$(normalize_boolean \
   "Public listing")"
 export VR_LIST_ON_STEAM="$VR_LIST_ON_EOS"
 
+readonly max_users="${VR_MAX_USERS:-10}"
+[[ "$max_users" =~ ^[0-9]+$ ]] || \
+  fail "Maximum players must be a whole number from 1 through 128."
+(( 10#$max_users >= 1 && 10#$max_users <= 128 )) || \
+  fail "Maximum players must be from 1 through 128."
+export VR_MAX_USERS="$((10#$max_users))"
+
 readonly difficulty="${DAUVA_VRISING_DIFFICULTY:-normal}"
 case "${difficulty,,}" in
   easy) export VR_DIFFICULTY_PRESET="Difficulty_Easy" ;;
