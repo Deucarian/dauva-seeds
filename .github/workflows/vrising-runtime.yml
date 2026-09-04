@@ -38,6 +38,7 @@ jobs:
           IMAGE: ghcr.io/deucarian/dauva-vrising-runtime
         run: |
           version="$(tr -d '[:space:]' < runtime/vrising/VERSION)"
+          runtime_revision="$(git rev-parse HEAD:runtime/vrising)"
           test -n "$version"
           docker buildx create \
             --name vrising-builder \
@@ -56,17 +57,16 @@ jobs:
             --platform linux/amd64 \
             --provenance=mode=max \
             --sbom=true \
-            --label "org.opencontainers.image.revision=${GITHUB_SHA}" \
+            --label "org.opencontainers.image.revision=${runtime_revision}" \
             --tag "${IMAGE}:${version}" \
             --tag "${IMAGE}:sha-${GITHUB_SHA}" \
             --push \
             runtime/vrising
-      - name: Keep the Leaf runtime anonymously pullable
+      - name: Verify the Leaf runtime is anonymously pullable
         shell: bash
         env:
-          GH_TOKEN: ${{ github.token }}
+          IMAGE: ghcr.io/deucarian/dauva-vrising-runtime
         run: |
-          gh api \
-            --method PATCH \
-            "/orgs/${GITHUB_REPOSITORY_OWNER}/packages/container/dauva-vrising-runtime/visibility" \
-            --field visibility=public
+          version="$(tr -d '[:space:]' < runtime/vrising/VERSION)"
+          docker logout ghcr.io
+          docker buildx imagetools inspect "${IMAGE}:${version}"
