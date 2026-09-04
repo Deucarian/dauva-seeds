@@ -39,6 +39,11 @@ jobs:
         run: |
           version="$(tr -d '[:space:]' < runtime/vrising/VERSION)"
           test -n "$version"
+          docker buildx create \
+            --name vrising-builder \
+            --driver docker-container \
+            --use
+          docker buildx inspect --bootstrap
           docker buildx build \
             --file runtime/vrising/Dockerfile \
             --platform linux/amd64 \
