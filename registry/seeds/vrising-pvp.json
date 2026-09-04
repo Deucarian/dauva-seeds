@@ -1,8 +1,8 @@
 {
   "schemaVersion": "dauva.dev/seed/v1",
   "id": "vrising-pvp",
-  "version": "1.0.0-rc.1",
-  "status": "candidate",
+  "version": "1.0.0",
+  "status": "stable",
   "podId": "vrising",
   "genres": [
     "action",
@@ -30,25 +30,17 @@
     ],
     "leafCapabilities": [
       "dynamic-ports",
-      "managed-game-updates-v1",
       "multi-port",
       "oci",
       "persistent-storage",
       "resource-limits"
     ]
   },
-  "runtimeVersion": {
-    "strategy": "steam-app-manifest",
-    "componentId": "server",
-    "volumeId": "install",
-    "path": "steamapps/appmanifest_1829350.acf",
-    "channel": "stable"
-  },
   "components": [
     {
       "id": "server",
       "role": "primary",
-      "image": "ghcr.io/deucarian/dauva-vrising-runtime@sha256:f3acad2a3b05c4b7f9e39806f7d1d82e8f5a01ca731f9a087e8c6518ac8023c4",
+      "image": "ghcr.io/deucarian/dauva-vrising-runtime@sha256:09ca6c70c19be749f0a55f278400a6c68a414122d8f9a8929c3f6a94b4914b0e",
       "imageUpdate": {
         "reference": "ghcr.io/deucarian/dauva-vrising-runtime:1.1.0"
       },
@@ -81,10 +73,7 @@
         "public-listing": "DAUVA_VRISING_PUBLIC_LISTING"
       },
       "agreementEnvironment": {},
-      "secretEnvironment": {
-        "initial-administrators": "DAUVA_VRISING_INITIAL_ADMINS",
-        "join-password": "VR_PASSWORD"
-      },
+      "secretEnvironment": {},
       "runtimeEnvironment": {
         "primaryPort": "VR_GAME_PORT",
         "serverName": "VR_NAME",
@@ -304,42 +293,7 @@
       "maxLength": 5
     }
   ],
-  "secrets": [
-    {
-      "key": "initial-administrators",
-      "source": "admin",
-      "required": false,
-      "label": {
-        "en": "Initial administrators",
-        "nl": "Eerste beheerders",
-        "de": "Erste Administratoren"
-      },
-      "help": {
-        "en": "Optional at creation. Enter semicolon-separated Name=SteamID64 pairs, for example Sproeikoei=your 17-digit SteamID64, or add them later in Server settings.",
-        "nl": "Optioneel bij het aanmaken. Voer met puntkomma's gescheiden Naam=SteamID64-paren in, bijvoorbeeld Sproeikoei=jouw 17-cijferige SteamID64, of voeg ze later toe in de Serverinstellingen.",
-        "de": "Bei der Erstellung optional. Gib durch Semikolon getrennte Name=SteamID64-Paare ein, zum Beispiel Sproeikoei=deine 17-stellige SteamID64, oder füge sie später in den Servereinstellungen hinzu."
-      },
-      "minLength": 19,
-      "maxLength": 4096
-    },
-    {
-      "key": "join-password",
-      "source": "admin",
-      "required": false,
-      "label": {
-        "en": "Join password (optional)",
-        "nl": "Toegangswachtwoord (optioneel)",
-        "de": "Beitrittspasswort (optional)"
-      },
-      "help": {
-        "en": "Leave blank for no join password. The value is protected and is never shown in ordinary Server records.",
-        "nl": "Laat leeg voor geen toegangswachtwoord. De waarde wordt beschermd en nooit in gewone Servergegevens getoond.",
-        "de": "Leer lassen für kein Beitrittspasswort. Der Wert wird geschützt und nie in normalen Serverdaten angezeigt."
-      },
-      "minLength": 4,
-      "maxLength": 128
-    }
-  ],
+  "secrets": [],
   "lifecycle": {
     "startOrder": [
       "server"
@@ -350,10 +304,10 @@
     "stopTimeoutSeconds": 300
   },
   "capabilities": {
-    "backup": true,
-    "restore": true,
-    "update": true,
-    "console": false
+    "backup": false,
+    "console": false,
+    "restore": false,
+    "update": false
   },
   "source": {
     "kind": "steamcmd",
@@ -375,34 +329,20 @@
     "estimatedDownloadMb": 12288,
     "estimatedInstallMb": 20480,
     "estimatedMutableMb": 30720,
-    "backupPolicy": "required"
+    "backupPolicy": "optional"
   },
   "updatePolicy": {
-    "discovery": "steamcmd",
-    "automaticCheck": true,
+    "automaticCheck": false,
     "automaticInstall": false,
-    "requiresBackup": true,
-    "rollback": true,
-    "strategy": "steamcmd",
-    "executable": "/home/steam/steamcmd/steamcmd.sh",
-    "homeDirectory": "/home/steam",
-    "user": "1000:1000",
-    "componentId": "server",
-    "volumeId": "install",
-    "installDirectory": "/vrising/server",
-    "appId": "1829350",
-    "branch": "public",
-    "validate": true
+    "discovery": "manual",
+    "requiresBackup": false,
+    "rollback": false
   },
   "proofPolicy": {
     "requiredChecks": [
       "images-pinned",
       "healthy",
       "ports",
-      "backup-if-supported",
-      "runtime-version",
-      "managed-update",
-      "rollback",
       "graceful-stop",
       "restart",
       "persistence",

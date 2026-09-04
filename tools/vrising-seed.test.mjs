@@ -19,10 +19,6 @@ function input(seed, key) {
   return seed.inputs.find((candidate) => candidate.key === key);
 }
 
-function secret(seed, key) {
-  return seed.secrets.find((candidate) => candidate.key === key);
-}
-
 function normalizedVariant(seed) {
   const normalized = structuredClone(seed);
   normalized.id = "vrising-variant";
@@ -38,11 +34,11 @@ function assertLocalized(text, context) {
   }
 }
 
-test("V Rising Pod recommends private PvE while both recipes stay candidates", () => {
-  assert.equal(pod.status, "candidate");
+test("V Rising Pod recommends private PvE while both recipes stay stable", () => {
+  assert.equal(pod.status, "stable");
   assert.equal(pod.recommendedSeedId, "vrising-pve");
-  assert.equal(pve.status, "candidate");
-  assert.equal(pvp.status, "candidate");
+  assert.equal(pve.status, "stable");
+  assert.equal(pvp.status, "stable");
   assert.match(pve.metadata.title.en, /PvE/);
   assert.match(pvp.metadata.title.en, /PvP/);
   assert.match(pvp.metadata.description.en, /Not the recommended default/);
@@ -54,7 +50,7 @@ test("PvE and PvP differ only by identity, copy, and the official preset", () =>
   assert.equal(pvp.components[0].environment.VR_PRESET, "StandardPvP");
 });
 
-test("V Rising runtime, ports, persistence, and managed update are bounded", () => {
+test("V Rising runtime, ports, and persistence are bounded", () => {
   const expectedImage = pve.components[0].image;
   assert.match(
     expectedImage,
@@ -91,12 +87,17 @@ test("V Rising runtime, ports, persistence, and managed update are bounded", () 
       { id: "persistent-data", role: "save" },
     ],
   );
-  assert.equal(pve.runtimeVersion.path, "steamapps/appmanifest_1829350.acf");
-  assert.equal(pve.updatePolicy.appId, "1829350");
-  assert.equal(pve.updatePolicy.branch, "public");
-  assert.equal(pve.updatePolicy.installDirectory, "/vrising/server");
-  assert.equal(pve.updatePolicy.requiresBackup, true);
-  assert.equal(pve.updatePolicy.rollback, true);
+  assert.equal(pve.runtimeVersion, undefined);
+  assert.deepEqual(pve.capabilities, {
+    backup: false,
+    console: false,
+    restore: false,
+    update: false,
+  });
+  assert.equal(pve.updatePolicy.discovery, "manual");
+  assert.equal(pve.updatePolicy.requiresBackup, false);
+  assert.equal(pve.updatePolicy.rollback, false);
+  assert.doesNotMatch(pve.compatibility.leafCapabilities.join(","), /managed-game-updates-v1/);
   assert.equal(pve.components[0].environment.UPDATE_ON_BOOT, "false");
   assert.equal(pve.components[0].environment.SKIPUPDATE, "true");
 });
@@ -106,16 +107,8 @@ test("private defaults and protected values do not embed a personal identifier",
   assert.equal(input(pve, "difficulty").defaultValue, "normal");
   assert.equal(input(pve, "max-players").defaultValue, "10");
   assert.equal(input(pve, "password-protected").defaultValue, "false");
-  assert.equal(secret(pve, "initial-administrators").required, false);
-  assert.equal(secret(pve, "join-password").required, false);
-  assert.equal(
-    pve.components[0].secretEnvironment["initial-administrators"],
-    "DAUVA_VRISING_INITIAL_ADMINS",
-  );
-  assert.equal(
-    pve.components[0].secretEnvironment["join-password"],
-    "VR_PASSWORD",
-  );
+  assert.deepEqual(pve.secrets, []);
+  assert.deepEqual(pve.components[0].secretEnvironment, {});
   assert.doesNotMatch(JSON.stringify([pve, pvp]), /7656119[0-9]{10}/);
 });
 

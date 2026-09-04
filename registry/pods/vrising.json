@@ -1,7 +1,7 @@
 {
   "schemaVersion": "dauva.dev/pod/v1",
   "id": "vrising",
-  "status": "candidate",
+  "status": "stable",
   "recommendedSeedId": "vrising-pve",
   "metadata": {
     "title": {
