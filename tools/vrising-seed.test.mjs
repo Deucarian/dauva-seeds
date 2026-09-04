@@ -106,7 +106,7 @@ test("private defaults and protected values do not embed a personal identifier",
   assert.equal(input(pve, "difficulty").defaultValue, "normal");
   assert.equal(input(pve, "max-players").defaultValue, "10");
   assert.equal(input(pve, "password-protected").defaultValue, "false");
-  assert.equal(secret(pve, "initial-administrators").required, true);
+  assert.equal(secret(pve, "initial-administrators").required, false);
   assert.equal(secret(pve, "join-password").required, false);
   assert.equal(
     pve.components[0].secretEnvironment["initial-administrators"],

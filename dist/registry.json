@@ -5707,7 +5707,7 @@
           "role": "primary",
           "image": "ghcr.io/deucarian/dauva-vrising-runtime@sha256:98c7e877c173dd7aa5435c6b8ea3a97de2848cb1beeaae9c340ad6d422b45595",
           "imageUpdate": {
-            "reference": "ghcr.io/deucarian/dauva-vrising-runtime:1.0.0"
+            "reference": "ghcr.io/deucarian/dauva-vrising-runtime:1.1.0"
           },
           "environment": {
             "AUTO_ANNOUNCE_ENABLED": "false",
@@ -5965,16 +5965,16 @@
         {
           "key": "initial-administrators",
           "source": "admin",
-          "required": true,
+          "required": false,
           "label": {
             "en": "Initial administrators",
             "nl": "Eerste beheerders",
             "de": "Erste Administratoren"
           },
           "help": {
-            "en": "Enter semicolon-separated Name=SteamID64 pairs, for example Sproeikoei=your 17-digit SteamID64. Values stay protected and can be extended later in Server settings.",
-            "nl": "Voer met puntkomma's gescheiden Naam=SteamID64-paren in, bijvoorbeeld Sproeikoei=jouw 17-cijferige SteamID64. Waarden blijven beschermd en kunnen later in de Serverinstellingen worden uitgebreid.",
-            "de": "Gib durch Semikolon getrennte Name=SteamID64-Paare ein, zum Beispiel Sproeikoei=deine 17-stellige SteamID64. Werte bleiben geschützt und können später in den Servereinstellungen erweitert werden."
+            "en": "Optional at creation. Enter semicolon-separated Name=SteamID64 pairs, for example Sproeikoei=your 17-digit SteamID64, or add them later in Server settings.",
+            "nl": "Optioneel bij het aanmaken. Voer met puntkomma's gescheiden Naam=SteamID64-paren in, bijvoorbeeld Sproeikoei=jouw 17-cijferige SteamID64, of voeg ze later toe in de Serverinstellingen.",
+            "de": "Bei der Erstellung optional. Gib durch Semikolon getrennte Name=SteamID64-Paare ein, zum Beispiel Sproeikoei=deine 17-stellige SteamID64, oder füge sie später in den Servereinstellungen hinzu."
           },
           "minLength": 19,
           "maxLength": 4096
@@ -6067,7 +6067,7 @@
         ],
         "expiresAfterDays": 90
       },
-      "manifestDigest": "sha256:234c3e09867e346922cc7c46075fbb27365aeb67c73b349bda24eb6d3a4b7074",
+      "manifestDigest": "sha256:62db607a285d32499db4bb49fb20d9de543c275c73a185017293add2cf89e203",
       "proof": {
         "state": "unproven",
         "missingArchitectures": [
@@ -6127,7 +6127,7 @@
           "role": "primary",
           "image": "ghcr.io/deucarian/dauva-vrising-runtime@sha256:98c7e877c173dd7aa5435c6b8ea3a97de2848cb1beeaae9c340ad6d422b45595",
           "imageUpdate": {
-            "reference": "ghcr.io/deucarian/dauva-vrising-runtime:1.0.0"
+            "reference": "ghcr.io/deucarian/dauva-vrising-runtime:1.1.0"
           },
           "environment": {
             "AUTO_ANNOUNCE_ENABLED": "false",
@@ -6385,16 +6385,16 @@
         {
           "key": "initial-administrators",
           "source": "admin",
-          "required": true,
+          "required": false,
           "label": {
             "en": "Initial administrators",
             "nl": "Eerste beheerders",
             "de": "Erste Administratoren"
           },
           "help": {
-            "en": "Enter semicolon-separated Name=SteamID64 pairs, for example Sproeikoei=your 17-digit SteamID64. Values stay protected and can be extended later in Server settings.",
-            "nl": "Voer met puntkomma's gescheiden Naam=SteamID64-paren in, bijvoorbeeld Sproeikoei=jouw 17-cijferige SteamID64. Waarden blijven beschermd en kunnen later in de Serverinstellingen worden uitgebreid.",
-            "de": "Gib durch Semikolon getrennte Name=SteamID64-Paare ein, zum Beispiel Sproeikoei=deine 17-stellige SteamID64. Werte bleiben geschützt und können später in den Servereinstellungen erweitert werden."
+            "en": "Optional at creation. Enter semicolon-separated Name=SteamID64 pairs, for example Sproeikoei=your 17-digit SteamID64, or add them later in Server settings.",
+            "nl": "Optioneel bij het aanmaken. Voer met puntkomma's gescheiden Naam=SteamID64-paren in, bijvoorbeeld Sproeikoei=jouw 17-cijferige SteamID64, of voeg ze later toe in de Serverinstellingen.",
+            "de": "Bei der Erstellung optional. Gib durch Semikolon getrennte Name=SteamID64-Paare ein, zum Beispiel Sproeikoei=deine 17-stellige SteamID64, oder füge sie später in den Servereinstellungen hinzu."
           },
           "minLength": 19,
           "maxLength": 4096
@@ -6487,7 +6487,7 @@
         ],
         "expiresAfterDays": 90
       },
-      "manifestDigest": "sha256:00d6a1eeb380bb7772979f7209f725c10b2e1656e357458a44a418517b571972",
+      "manifestDigest": "sha256:b0201f48353c1d7cdacbc49fc605007d900583ff59bb5c4fdc8660e543952443",
       "proof": {
         "state": "unproven",
         "missingArchitectures": [
@@ -7408,5 +7408,5 @@
       "upstreamId": "1690800"
     }
   ],
-  "registryDigest": "sha256:887000f1772be51a9b3fad472edb2e9d690a943cbad011acb6d4f84def34f598"
+  "registryDigest": "sha256:73ac9e64a6942a82bb64c46c887cf47fc88a088fd251e8d9fc6b8a083545e1d2"
 }

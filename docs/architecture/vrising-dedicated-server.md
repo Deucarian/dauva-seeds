@@ -77,13 +77,15 @@ an unmanaged container timer or host cron job is not an acceptable substitute.
 
 ## Administrator and password handling
 
-`initial-administrators` is an administrator-owned protected value containing
+`initial-administrators` is an optional administrator-owned protected value containing
 semicolon-separated `Name=SteamID64` entries. Only canonical 17-digit SteamID64
 values in the individual-account range are accepted. The runtime reads and
 validates the existing fixed target `/vrising/data/Settings/adminlist.txt`,
 deduplicates while preserving existing entries, adds missing supplied IDs, and
 atomically replaces that one file with a final newline. It never prints IDs,
 labels, join passwords, or file contents. Invalid input fails before mutation.
+An empty initial value creates an empty fixed-path file so a Server can be
+Sprouted first and administrators can be added later without replacing its world.
 
 Garden may later send a replacement protected value through normal Server
 settings; blank means preserve the current protected value. The additive file

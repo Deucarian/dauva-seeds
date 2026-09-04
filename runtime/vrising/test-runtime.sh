@@ -3,6 +3,13 @@ set -Eeuo pipefail
 
 readonly image="${1:-dauva-vrising-runtime:test}"
 
+docker run --rm --entrypoint bash "$image" -Eeuo pipefail -c '
+  unset DAUVA_VRISING_INITIAL_ADMINS
+  /usr/local/bin/dauva-vrising-reconcile-admins
+  test -f /vrising/data/Settings/adminlist.txt
+  test ! -s /vrising/data/Settings/adminlist.txt
+'
+
 if docker run --rm \
   --env VR_MAX_USERS=129 \
   --env DAUVA_VRISING_INITIAL_ADMINS=Test=76561197960265729 \

@@ -4,7 +4,7 @@ LABEL org.opencontainers.image.title="Dauva V Rising runtime" \
       org.opencontainers.image.description="Audited Wine runtime for Dauva-managed V Rising dedicated Servers" \
       org.opencontainers.image.source="https://github.com/Deucarian/dauva-seeds" \
       org.opencontainers.image.licenses="MIT" \
-      dev.dauva.runtime.version="1.0.0" \
+      dev.dauva.runtime.version="1.1.0" \
       dev.dauva.upstream.image="docker.io/zkoesters/vrising-server@sha256:5d39d8a859eb92f1d8dac4f1e35acd3ac1b003f7f93d46e1e22d38d3a6373f58"
 
 COPY --chmod=0755 dauva-entrypoint.sh /usr/local/bin/dauva-vrising-entrypoint
