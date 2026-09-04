@@ -27,6 +27,18 @@ readonly max_users="${VR_MAX_USERS:-10}"
   fail "Maximum players must be from 1 through 128."
 export VR_MAX_USERS="$((10#$max_users))"
 
+readonly password_enabled="$(normalize_boolean \
+  "${DAUVA_VRISING_PASSWORD_ENABLED:-false}" \
+  "Password protection")"
+readonly join_password="${VR_PASSWORD:-}"
+if [[ "$password_enabled" == true ]]; then
+  (( ${#join_password} >= 4 && ${#join_password} <= 128 )) || \
+    fail "A 4 to 128 character join password is required when password protection is on."
+  export VR_PASSWORD="$join_password"
+else
+  export VR_PASSWORD=""
+fi
+
 readonly difficulty="${DAUVA_VRISING_DIFFICULTY:-normal}"
 case "${difficulty,,}" in
   easy) export VR_DIFFICULTY_PRESET="Difficulty_Easy" ;;

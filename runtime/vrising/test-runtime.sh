@@ -11,6 +11,14 @@ if docker run --rm \
   exit 1
 fi
 
+if docker run --rm \
+  --env DAUVA_VRISING_PASSWORD_ENABLED=true \
+  --env DAUVA_VRISING_INITIAL_ADMINS=Test=76561197960265729 \
+  "$image"; then
+  echo "Missing enabled join password was accepted." >&2
+  exit 1
+fi
+
 docker run --rm --entrypoint bash "$image" -Eeuo pipefail -c '
   first=76561197960265729
   second=76561197960265730
