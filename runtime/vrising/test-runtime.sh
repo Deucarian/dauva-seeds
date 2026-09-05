@@ -3,6 +3,25 @@ set -Eeuo pipefail
 
 readonly image="${1:-dauva-vrising-runtime:test}"
 
+# This fixture replaces only the final launcher inside a disposable container.
+# It proves startup precedence without downloading or starting the actual game.
+docker run --rm --entrypoint bash "$image" -Eeuo pipefail -c '
+  mkdir -p /vrising/data/Settings
+  printf "%s\n" "{\"TeleportBoundItems\":false,\"ClanSize\":8}" > /vrising/data/Settings/ServerGameSettings.json
+  printf "%s\n" "{\"MaxConnectedUsers\":12,\"GameSettingsPreset\":\"\",\"GameDifficultyPreset\":\"\"}" > /vrising/data/Settings/ServerHostSettings.json
+  cp /vrising/data/Settings/ServerGameSettings.json /tmp/original-game
+  printf "%s\n" "#!/usr/bin/env bash" "set -Eeuo pipefail" \
+    "test -z \"\${VR_PRESET+x}\"" "test -z \"\${VR_DIFFICULTY_PRESET+x}\"" \
+    "test -z \"\${VR_MAX_USERS+x}\"" \
+    "test \"\${VR_GAME_PORT}\" = 27777" \
+    "cmp /tmp/original-game /vrising/data/Settings/ServerGameSettings.json" \
+    > /vrising/scripts/init.sh
+  chmod +x /vrising/scripts/init.sh
+  export DAUVA_NATIVE_SETTINGS=true VR_PRESET=StandardPvE VR_DIFFICULTY_PRESET=Difficulty_Brutal
+  export VR_MAX_USERS=10 VR_GAME_PORT=27777
+  /usr/local/bin/dauva-vrising-entrypoint
+'
+
 docker run --rm --entrypoint bash "$image" -Eeuo pipefail -c '
   unset DAUVA_VRISING_INITIAL_ADMINS
   /usr/local/bin/dauva-vrising-reconcile-admins

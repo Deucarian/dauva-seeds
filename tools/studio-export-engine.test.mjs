@@ -115,10 +115,10 @@ test("stable reproof export is deterministic and never rewrites stable manifests
     "package.json",
     `proofs/minecraft-paper-1.0.0-amd64-${receiptPayload.proofId}.json`,
   ]);
-  const currentPackage = await readJson(path.join(repositoryRoot, "package.json"));
-  const [major, minor, patch] = currentPackage.version.split(".").map(Number);
-  assert.equal(first.semanticVersions[0].from, currentPackage.version);
-  assert.equal(first.semanticVersions[0].to, `${major}.${minor}.${patch + 1}`);
+  const version = (await readJson(path.join(repositoryRoot, "package.json"))).version;
+  const parts = version.split(".").map(Number);
+  assert.equal(first.semanticVersions[0].from, version);
+  assert.equal(first.semanticVersions[0].to, parts[0] + "." + parts[1] + "." + (parts[2] + 1));
 
   await assert.rejects(
     () =>
