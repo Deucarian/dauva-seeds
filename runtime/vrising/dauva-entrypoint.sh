@@ -14,6 +14,26 @@ normalize_boolean() {
   esac
 }
 
+readonly native_settings="$(normalize_boolean \
+  "${DAUVA_NATIVE_SETTINGS:-false}" "Native settings")"
+if [[ "$native_settings" == true ]]; then
+  # Native mode uses persistent configuration, never Steam-owned presets.
+  # Retain only Dauva-owned identity/network/security environment overrides.
+  test -s /vrising/data/Settings/ServerHostSettings.json ||
+    fail "Native host settings are missing."
+  test -s /vrising/data/Settings/ServerGameSettings.json ||
+    fail "Native game settings are missing."
+  while IFS= read -r variable; do
+    case "$variable" in
+      VR_GAME_PORT|VR_QUERY_PORT|VR_ADDRESS|VR_BIND_ADDRESS|VR_SAVE_NAME|VR_SECURE|VR_LAN_MODE|VR_RCON_*|VR_RESET_DAYS_INTERVAL) ;;
+      *) unset "$variable" ;;
+    esac
+  done < <(compgen -A variable VR_)
+  export COMPILE_HOST_SETTINGS=false COMPILE_GAME_SETTINGS=false
+  /usr/local/bin/dauva-vrising-reconcile-admins
+  exec /vrising/scripts/init.sh
+fi
+
 export VR_LIST_ON_EOS
 VR_LIST_ON_EOS="$(normalize_boolean \
   "${DAUVA_VRISING_PUBLIC_LISTING:-false}" \
