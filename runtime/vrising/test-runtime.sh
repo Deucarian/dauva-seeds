@@ -3,6 +3,25 @@ set -Eeuo pipefail
 
 readonly image="${1:-dauva-vrising-runtime:test}"
 
+# This fixture replaces only the final launcher inside a disposable container.
+# It proves startup precedence without downloading or starting the actual game.
+docker run --rm --entrypoint bash "$image" -Eeuo pipefail -c '
+  mkdir -p /vrising/data/Settings
+  printf "%s\n" "{\"TeleportBoundItems\":false,\"ClanSize\":8}" > /vrising/data/Settings/ServerGameSettings.json
+  printf "%s\n" "{\"MaxConnectedUsers\":12,\"GameSettingsPreset\":\"\",\"GameDifficultyPreset\":\"\"}" > /vrising/data/Settings/ServerHostSettings.json
+  cp /vrising/data/Settings/ServerGameSettings.json /tmp/original-game
+  printf "%s\n" "#!/usr/bin/env bash" "set -Eeuo pipefail" \
+    "test -z \"\${VR_PRESET+x}\"" "test -z \"\${VR_DIFFICULTY_PRESET+x}\"" \
+    "test -z \"\${VR_MAX_USERS+x}\"" \
+    "test \"\${VR_GAME_PORT}\" = 27777" \
+    "cmp /tmp/original-game /vrising/data/Settings/ServerGameSettings.json" \
+    > /vrising/scripts/init.sh
+  chmod +x /vrising/scripts/init.sh
+  export DAUVA_NATIVE_SETTINGS=true VR_PRESET=StandardPvE VR_DIFFICULTY_PRESET=Difficulty_Brutal
+  export VR_MAX_USERS=10 VR_GAME_PORT=27777
+  /usr/local/bin/dauva-vrising-entrypoint
+'
+
 docker run --rm --entrypoint bash "$image" -Eeuo pipefail -c '
   unset DAUVA_VRISING_INITIAL_ADMINS
   /usr/local/bin/dauva-vrising-reconcile-admins
@@ -56,5 +75,27 @@ docker run --rm --entrypoint bash "$image" -Eeuo pipefail -c '
   bash -c "exec -a VRisingServer.exe sleep 10" &
   process=$!
   /usr/local/bin/dauva-vrising-healthcheck
+  printf "%b\n" "CryptographicException: Couldn\047t access random source." >> /vrising/data/logs/latest.log
+  if /usr/local/bin/dauva-vrising-healthcheck; then
+    echo "A server with failing autosaves was reported healthy." >&2
+    kill "$process"
+    exit 1
+  fi
   kill "$process"
+'
+
+# Reproduce the incomplete-prefix failure without starting a game or touching
+# a persistent world. Initialization must restore the missing provider.
+docker run --rm --user 1000:1000 --entrypoint bash "$image" -Eeuo pipefail -c '
+  /usr/local/bin/dauva-vrising-prepare-wine
+  provider="HKLM\\Software\\Microsoft\\Cryptography\\Defaults\\Provider Types\\Type 001"
+  WINEDEBUG=-all wine reg delete "$provider" /f
+  WINEDEBUG=-all wineserver -w
+  if WINEDEBUG=-all wine reg query "$provider" /ve >/dev/null 2>&1; then
+    echo "Failed to create the incomplete-prefix regression fixture." >&2
+    exit 1
+  fi
+  /usr/local/bin/dauva-vrising-prepare-wine
+  WINEDEBUG=-all wine reg query "$provider" /ve >/dev/null
+  WINEDEBUG=-all wineserver -w
 '

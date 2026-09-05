@@ -4360,33 +4360,13 @@
       }
     },
     {
-      "schemaVersion": "dauva.dev/seed/v1",
-      "id": "terraria-tshock",
-      "version": "1.0.0",
-      "status": "stable",
-      "podId": "terraria",
-      "genres": [
-        "adventure",
-        "sandbox",
-        "survival"
-      ],
-      "metadata": {
-        "title": {
-          "en": "Terraria TShock",
-          "nl": "Terraria TShock",
-          "de": "Terraria TShock"
-        },
-        "description": {
-          "en": "A rootless TShock Server with administration, plugins, and server-side characters.",
-          "nl": "Een rootless TShock-Server met beheer, plugins en server-side characters.",
-          "de": "Ein rootloser TShock-Server mit Verwaltung, Plugins und serverseitigen Charakteren."
-        },
-        "icon": "gem"
+      "capabilities": {
+        "backup": false,
+        "console": false,
+        "restore": false,
+        "update": false
       },
       "compatibility": {
-        "operatingSystems": [
-          "linux"
-        ],
         "architectures": [
           "amd64"
         ],
@@ -4395,19 +4375,27 @@
           "oci",
           "persistent-storage",
           "resource-limits"
+        ],
+        "operatingSystems": [
+          "linux"
         ]
       },
       "components": [
         {
-          "id": "server",
-          "role": "primary",
-          "image": "docker.io/finallf/terraria@sha256:218ad68436005fc533e037ee7186ee60a9055c6460a91d9ff9ffc8282b0fd040",
-          "imageUpdate": {
-            "reference": "docker.io/finallf/terraria:latest"
-          },
+          "agreementEnvironment": {},
+          "dependsOn": [],
           "environment": {
             "AUTO_SAVE": "true",
             "REST_API_ENABLED": "false"
+          },
+          "health": {
+            "source": "running",
+            "startupGraceSeconds": 600
+          },
+          "id": "server",
+          "image": "docker.io/finallf/terraria@sha256:218ad68436005fc533e037ee7186ee60a9055c6460a91d9ff9ffc8282b0fd040",
+          "imageUpdate": {
+            "reference": "docker.io/finallf/terraria:latest"
           },
           "optionEnvironment": {
             "max-players": "MAX_SLOTS",
@@ -4415,235 +4403,131 @@
             "world-name": "WORLD_NAME",
             "world-size": "AUTO_CREATE"
           },
-          "agreementEnvironment": {},
-          "secretEnvironment": {
-            "server-password": "SERVER_PASSWORD"
-          },
+          "role": "primary",
           "runtimeEnvironment": {
             "timezone": "TZ"
           },
+          "secretEnvironment": {
+            "server-password": "SERVER_PASSWORD"
+          },
           "volumeMounts": [
             {
-              "volumeId": "worlds",
+              "readOnly": false,
               "target": "/tshock/worlds",
-              "readOnly": false
+              "volumeId": "worlds"
             },
             {
-              "volumeId": "config",
+              "readOnly": false,
               "target": "/tshock/config",
-              "readOnly": false
+              "volumeId": "config"
             },
             {
-              "volumeId": "plugins",
+              "readOnly": false,
               "target": "/tshock/plugins",
-              "readOnly": false
+              "volumeId": "plugins"
             },
             {
-              "volumeId": "logs",
+              "readOnly": false,
               "target": "/tshock/logs",
-              "readOnly": false
+              "volumeId": "logs"
             }
-          ],
-          "dependsOn": [],
-          "health": {
-            "source": "running",
-            "startupGraceSeconds": 600
-          }
+          ]
         }
       ],
-      "volumes": [
-        {
-          "id": "worlds",
-          "role": "save",
-          "retention": "delete-with-server",
-          "ownerUid": 1000,
-          "ownerGid": 1000,
-          "directoryMode": "0770"
-        },
-        {
-          "id": "config",
-          "role": "config",
-          "retention": "delete-with-server",
-          "ownerUid": 1000,
-          "ownerGid": 1000,
-          "directoryMode": "0770"
-        },
-        {
-          "id": "plugins",
-          "role": "data",
-          "retention": "delete-with-server",
-          "ownerUid": 1000,
-          "ownerGid": 1000,
-          "directoryMode": "0770"
-        },
-        {
-          "id": "logs",
-          "role": "data",
-          "retention": "delete-with-server",
-          "ownerUid": 1000,
-          "ownerGid": 1000,
-          "directoryMode": "0770"
-        }
+      "genres": [
+        "adventure",
+        "sandbox",
+        "survival"
       ],
-      "ports": [
-        {
-          "id": "game",
-          "componentId": "server",
-          "containerPort": 7777,
-          "containerPortMode": "fixed",
-          "protocols": [
-            "tcp",
-            "udp"
-          ],
-          "exposure": "public",
-          "purpose": "game",
-          "primary": true,
-          "sharedHostPort": true
-        }
-      ],
-      "resources": {
-        "defaultPresetId": "balanced",
-        "presets": [
-          {
-            "id": "small",
-            "title": {
-              "en": "Small",
-              "nl": "Klein",
-              "de": "Klein"
-            },
-            "description": {
-              "en": "For a small world with a few players.",
-              "nl": "Voor een kleine wereld met enkele spelers.",
-              "de": "Für eine kleine Welt mit wenigen Spielern."
-            },
-            "memoryMb": 1024,
-            "diskMb": 4096,
-            "cpuPercent": 100
-          },
-          {
-            "id": "balanced",
-            "title": {
-              "en": "Balanced",
-              "nl": "Gebalanceerd",
-              "de": "Ausgewogen"
-            },
-            "description": {
-              "en": "Recommended for a persistent cooperative world.",
-              "nl": "Aanbevolen voor een blijvende coöperatieve wereld.",
-              "de": "Für eine persistente kooperative Welt empfohlen."
-            },
-            "memoryMb": 2048,
-            "diskMb": 8192,
-            "cpuPercent": 150
-          }
-        ]
-      },
+      "id": "terraria-tshock",
       "inputs": [
         {
-          "key": "accept-steam-agreement",
-          "type": "agreement",
-          "label": {
-            "en": "Steam Subscriber Agreement",
-            "nl": "Steam Subscriber Agreement",
-            "de": "Steam-Nutzungsvertrag"
-          },
-          "help": {
-            "en": "I have read and accept the Steam Subscriber Agreement and the applicable game terms.",
-            "nl": "Ik heb de Steam Subscriber Agreement en de toepasselijke gamevoorwaarden gelezen en accepteer deze.",
-            "de": "Ich habe den Steam-Nutzungsvertrag und die anwendbaren Spielbedingungen gelesen und akzeptiert."
-          },
-          "required": true,
           "defaultValue": "false",
-          "url": "https://store.steampowered.com/subscriber_agreement/",
-          "revision": "official-current"
-        },
-        {
-          "key": "world-name",
-          "type": "string",
-          "label": {
-            "en": "World name",
-            "nl": "Wereldnaam",
-            "de": "Weltname"
-          },
           "help": {
-            "en": "Name of the persistent Terraria world.",
-            "nl": "Naam van de blijvende Terraria-wereld.",
-            "de": "Name der persistenten Terraria-Welt."
+            "de": "Ich habe den Steam-Nutzungsvertrag und die anwendbaren Spielbedingungen gelesen und akzeptiert.",
+            "en": "I have read and accept the Steam Subscriber Agreement and the applicable game terms.",
+            "nl": "Ik heb de Steam Subscriber Agreement en de toepasselijke gamevoorwaarden gelezen en accepteer deze."
+          },
+          "key": "accept-steam-agreement",
+          "label": {
+            "de": "Steam-Nutzungsvertrag",
+            "en": "Steam Subscriber Agreement",
+            "nl": "Steam Subscriber Agreement"
           },
           "required": true,
+          "revision": "official-current",
+          "type": "agreement",
+          "url": "https://store.steampowered.com/subscriber_agreement/"
+        },
+        {
           "defaultValue": "Dauva",
+          "help": {
+            "de": "Name der persistenten Terraria-Welt.",
+            "en": "Name of the persistent Terraria world.",
+            "nl": "Naam van de blijvende Terraria-wereld."
+          },
+          "key": "world-name",
+          "label": {
+            "de": "Weltname",
+            "en": "World name",
+            "nl": "Wereldnaam"
+          },
+          "maxLength": 64,
           "minLength": 1,
-          "maxLength": 64
+          "required": true,
+          "type": "string"
         },
         {
-          "key": "world-size",
-          "type": "integer",
-          "label": {
-            "en": "World size",
-            "nl": "Wereldgrootte",
-            "de": "Weltgröße"
-          },
-          "help": {
-            "en": "World size: 1 small, 2 medium, or 3 large.",
-            "nl": "Wereldgrootte: 1 klein, 2 middelgroot of 3 groot.",
-            "de": "Weltgröße: 1 klein, 2 mittel oder 3 groß."
-          },
-          "required": true,
           "defaultValue": "2",
+          "help": {
+            "de": "Weltgröße: 1 klein, 2 mittel oder 3 groß.",
+            "en": "World size: 1 small, 2 medium, or 3 large.",
+            "nl": "Wereldgrootte: 1 klein, 2 middelgroot of 3 groot."
+          },
+          "key": "world-size",
+          "label": {
+            "de": "Weltgröße",
+            "en": "World size",
+            "nl": "Wereldgrootte"
+          },
+          "maxLength": 1,
           "minLength": 1,
-          "maxLength": 1
+          "required": true,
+          "type": "integer"
         },
         {
-          "key": "max-players",
-          "type": "integer",
-          "label": {
-            "en": "Maximum players",
-            "nl": "Maximumaantal spelers",
-            "de": "Maximale Spielerzahl"
-          },
-          "help": {
-            "en": "Maximum simultaneous players.",
-            "nl": "Maximaal aantal gelijktijdige spelers.",
-            "de": "Maximale Anzahl gleichzeitiger Spieler."
-          },
-          "required": true,
           "defaultValue": "8",
+          "help": {
+            "de": "Maximale Anzahl gleichzeitiger Spieler.",
+            "en": "Maximum simultaneous players.",
+            "nl": "Maximaal aantal gelijktijdige spelers."
+          },
+          "key": "max-players",
+          "label": {
+            "de": "Maximale Spielerzahl",
+            "en": "Maximum players",
+            "nl": "Maximumaantal spelers"
+          },
+          "maxLength": 3,
           "minLength": 1,
-          "maxLength": 3
+          "required": true,
+          "type": "integer"
         },
         {
-          "key": "server-side-characters",
-          "type": "boolean",
-          "label": {
-            "en": "Server-side characters",
-            "nl": "Server-side characters",
-            "de": "Serverseitige Charaktere"
-          },
+          "defaultValue": "false",
           "help": {
+            "de": "Charakterfortschritt auf dem Server speichern.",
             "en": "Store character progression on the Server.",
-            "nl": "Bewaar de voortgang van personages op de Server.",
-            "de": "Charakterfortschritt auf dem Server speichern."
+            "nl": "Bewaar de voortgang van personages op de Server."
+          },
+          "key": "server-side-characters",
+          "label": {
+            "de": "Serverseitige Charaktere",
+            "en": "Server-side characters",
+            "nl": "Server-side characters"
           },
           "required": true,
-          "defaultValue": "false"
-        }
-      ],
-      "secrets": [
-        {
-          "key": "server-password",
-          "source": "admin",
-          "label": {
-            "en": "Server password",
-            "nl": "Serverwachtwoord",
-            "de": "Serverpasswort"
-          },
-          "help": {
-            "en": "Used only while Sprouting; the clear value is not stored in the Dauva Server record.",
-            "nl": "Alleen gebruikt tijdens het ontkiemen; Dauva bewaart de leesbare waarde niet in het Server-record.",
-            "de": "Wird nur beim Starten verwendet; der Klartextwert wird nicht im Dauva-Serverdatensatz gespeichert."
-          },
-          "minLength": 6,
-          "maxLength": 128
+          "type": "boolean"
         }
       ],
       "lifecycle": {
@@ -4655,65 +4539,183 @@
         ],
         "stopTimeoutSeconds": 120
       },
-      "capabilities": {
-        "backup": false,
-        "restore": false,
-        "update": false,
-        "console": false
+      "metadata": {
+        "description": {
+          "de": "Ein rootloser TShock-Server mit Verwaltung, Plugins und serverseitigen Charakteren.",
+          "en": "A rootless TShock Server with administration, plugins, and server-side characters.",
+          "nl": "Een rootless TShock-Server met beheer, plugins en server-side characters."
+        },
+        "icon": "gem",
+        "title": {
+          "de": "Terraria TShock",
+          "en": "Terraria TShock",
+          "nl": "Terraria TShock"
+        }
       },
-      "source": {
-        "kind": "oci",
-        "homepage": "https://terraria.org/",
-        "repository": "https://github.com/Finallf/terraria",
-        "imageRegistries": [
-          "docker.io"
-        ]
-      },
-      "trust": {
-        "level": "curated",
-        "reviewedAt": "2026-07-26",
-        "mutableRuntimeImagesAllowed": false
-      },
-      "storage": {
-        "class": "fast",
-        "backupClass": "backup",
-        "estimatedDownloadMb": 100,
-        "estimatedInstallMb": 512,
-        "estimatedMutableMb": 4096,
-        "backupPolicy": "recommended"
-      },
-      "updatePolicy": {
-        "discovery": "oci-tag",
-        "automaticCheck": true,
-        "automaticInstall": false,
-        "requiresBackup": false,
-        "rollback": true
-      },
+      "podId": "terraria",
+      "ports": [
+        {
+          "componentId": "server",
+          "containerPort": 7777,
+          "containerPortMode": "fixed",
+          "exposure": "public",
+          "id": "game",
+          "primary": true,
+          "protocols": [
+            "tcp",
+            "udp"
+          ],
+          "purpose": "game",
+          "sharedHostPort": true
+        }
+      ],
       "proofPolicy": {
+        "expiresAfterDays": 90,
         "requiredChecks": [
           "images-pinned",
           "healthy",
           "ports",
-          "backup-if-supported",
           "graceful-stop",
           "restart",
           "persistence",
           "cleanup"
-        ],
-        "expiresAfterDays": 90
+        ]
       },
-      "manifestDigest": "sha256:8c825c740cb121700574469f252f895870ff07df08c1e2694f3c445bd456bbff",
+      "resources": {
+        "defaultPresetId": "balanced",
+        "presets": [
+          {
+            "cpuPercent": 100,
+            "description": {
+              "de": "Für eine kleine Welt mit wenigen Spielern.",
+              "en": "For a small world with a few players.",
+              "nl": "Voor een kleine wereld met enkele spelers."
+            },
+            "diskMb": 4096,
+            "id": "small",
+            "memoryMb": 1024,
+            "title": {
+              "de": "Klein",
+              "en": "Small",
+              "nl": "Klein"
+            }
+          },
+          {
+            "cpuPercent": 150,
+            "description": {
+              "de": "Für eine persistente kooperative Welt empfohlen.",
+              "en": "Recommended for a persistent cooperative world.",
+              "nl": "Aanbevolen voor een blijvende coöperatieve wereld."
+            },
+            "diskMb": 8192,
+            "id": "balanced",
+            "memoryMb": 2048,
+            "title": {
+              "de": "Ausgewogen",
+              "en": "Balanced",
+              "nl": "Gebalanceerd"
+            }
+          }
+        ]
+      },
+      "schemaVersion": "dauva.dev/seed/v1",
+      "secrets": [
+        {
+          "help": {
+            "de": "Wird nur beim Starten verwendet; der Klartextwert wird nicht im Dauva-Serverdatensatz gespeichert.",
+            "en": "Used only while Sprouting; the clear value is not stored in the Dauva Server record.",
+            "nl": "Alleen gebruikt tijdens het ontkiemen; Dauva bewaart de leesbare waarde niet in het Server-record."
+          },
+          "key": "server-password",
+          "label": {
+            "de": "Serverpasswort",
+            "en": "Server password",
+            "nl": "Serverwachtwoord"
+          },
+          "maxLength": 128,
+          "minLength": 6,
+          "source": "admin"
+        }
+      ],
+      "source": {
+        "homepage": "https://terraria.org/",
+        "imageRegistries": [
+          "docker.io"
+        ],
+        "kind": "oci",
+        "repository": "https://github.com/Finallf/terraria"
+      },
+      "status": "stable",
+      "storage": {
+        "backupClass": "backup",
+        "backupPolicy": "recommended",
+        "class": "fast",
+        "estimatedDownloadMb": 100,
+        "estimatedInstallMb": 512,
+        "estimatedMutableMb": 4096
+      },
+      "trust": {
+        "level": "curated",
+        "mutableRuntimeImagesAllowed": false,
+        "reviewedAt": "2026-07-26"
+      },
+      "updatePolicy": {
+        "automaticCheck": true,
+        "automaticInstall": false,
+        "discovery": "oci-tag",
+        "requiresBackup": false,
+        "rollback": true
+      },
+      "version": "1.0.1",
+      "volumes": [
+        {
+          "directoryMode": "0770",
+          "id": "worlds",
+          "ownerGid": 1000,
+          "ownerUid": 1000,
+          "retention": "delete-with-server",
+          "role": "save"
+        },
+        {
+          "directoryMode": "0770",
+          "id": "config",
+          "ownerGid": 1000,
+          "ownerUid": 1000,
+          "retention": "delete-with-server",
+          "role": "config"
+        },
+        {
+          "directoryMode": "0770",
+          "id": "plugins",
+          "ownerGid": 1000,
+          "ownerUid": 1000,
+          "retention": "delete-with-server",
+          "role": "data"
+        },
+        {
+          "directoryMode": "0770",
+          "id": "logs",
+          "ownerGid": 1000,
+          "ownerUid": 1000,
+          "retention": "delete-with-server",
+          "role": "data"
+        }
+      ],
+      "manifestDigest": "sha256:3165b26bb3bd7ab222f961c6bdd810977736a7a74f333267df591659147832b7",
       "proof": {
-        "state": "legacy",
-        "schemaVersion": "dauva.dev/seed-proof/v1",
-        "binding": "legacy-unverified",
-        "provedAt": "2026-07-26T00:46:43.9364324+00:00",
-        "expiresAt": "2026-10-24T00:46:43.936Z",
-        "leaf": "j-hoef-debian-proof",
-        "provedVersion": "1.0.0-rc.1",
-        "receiptDigest": "sha256:20e7acfce168c68caf3e518167ba31d4b7f760e0e4ea9f87b3d78a843b80b824",
-        "missingArchitectures": [
-          "amd64"
+        "state": "proven",
+        "schemaVersion": "dauva.dev/seed-proof/v2",
+        "binding": "exact",
+        "architectures": [
+          {
+            "architecture": "amd64",
+            "proofId": "23f11426-228a-4af1-966a-3e349f59a0ce",
+            "completedAt": "2026-09-05T18:14:34.593Z",
+            "expiresAt": "2026-12-04T18:14:34.593Z",
+            "leafId": "develop-proof-leaf",
+            "provedVersion": "1.0.1-rc.1",
+            "receiptDigest": "sha256:b7287d98af20e51e84347fb1f7b11a5b3d60b6246fc7feebb464926fee08bca0"
+          }
         ]
       }
     },
@@ -6653,6 +6655,357 @@
           "amd64"
         ]
       }
+    },
+    {
+      "schemaVersion": "dauva.dev/seed/v1",
+      "id": "terraria-tshock",
+      "version": "1.0.0",
+      "status": "stable",
+      "podId": "terraria",
+      "genres": [
+        "adventure",
+        "sandbox",
+        "survival"
+      ],
+      "metadata": {
+        "title": {
+          "en": "Terraria TShock",
+          "nl": "Terraria TShock",
+          "de": "Terraria TShock"
+        },
+        "description": {
+          "en": "A rootless TShock Server with administration, plugins, and server-side characters.",
+          "nl": "Een rootless TShock-Server met beheer, plugins en server-side characters.",
+          "de": "Ein rootloser TShock-Server mit Verwaltung, Plugins und serverseitigen Charakteren."
+        },
+        "icon": "gem"
+      },
+      "compatibility": {
+        "operatingSystems": [
+          "linux"
+        ],
+        "architectures": [
+          "amd64"
+        ],
+        "leafCapabilities": [
+          "dynamic-ports",
+          "oci",
+          "persistent-storage",
+          "resource-limits"
+        ]
+      },
+      "components": [
+        {
+          "id": "server",
+          "role": "primary",
+          "image": "docker.io/finallf/terraria@sha256:218ad68436005fc533e037ee7186ee60a9055c6460a91d9ff9ffc8282b0fd040",
+          "imageUpdate": {
+            "reference": "docker.io/finallf/terraria:latest"
+          },
+          "environment": {
+            "AUTO_SAVE": "true",
+            "REST_API_ENABLED": "false"
+          },
+          "optionEnvironment": {
+            "max-players": "MAX_SLOTS",
+            "server-side-characters": "SSC_ENABLED",
+            "world-name": "WORLD_NAME",
+            "world-size": "AUTO_CREATE"
+          },
+          "agreementEnvironment": {},
+          "secretEnvironment": {
+            "server-password": "SERVER_PASSWORD"
+          },
+          "runtimeEnvironment": {
+            "timezone": "TZ"
+          },
+          "volumeMounts": [
+            {
+              "volumeId": "worlds",
+              "target": "/tshock/worlds",
+              "readOnly": false
+            },
+            {
+              "volumeId": "config",
+              "target": "/tshock/config",
+              "readOnly": false
+            },
+            {
+              "volumeId": "plugins",
+              "target": "/tshock/plugins",
+              "readOnly": false
+            },
+            {
+              "volumeId": "logs",
+              "target": "/tshock/logs",
+              "readOnly": false
+            }
+          ],
+          "dependsOn": [],
+          "health": {
+            "source": "running",
+            "startupGraceSeconds": 600
+          }
+        }
+      ],
+      "volumes": [
+        {
+          "id": "worlds",
+          "role": "save",
+          "retention": "delete-with-server",
+          "ownerUid": 1000,
+          "ownerGid": 1000,
+          "directoryMode": "0770"
+        },
+        {
+          "id": "config",
+          "role": "config",
+          "retention": "delete-with-server",
+          "ownerUid": 1000,
+          "ownerGid": 1000,
+          "directoryMode": "0770"
+        },
+        {
+          "id": "plugins",
+          "role": "data",
+          "retention": "delete-with-server",
+          "ownerUid": 1000,
+          "ownerGid": 1000,
+          "directoryMode": "0770"
+        },
+        {
+          "id": "logs",
+          "role": "data",
+          "retention": "delete-with-server",
+          "ownerUid": 1000,
+          "ownerGid": 1000,
+          "directoryMode": "0770"
+        }
+      ],
+      "ports": [
+        {
+          "id": "game",
+          "componentId": "server",
+          "containerPort": 7777,
+          "containerPortMode": "fixed",
+          "protocols": [
+            "tcp",
+            "udp"
+          ],
+          "exposure": "public",
+          "purpose": "game",
+          "primary": true,
+          "sharedHostPort": true
+        }
+      ],
+      "resources": {
+        "defaultPresetId": "balanced",
+        "presets": [
+          {
+            "id": "small",
+            "title": {
+              "en": "Small",
+              "nl": "Klein",
+              "de": "Klein"
+            },
+            "description": {
+              "en": "For a small world with a few players.",
+              "nl": "Voor een kleine wereld met enkele spelers.",
+              "de": "Für eine kleine Welt mit wenigen Spielern."
+            },
+            "memoryMb": 1024,
+            "diskMb": 4096,
+            "cpuPercent": 100
+          },
+          {
+            "id": "balanced",
+            "title": {
+              "en": "Balanced",
+              "nl": "Gebalanceerd",
+              "de": "Ausgewogen"
+            },
+            "description": {
+              "en": "Recommended for a persistent cooperative world.",
+              "nl": "Aanbevolen voor een blijvende coöperatieve wereld.",
+              "de": "Für eine persistente kooperative Welt empfohlen."
+            },
+            "memoryMb": 2048,
+            "diskMb": 8192,
+            "cpuPercent": 150
+          }
+        ]
+      },
+      "inputs": [
+        {
+          "key": "accept-steam-agreement",
+          "type": "agreement",
+          "label": {
+            "en": "Steam Subscriber Agreement",
+            "nl": "Steam Subscriber Agreement",
+            "de": "Steam-Nutzungsvertrag"
+          },
+          "help": {
+            "en": "I have read and accept the Steam Subscriber Agreement and the applicable game terms.",
+            "nl": "Ik heb de Steam Subscriber Agreement en de toepasselijke gamevoorwaarden gelezen en accepteer deze.",
+            "de": "Ich habe den Steam-Nutzungsvertrag und die anwendbaren Spielbedingungen gelesen und akzeptiert."
+          },
+          "required": true,
+          "defaultValue": "false",
+          "url": "https://store.steampowered.com/subscriber_agreement/",
+          "revision": "official-current"
+        },
+        {
+          "key": "world-name",
+          "type": "string",
+          "label": {
+            "en": "World name",
+            "nl": "Wereldnaam",
+            "de": "Weltname"
+          },
+          "help": {
+            "en": "Name of the persistent Terraria world.",
+            "nl": "Naam van de blijvende Terraria-wereld.",
+            "de": "Name der persistenten Terraria-Welt."
+          },
+          "required": true,
+          "defaultValue": "Dauva",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        {
+          "key": "world-size",
+          "type": "integer",
+          "label": {
+            "en": "World size",
+            "nl": "Wereldgrootte",
+            "de": "Weltgröße"
+          },
+          "help": {
+            "en": "World size: 1 small, 2 medium, or 3 large.",
+            "nl": "Wereldgrootte: 1 klein, 2 middelgroot of 3 groot.",
+            "de": "Weltgröße: 1 klein, 2 mittel oder 3 groß."
+          },
+          "required": true,
+          "defaultValue": "2",
+          "minLength": 1,
+          "maxLength": 1
+        },
+        {
+          "key": "max-players",
+          "type": "integer",
+          "label": {
+            "en": "Maximum players",
+            "nl": "Maximumaantal spelers",
+            "de": "Maximale Spielerzahl"
+          },
+          "help": {
+            "en": "Maximum simultaneous players.",
+            "nl": "Maximaal aantal gelijktijdige spelers.",
+            "de": "Maximale Anzahl gleichzeitiger Spieler."
+          },
+          "required": true,
+          "defaultValue": "8",
+          "minLength": 1,
+          "maxLength": 3
+        },
+        {
+          "key": "server-side-characters",
+          "type": "boolean",
+          "label": {
+            "en": "Server-side characters",
+            "nl": "Server-side characters",
+            "de": "Serverseitige Charaktere"
+          },
+          "help": {
+            "en": "Store character progression on the Server.",
+            "nl": "Bewaar de voortgang van personages op de Server.",
+            "de": "Charakterfortschritt auf dem Server speichern."
+          },
+          "required": true,
+          "defaultValue": "false"
+        }
+      ],
+      "secrets": [
+        {
+          "key": "server-password",
+          "source": "admin",
+          "label": {
+            "en": "Server password",
+            "nl": "Serverwachtwoord",
+            "de": "Serverpasswort"
+          },
+          "help": {
+            "en": "Used only while Sprouting; the clear value is not stored in the Dauva Server record.",
+            "nl": "Alleen gebruikt tijdens het ontkiemen; Dauva bewaart de leesbare waarde niet in het Server-record.",
+            "de": "Wird nur beim Starten verwendet; der Klartextwert wird nicht im Dauva-Serverdatensatz gespeichert."
+          },
+          "minLength": 6,
+          "maxLength": 128
+        }
+      ],
+      "lifecycle": {
+        "startOrder": [
+          "server"
+        ],
+        "stopOrder": [
+          "server"
+        ],
+        "stopTimeoutSeconds": 120
+      },
+      "capabilities": {
+        "backup": false,
+        "restore": false,
+        "update": false,
+        "console": false
+      },
+      "source": {
+        "kind": "oci",
+        "homepage": "https://terraria.org/",
+        "repository": "https://github.com/Finallf/terraria",
+        "imageRegistries": [
+          "docker.io"
+        ]
+      },
+      "trust": {
+        "level": "curated",
+        "reviewedAt": "2026-07-26",
+        "mutableRuntimeImagesAllowed": false
+      },
+      "storage": {
+        "class": "fast",
+        "backupClass": "backup",
+        "estimatedDownloadMb": 100,
+        "estimatedInstallMb": 512,
+        "estimatedMutableMb": 4096,
+        "backupPolicy": "recommended"
+      },
+      "updatePolicy": {
+        "discovery": "oci-tag",
+        "automaticCheck": true,
+        "automaticInstall": false,
+        "requiresBackup": false,
+        "rollback": true
+      },
+      "proofPolicy": {
+        "requiredChecks": [
+          "images-pinned",
+          "healthy",
+          "ports",
+          "backup-if-supported",
+          "graceful-stop",
+          "restart",
+          "persistence",
+          "cleanup"
+        ],
+        "expiresAfterDays": 90
+      },
+      "manifestDigest": "sha256:8c825c740cb121700574469f252f895870ff07df08c1e2694f3c445bd456bbff",
+      "proof": {
+        "state": "unproven",
+        "missingArchitectures": [
+          "amd64"
+        ]
+      }
     }
   ],
   "proofs": [
@@ -7129,6 +7482,162 @@
       "receiptDigest": "sha256:20e7acfce168c68caf3e518167ba31d4b7f760e0e4ea9f87b3d78a843b80b824"
     },
     {
+      "apiAttestation": {
+        "algorithm": "Ed25519",
+        "keyId": "sha256:452a47f345fe57ae1d50b97ef105905fef642f7f0e6d408f2076b47ebbe80b26",
+        "signature": "KrSu-WyEdAFJ8XckPs2-s7RLK8GQ59Ht4niXIG56saxE5vuQTTIpE7iSSd0RW64_pU8lythPBtmyN52BJTEzCA"
+      },
+      "leafAttestation": {
+        "algorithm": "Ed25519",
+        "keyId": "sha256:23aba8e706af2e71bd740ff3bba305e50e447edb9b642c803b8ca6c309db8327",
+        "signature": "lgW8z_U3lC0_OyIzKft23FtH7jnD_BwUPQ6uu4S9OUmQf0nKwMKvU3-bQv00qgotfM5xgKqNKwSRqK7JFBoNDg"
+      },
+      "receiptDigest": "sha256:b7287d98af20e51e84347fb1f7b11a5b3d60b6246fc7feebb464926fee08bca0",
+      "receiptPayload": {
+        "agreements": [
+          {
+            "accepted": true,
+            "acceptedAt": "2026-09-05T18:08:14.512Z",
+            "actorId": "6ac48d16-1066-4719-9aff-a283765681a9",
+            "key": "accept-steam-agreement",
+            "revision": "official-current",
+            "url": "https://store.steampowered.com/subscriber_agreement/"
+          }
+        ],
+        "attemptId": "e7236b93-33c0-4c2f-8adb-0e3df4dbe18a",
+        "baseRegistryDigest": "sha256:04688f07704f33b9b140ae8af8aee353a49633c185864718d6ca44818d606fb5",
+        "checks": [
+          {
+            "code": "backup",
+            "completedAt": "2026-09-05T18:14:34.581Z",
+            "evidenceDigests": [],
+            "startedAt": "2026-09-05T18:14:34.581Z",
+            "status": "not_applicable"
+          },
+          {
+            "code": "restore",
+            "completedAt": "2026-09-05T18:14:34.581Z",
+            "evidenceDigests": [],
+            "startedAt": "2026-09-05T18:14:34.581Z",
+            "status": "not_applicable"
+          },
+          {
+            "code": "console",
+            "completedAt": "2026-09-05T18:14:34.582Z",
+            "evidenceDigests": [],
+            "startedAt": "2026-09-05T18:14:34.582Z",
+            "status": "not_applicable"
+          },
+          {
+            "code": "update",
+            "completedAt": "2026-09-05T18:14:34.583Z",
+            "evidenceDigests": [],
+            "startedAt": "2026-09-05T18:14:34.583Z",
+            "status": "not_applicable"
+          },
+          {
+            "code": "images-pinned",
+            "completedAt": "2026-09-05T18:08:16.916Z",
+            "evidenceDigests": [],
+            "startedAt": "2026-09-05T18:08:16.909Z",
+            "status": "passed"
+          },
+          {
+            "code": "healthy",
+            "completedAt": "2026-09-05T18:14:08.185Z",
+            "evidenceDigests": [],
+            "startedAt": "2026-09-05T18:08:18.145Z",
+            "status": "passed"
+          },
+          {
+            "code": "ports",
+            "completedAt": "2026-09-05T18:14:08.198Z",
+            "evidenceDigests": [],
+            "startedAt": "2026-09-05T18:14:08.186Z",
+            "status": "passed"
+          },
+          {
+            "code": "graceful-stop",
+            "completedAt": "2026-09-05T18:14:11.229Z",
+            "evidenceDigests": [],
+            "startedAt": "2026-09-05T18:14:08.200Z",
+            "status": "passed"
+          },
+          {
+            "code": "stopped-remains-stopped",
+            "completedAt": "2026-09-05T18:14:14.244Z",
+            "evidenceDigests": [],
+            "startedAt": "2026-09-05T18:14:11.232Z",
+            "status": "passed"
+          },
+          {
+            "code": "restart",
+            "completedAt": "2026-09-05T18:14:30.689Z",
+            "evidenceDigests": [],
+            "startedAt": "2026-09-05T18:14:14.245Z",
+            "status": "passed"
+          },
+          {
+            "code": "persistence",
+            "completedAt": "2026-09-05T18:14:30.730Z",
+            "evidenceDigests": [],
+            "startedAt": "2026-09-05T18:14:30.690Z",
+            "status": "passed"
+          },
+          {
+            "code": "cleanup",
+            "completedAt": "2026-09-05T18:14:34.593Z",
+            "evidenceDigests": [],
+            "startedAt": "2026-09-05T18:14:30.734Z",
+            "status": "passed"
+          }
+        ],
+        "cleanup": {
+          "completedAt": "2026-09-05T18:14:34.593Z",
+          "journalDigest": "sha256:ecf9a94cf783df8063040519f437ec9faae40cfcc240d7a33a2e015c59898edf",
+          "resources": {
+            "backups": 0,
+            "containers": 0,
+            "directories": 0,
+            "networks": 0,
+            "ports": 0,
+            "secrets": 0,
+            "volumes": 0
+          },
+          "status": "passed"
+        },
+        "completedAt": "2026-09-05T18:14:34.593Z",
+        "evidence": [],
+        "expiresAt": "2026-12-04T18:14:34.593Z",
+        "policyVersion": "1.1.0",
+        "proofBundleDigest": "sha256:8e4fb41939eea3a66eb5de091d928c9762c37f6d612c80350be9489c9faf4b03",
+        "proofId": "23f11426-228a-4af1-966a-3e349f59a0ce",
+        "proofPlanDigest": "sha256:ec7092a4e9bf54fcdfc005fc6aed87b50b7ef434d2b4f8bab70f0c39575da425",
+        "result": "passed",
+        "revisionId": "2d1d2fb2-2fd1-4d3e-8823-3f324aedda9c",
+        "runId": "f22ac9eb-4e3b-42d2-9e49-111e89d7265d",
+        "runStatementDigest": "sha256:a02c2ea25e5724f300a10a76e4d6a3bb003f9614757b95c6fdb70fb921738347",
+        "runner": {
+          "agentVersion": "0.17.3",
+          "architecture": "amd64",
+          "leafId": "develop-proof-leaf",
+          "leafKeyId": "sha256:23aba8e706af2e71bd740ff3bba305e50e447edb9b642c803b8ca6c309db8327",
+          "operatingSystem": "linux",
+          "runtimeVersion": "9.0.15"
+        },
+        "seed": {
+          "id": "terraria-tshock",
+          "intendedStableVersion": "1.0.1",
+          "manifestDigest": "sha256:e00052157c94b9afca48bf4cf99953cfc0daf6c5455de59defc3f7db4f2a14f5",
+          "proofContractDigest": "sha256:703a89239434c2301367b7d6c21554f140836fd1694fe3ada0f6fd599899c766",
+          "testedVersion": "1.0.1-rc.1"
+        },
+        "startedAt": "2026-09-05T18:08:16.851Z",
+        "validatorVersion": "0.14.0"
+      },
+      "schemaVersion": "dauva.dev/seed-proof/v2"
+    },
+    {
       "schemaVersion": "dauva.dev/seed-proof/v1",
       "seedId": "terraria-vanilla",
       "seedVersion": "1.0.0-rc.1",
@@ -7528,12 +8037,12 @@
       ]
     },
     {
-      "kind": "oci",
       "homepage": "https://terraria.org/",
-      "repository": "https://github.com/Finallf/terraria",
       "imageRegistries": [
         "docker.io"
-      ]
+      ],
+      "kind": "oci",
+      "repository": "https://github.com/Finallf/terraria"
     },
     {
       "kind": "oci",
@@ -7620,5 +8129,5 @@
       "upstreamId": "1690800"
     }
   ],
-  "registryDigest": "sha256:04688f07704f33b9b140ae8af8aee353a49633c185864718d6ca44818d606fb5"
+  "registryDigest": "sha256:c2424e20848616396330b8b5195788c25b975a12bca46fbc4a2d1a8d7e61e42f"
 }
