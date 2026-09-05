@@ -56,5 +56,27 @@ docker run --rm --entrypoint bash "$image" -Eeuo pipefail -c '
   bash -c "exec -a VRisingServer.exe sleep 10" &
   process=$!
   /usr/local/bin/dauva-vrising-healthcheck
+  printf "%b\n" "CryptographicException: Couldn\047t access random source." >> /vrising/data/logs/latest.log
+  if /usr/local/bin/dauva-vrising-healthcheck; then
+    echo "A server with failing autosaves was reported healthy." >&2
+    kill "$process"
+    exit 1
+  fi
   kill "$process"
+'
+
+# Reproduce the incomplete-prefix failure without starting a game or touching
+# a persistent world. Initialization must restore the missing provider.
+docker run --rm --user 1000:1000 --entrypoint bash "$image" -Eeuo pipefail -c '
+  /usr/local/bin/dauva-vrising-prepare-wine
+  provider="HKLM\\Software\\Microsoft\\Cryptography\\Defaults\\Provider Types\\Type 001"
+  WINEDEBUG=-all wine reg delete "$provider" /f
+  WINEDEBUG=-all wineserver -w
+  if WINEDEBUG=-all wine reg query "$provider" /ve >/dev/null 2>&1; then
+    echo "Failed to create the incomplete-prefix regression fixture." >&2
+    exit 1
+  fi
+  /usr/local/bin/dauva-vrising-prepare-wine
+  WINEDEBUG=-all wine reg query "$provider" /ve >/dev/null
+  WINEDEBUG=-all wineserver -w
 '

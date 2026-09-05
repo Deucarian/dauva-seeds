@@ -13,3 +13,7 @@ done
 [[ "$server_running" == true ]]
 [[ -s "$log_file" ]]
 grep -Fq '[Server] Startup Completed - Disabling Scene Loading Systems' "$log_file"
+if grep -Fq "CryptographicException: Couldn't access random source." "$log_file"; then
+  printf '%s\n' 'V Rising cannot save: Wine cryptography failed.' >&2
+  exit 1
+fi
