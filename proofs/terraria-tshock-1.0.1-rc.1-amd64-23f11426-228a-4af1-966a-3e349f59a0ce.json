@@ -1,0 +1,156 @@
+{
+  "apiAttestation": {
+    "algorithm": "Ed25519",
+    "keyId": "sha256:452a47f345fe57ae1d50b97ef105905fef642f7f0e6d408f2076b47ebbe80b26",
+    "signature": "KrSu-WyEdAFJ8XckPs2-s7RLK8GQ59Ht4niXIG56saxE5vuQTTIpE7iSSd0RW64_pU8lythPBtmyN52BJTEzCA"
+  },
+  "leafAttestation": {
+    "algorithm": "Ed25519",
+    "keyId": "sha256:23aba8e706af2e71bd740ff3bba305e50e447edb9b642c803b8ca6c309db8327",
+    "signature": "lgW8z_U3lC0_OyIzKft23FtH7jnD_BwUPQ6uu4S9OUmQf0nKwMKvU3-bQv00qgotfM5xgKqNKwSRqK7JFBoNDg"
+  },
+  "receiptDigest": "sha256:b7287d98af20e51e84347fb1f7b11a5b3d60b6246fc7feebb464926fee08bca0",
+  "receiptPayload": {
+    "agreements": [
+      {
+        "accepted": true,
+        "acceptedAt": "2026-09-05T18:08:14.512Z",
+        "actorId": "6ac48d16-1066-4719-9aff-a283765681a9",
+        "key": "accept-steam-agreement",
+        "revision": "official-current",
+        "url": "https://store.steampowered.com/subscriber_agreement/"
+      }
+    ],
+    "attemptId": "e7236b93-33c0-4c2f-8adb-0e3df4dbe18a",
+    "baseRegistryDigest": "sha256:04688f07704f33b9b140ae8af8aee353a49633c185864718d6ca44818d606fb5",
+    "checks": [
+      {
+        "code": "backup",
+        "completedAt": "2026-09-05T18:14:34.581Z",
+        "evidenceDigests": [],
+        "startedAt": "2026-09-05T18:14:34.581Z",
+        "status": "not_applicable"
+      },
+      {
+        "code": "restore",
+        "completedAt": "2026-09-05T18:14:34.581Z",
+        "evidenceDigests": [],
+        "startedAt": "2026-09-05T18:14:34.581Z",
+        "status": "not_applicable"
+      },
+      {
+        "code": "console",
+        "completedAt": "2026-09-05T18:14:34.582Z",
+        "evidenceDigests": [],
+        "startedAt": "2026-09-05T18:14:34.582Z",
+        "status": "not_applicable"
+      },
+      {
+        "code": "update",
+        "completedAt": "2026-09-05T18:14:34.583Z",
+        "evidenceDigests": [],
+        "startedAt": "2026-09-05T18:14:34.583Z",
+        "status": "not_applicable"
+      },
+      {
+        "code": "images-pinned",
+        "completedAt": "2026-09-05T18:08:16.916Z",
+        "evidenceDigests": [],
+        "startedAt": "2026-09-05T18:08:16.909Z",
+        "status": "passed"
+      },
+      {
+        "code": "healthy",
+        "completedAt": "2026-09-05T18:14:08.185Z",
+        "evidenceDigests": [],
+        "startedAt": "2026-09-05T18:08:18.145Z",
+        "status": "passed"
+      },
+      {
+        "code": "ports",
+        "completedAt": "2026-09-05T18:14:08.198Z",
+        "evidenceDigests": [],
+        "startedAt": "2026-09-05T18:14:08.186Z",
+        "status": "passed"
+      },
+      {
+        "code": "graceful-stop",
+        "completedAt": "2026-09-05T18:14:11.229Z",
+        "evidenceDigests": [],
+        "startedAt": "2026-09-05T18:14:08.200Z",
+        "status": "passed"
+      },
+      {
+        "code": "stopped-remains-stopped",
+        "completedAt": "2026-09-05T18:14:14.244Z",
+        "evidenceDigests": [],
+        "startedAt": "2026-09-05T18:14:11.232Z",
+        "status": "passed"
+      },
+      {
+        "code": "restart",
+        "completedAt": "2026-09-05T18:14:30.689Z",
+        "evidenceDigests": [],
+        "startedAt": "2026-09-05T18:14:14.245Z",
+        "status": "passed"
+      },
+      {
+        "code": "persistence",
+        "completedAt": "2026-09-05T18:14:30.730Z",
+        "evidenceDigests": [],
+        "startedAt": "2026-09-05T18:14:30.690Z",
+        "status": "passed"
+      },
+      {
+        "code": "cleanup",
+        "completedAt": "2026-09-05T18:14:34.593Z",
+        "evidenceDigests": [],
+        "startedAt": "2026-09-05T18:14:30.734Z",
+        "status": "passed"
+      }
+    ],
+    "cleanup": {
+      "completedAt": "2026-09-05T18:14:34.593Z",
+      "journalDigest": "sha256:ecf9a94cf783df8063040519f437ec9faae40cfcc240d7a33a2e015c59898edf",
+      "resources": {
+        "backups": 0,
+        "containers": 0,
+        "directories": 0,
+        "networks": 0,
+        "ports": 0,
+        "secrets": 0,
+        "volumes": 0
+      },
+      "status": "passed"
+    },
+    "completedAt": "2026-09-05T18:14:34.593Z",
+    "evidence": [],
+    "expiresAt": "2026-12-04T18:14:34.593Z",
+    "policyVersion": "1.1.0",
+    "proofBundleDigest": "sha256:8e4fb41939eea3a66eb5de091d928c9762c37f6d612c80350be9489c9faf4b03",
+    "proofId": "23f11426-228a-4af1-966a-3e349f59a0ce",
+    "proofPlanDigest": "sha256:ec7092a4e9bf54fcdfc005fc6aed87b50b7ef434d2b4f8bab70f0c39575da425",
+    "result": "passed",
+    "revisionId": "2d1d2fb2-2fd1-4d3e-8823-3f324aedda9c",
+    "runId": "f22ac9eb-4e3b-42d2-9e49-111e89d7265d",
+    "runStatementDigest": "sha256:a02c2ea25e5724f300a10a76e4d6a3bb003f9614757b95c6fdb70fb921738347",
+    "runner": {
+      "agentVersion": "0.17.3",
+      "architecture": "amd64",
+      "leafId": "develop-proof-leaf",
+      "leafKeyId": "sha256:23aba8e706af2e71bd740ff3bba305e50e447edb9b642c803b8ca6c309db8327",
+      "operatingSystem": "linux",
+      "runtimeVersion": "9.0.15"
+    },
+    "seed": {
+      "id": "terraria-tshock",
+      "intendedStableVersion": "1.0.1",
+      "manifestDigest": "sha256:e00052157c94b9afca48bf4cf99953cfc0daf6c5455de59defc3f7db4f2a14f5",
+      "proofContractDigest": "sha256:703a89239434c2301367b7d6c21554f140836fd1694fe3ada0f6fd599899c766",
+      "testedVersion": "1.0.1-rc.1"
+    },
+    "startedAt": "2026-09-05T18:08:16.851Z",
+    "validatorVersion": "0.14.0"
+  },
+  "schemaVersion": "dauva.dev/seed-proof/v2"
+}
