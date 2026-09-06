@@ -1,6 +1,6 @@
 {
   "name": "@deucarian/dauva-seeds",
-  "version": "0.19.1",
+  "version": "0.20.0",
   "private": true,
   "type": "module",
   "description": "Validation and compilation tooling for the Dauva Seed Registry.",
@@ -9,6 +9,7 @@
     "compile": "node tools/compile-registry.mjs",
     "test": "node --test",
     "check": "npm run test && npm run validate && npm run compile -- --check",
+    "settings:check-leaf": "node tools/check-leaf-settings.mjs",
     "updates:check": "node tools/check-seed-updates.mjs",
     "updates:prepare": "node tools/prepare-seed-candidates.mjs",
     "seed:promote": "node tools/promote-seed.mjs",
