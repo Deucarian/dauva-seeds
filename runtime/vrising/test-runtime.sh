@@ -3,6 +3,51 @@ set -Eeuo pipefail
 
 readonly image="${1:-dauva-vrising-runtime:test}"
 
+# A fresh process must not enter Wine initialization until Xvfb confirms it is
+# ready. Run twice in separate containers to cover replacement's fresh layer.
+for replacement in first recreated; do
+  docker run --rm --user 1000:1000 --entrypoint bash "$image" -Eeuo pipefail -c '
+    export DISPLAY=:0.0
+    /usr/local/bin/dauva-vrising-prepare-display
+    test -S /tmp/.X11-unix/X0
+    /usr/local/bin/dauva-vrising-prepare-wine
+    WINEDEBUG=-all wine reg query "HKLM\\Software\\Microsoft\\Cryptography\\Defaults\\Provider Types\\Type 001" /ve >/dev/null
+    WINEDEBUG=-all wineserver -w
+  '
+done
+
+docker run --rm --entrypoint bash "$image" -Eeuo pipefail -c '
+  mkdir /tmp/fake-bin
+  printf "%s\n" "#!/usr/bin/env bash" "exit 42" > /tmp/fake-bin/Xvfb
+  chmod +x /tmp/fake-bin/Xvfb
+  if PATH="/tmp/fake-bin:$PATH" /usr/local/bin/dauva-vrising-prepare-display; then
+    echo "An unsuccessful display was reported ready." >&2
+    exit 1
+  fi
+'
+
+# Installer failures are actual child-process results, not elapsed observation
+# deadlines. Only two attempts may touch the same fresh installation.
+docker run --rm --entrypoint bash "$image" -Eeuo pipefail -c '
+  mkdir /tmp/fake-install
+  export SCRIPTSDIR=/tmp/fake-install
+  touch "$SCRIPTSDIR/helper_functions.sh"
+  printf "%s\n" \
+    "IsInstalled() { test -e /tmp/fake-install/installed; }" \
+    "InstallServer() { if test -e /tmp/fake-install/attempted; then touch /tmp/fake-install/installed; return 0; fi; touch /tmp/fake-install/attempted; return 1; }" \
+    > "$SCRIPTSDIR/helper_install.sh"
+  /usr/local/bin/dauva-vrising-install-first-run
+  test -e "$SCRIPTSDIR/installed"
+  printf "%s\n" "IsInstalled() { return 0; }" "InstallServer() { echo forbidden-existing-install-update >&2; exit 91; }" > "$SCRIPTSDIR/helper_install.sh"
+  /usr/local/bin/dauva-vrising-install-first-run
+  printf "%s\n" "IsInstalled() { return 1; }" "InstallServer() { echo attempted >> /tmp/fake-install/failures; return 1; }" > "$SCRIPTSDIR/helper_install.sh"
+  if /usr/local/bin/dauva-vrising-install-first-run; then
+    echo "An incomplete installation was accepted." >&2
+    exit 1
+  fi
+  test "$(wc -l < /tmp/fake-install/failures)" -eq 2
+'
+
 # This fixture replaces only the final launcher inside a disposable container.
 # It proves startup precedence without downloading or starting the actual game.
 docker run --rm --entrypoint bash "$image" -Eeuo pipefail -c '
