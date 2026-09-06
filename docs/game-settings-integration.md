@@ -27,6 +27,21 @@ present launch settings even when its native config remains a commented example.
 Preserve these cases for every respective variant. Commented example passwords
 and world paths are not defaults. Custom startup hooks must not be overwritten.
 
+Additional real-runtime regressions are mandatory for both Enshrouded images:
+stored gameplay numbers are inactive outside Custom, switching presets is an
+explicit owner choice, fractional multipliers require reviewed bounds, and a
+startup preset rewrite must not count as successful application. Valheim public
+visibility is a boolean, not an integer. Satisfactory emits lowerCamelCase API
+members despite PascalCase documentation; ambiguous responses fail closed.
+All these named tests are required by the shared contract, starting with Leaf
+0.10.4. Passing fixtures still does not qualify either exact game image.
+
+Satisfactory advanced gameplay requires a game-owned world save before restart,
+not only an API acknowledgment. Bind the active session, use the operation's
+fixed save identity, confirm its save header and preserve it through a lost
+response/reconnect and named fake-clock 10/20/100-second boundaries. Never
+silently apply to a different world selected after the settings page loaded.
+
 This inventory is **source coverage metadata**, not signed runtime proof. It
 does not alter released Seed manifests or authenticate a new image digest.
 Existing lifecycle receipts do not prove that settings work in the real game.
