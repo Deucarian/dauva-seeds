@@ -1,6 +1,14 @@
 {
   "schemaVersion": "dauva.dev/native-game-settings-contract/v1",
   "leafCapability": "native-game-settings-v1",
+  "requiredWorkflowTests": [
+    "TestSeedRegistrySettingsContract",
+    "TestEveryProfileAppliesPersistsAndMasksSettings",
+    "TestReadbackTransportBoundariesRemainUnknownAndResumeSameIdentity",
+    "TestMinecraftWorldReadbackBoundariesAndLostAcceptance",
+    "TestMinecraftStoppedSaveCarriesDurableWorldStartupCommand",
+    "TestTerrariaCommentedTemplateExposesActualLaunchSettings"
+  ],
   "profiles": [
     {"id":"minecraft","images":["ghcr.io/itzg/minecraft-server","docker.io/itzg/minecraft-server"],"seeds":["minecraft-fabric","minecraft-paper"]},
     {"id":"valheim","images":["ghcr.io/community-valheim-tools/valheim-server","docker.io/lloesche/valheim-server"],"seeds":["valheim","valheim-bepinex"]},
