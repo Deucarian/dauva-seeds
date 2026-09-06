@@ -19,6 +19,7 @@ import {
   verifyAttestation,
 } from "./proof-crypto.mjs";
 import { proofCheckPolicyIssues } from "./proof-check-policy.mjs";
+import { nativeSettingsContractIssues } from "./native-settings-contract.mjs";
 
 const ajv = new Ajv2020({
   allErrors: true,
@@ -70,6 +71,8 @@ const releaseFiles = await readManifestDirectory("registry/history", {
 });
 const proofFiles = await readManifestDirectory("proofs");
 const errors = [];
+const settingsContract = await readJson(path.join(repositoryRoot, "contracts", "native-game-settings-v1.json"));
+errors.push(...nativeSettingsContractIssues(settingsContract, seedFiles.map((entry) => entry.value)));
 
 validateSchema(
   {
