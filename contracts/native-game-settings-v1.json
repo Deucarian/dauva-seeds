@@ -15,7 +15,14 @@
     "TestEnshroudedPresetRewriteCannotHideIgnoredCustomValue",
     "TestSatisfactoryRealResponseCasingAndAmbiguity",
     "TestSatisfactoryGameSaveBoundariesResumeOneSaveBeforeRestart",
-    "TestSatisfactoryWorldChangeInvalidatesSnapshotAndAcceptedApply"
+    "TestSatisfactoryWorldChangeInvalidatesSnapshotAndAcceptedApply",
+    "TestGarrysModEmptyConfigRuntimeDiscoveryAndDurableApply",
+    "TestGarrysModStoppedRebasePreservesShutdownChanges",
+    "TestGarrysModQueryTimeouts10s20s100sResumeSameOperation",
+    "TestGarrysModRuntimeRevisionAndCustomCommandsFailClosed",
+    "TestGarrysModUnknownProtectedPasswordRequiresExplicitReplacement",
+    "TestSourceRulesBoundedParsingAndOutOfOrderFragments",
+    "TestSourceQueryEndpointUsesOnlyObservedPrivatePorts"
   ],
   "profiles": [
     {"id":"minecraft","images":["ghcr.io/itzg/minecraft-server","docker.io/itzg/minecraft-server"],"seeds":["minecraft-fabric","minecraft-paper"]},

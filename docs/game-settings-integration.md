@@ -42,6 +42,19 @@ fixed save identity, confirm its save header and preserve it through a lost
 response/reconnect and named fake-clock 10/20/100-second boundaries. Never
 silently apply to a different world selected after the settings page loaded.
 
+Garry's Mod Construct and Flatgrass must discover reviewed sandbox settings from
+the exact running game's bounded A2S_RULES challenge-response query even when
+`server.cfg` is empty. Never invent defaults or expose arbitrary Source commands.
+Bind the encrypted accepted observation to the container and revision; preserve
+unrelated shutdown-time native changes while materializing actual gameplay values
+only after stopping. Confirm requested native bytes and actual game rules after
+restart. The same operation must survive query timeouts at the named fake-clock
+10/20/100-second boundaries and helper reconnects. Password presence must stay
+masked and is not client-authentication proof. An unsaved protected password
+requires an explicit replacement or clear, never a guessed value. Preserve and
+protect custom launch commands, map, game mode and persistence selectors. These
+named regressions require Leaf 0.10.5 or newer; fixtures are not signed game proof.
+
 This inventory is **source coverage metadata**, not signed runtime proof. It
 does not alter released Seed manifests or authenticate a new image digest.
 Existing lifecycle receipts do not prove that settings work in the real game.
