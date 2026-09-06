@@ -15,6 +15,18 @@ adapter. `npm run validate` (and therefore CI and deployment's `npm run check`)
 rejects missing mappings, ambiguous primary components, stale mappings and
 primary images outside the profile's trusted repositories.
 
+The contract also names required Leaf workflow regressions. The cross-repository
+check lists real Go tests, rejects a checkout missing any required test, and then
+runs the complete settings suite against this exact contract. It cannot pass an
+older file-only adapter by merely finding a profile with the right name.
+
+Two mandatory runtime-specific regression cases were added after disposable
+real-game tests: Minecraft difficulty must change the saved world and be read
+back from the game, not only `server.properties`; vanilla Terraria must expose
+present launch settings even when its native config remains a commented example.
+Preserve these cases for every respective variant. Commented example passwords
+and world paths are not defaults. Custom startup hooks must not be overwritten.
+
 This inventory is **source coverage metadata**, not signed runtime proof. It
 does not alter released Seed manifests or authenticate a new image digest.
 Existing lifecycle receipts do not prove that settings work in the real game.

@@ -16,6 +16,7 @@ crypto_provider_ready() {
 }
 
 if crypto_provider_ready; then
+  wineserver -w
   exit 0
 fi
 

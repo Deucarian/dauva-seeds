@@ -2,7 +2,7 @@ import path from "node:path";
 import process from "node:process";
 import { spawnSync } from "node:child_process";
 import { readJson, readManifestDirectory, repositoryRoot } from "./registry-lib.mjs";
-import { nativeSettingsContractIssues } from "./native-settings-contract.mjs";
+import { nativeSettingsContractIssues, missingWorkflowTests } from "./native-settings-contract.mjs";
 
 const leafPath = process.argv[2];
 if (!leafPath || process.argv.length !== 3) {
@@ -15,12 +15,13 @@ const errors = nativeSettingsContractIssues(contract, seeds);
 if (errors.length) throw new Error(errors.join("\n"));
 // This intentionally uses a local reviewed checkout: no network credentials,
 // implicit installation, runtime changes, shell interpolation or live games.
-const list = spawnSync(process.env.DAUVA_GO_EXECUTABLE || "go", ["test", "-list", "^TestSeedRegistrySettingsContract$", "./internal/gamesettings"], {
+const list = spawnSync(process.env.DAUVA_GO_EXECUTABLE || "go", ["test", "-list", "^Test", "./internal/gamesettings"], {
   cwd: path.resolve(leafPath), encoding: "utf8", shell: false,
 });
 if (list.error) throw list.error;
-if (list.status !== 0 || !list.stdout.split(/\r?\n/).includes("TestSeedRegistrySettingsContract")) {
-  throw new Error("The selected Leaf checkout has no runnable Seed Registry settings contract test. Use the compatible reviewed Leaf source.");
+const missing = missingWorkflowTests(contract, list.stdout);
+if (list.status !== 0 || missing.length) {
+  throw new Error(`The selected Leaf checkout lacks required runnable settings regressions: ${missing.join(", ")}. Use the compatible reviewed Leaf source.`);
 }
 const result = spawnSync(process.env.DAUVA_GO_EXECUTABLE || "go", ["test", "-count=1", "./internal/gamesettings"], {
   cwd: path.resolve(leafPath), stdio: "inherit", shell: false,
