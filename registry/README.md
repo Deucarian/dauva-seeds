@@ -16,6 +16,11 @@ Rules already fixed by the canonical design:
 - Arbitrary host scripts, privileged containers, Docker socket mounts, and
   unrestricted host paths are forbidden.
 - A Seed may contain a primary component and restricted companion components.
+- Every game and Seed variant must support the shared Garden settings editor,
+  persistent application and verified readback. Follow the mandatory
+  [integration checklist](../docs/game-settings-integration.md) and update
+  `../contracts/native-game-settings-v1.json`; validation rejects missing
+  coverage. A bootable image alone is not a completed game integration.
 
 The current Compose-managed Servers were used as reference implementations
 for Minecraft, Valheim, Core Keeper, Satisfactory, Factorio, and Enshrouded.

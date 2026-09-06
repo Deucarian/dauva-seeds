@@ -9,6 +9,7 @@ store live worlds, saves, secrets, backups, or large game installations.
 ## Start here
 
 - [Native server platform design](docs/architecture/dauva-native-server-platform.md)
+- [Required settings integration for every game and Seed](docs/game-settings-integration.md)
 - [Internal Seed Studio specification](docs/architecture/internal-seed-studio.md)
 - [Registry layout](registry/README.md)
 

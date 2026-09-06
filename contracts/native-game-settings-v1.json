@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "dauva.dev/native-game-settings-contract/v1",
+  "leafCapability": "native-game-settings-v1",
+  "profiles": [
+    {"id":"minecraft","images":["ghcr.io/itzg/minecraft-server","docker.io/itzg/minecraft-server"],"seeds":["minecraft-fabric","minecraft-paper"]},
+    {"id":"valheim","images":["ghcr.io/community-valheim-tools/valheim-server","docker.io/lloesche/valheim-server"],"seeds":["valheim","valheim-bepinex"]},
+    {"id":"vrising","images":["ghcr.io/deucarian/dauva-vrising-runtime"],"seeds":["vrising-pve","vrising-pvp"]},
+    {"id":"factorio","images":["docker.io/factoriotools/factorio"],"seeds":["factorio","factorio-stable"]},
+    {"id":"core-keeper","images":["docker.io/escaping/core-keeper-dedicated"],"seeds":["core-keeper","core-keeper-hard"]},
+    {"id":"enshrouded","images":["docker.io/sknnr/enshrouded-dedicated-server"],"seeds":["enshrouded"]},
+    {"id":"enshrouded-wine","images":["docker.io/mornedhels/enshrouded-server"],"seeds":["enshrouded-wine"]},
+    {"id":"project-zomboid","images":["docker.io/sknnr/project-zomboid-server"],"seeds":["project-zomboid-private","project-zomboid-community"]},
+    {"id":"satisfactory","images":["docker.io/wolveix/satisfactory-server"],"seeds":["satisfactory","satisfactory-experimental"]},
+    {"id":"terraria","images":["docker.io/brammys/terraria"],"seeds":["terraria-vanilla"]},
+    {"id":"terraria-tshock","images":["docker.io/finallf/terraria"],"seeds":["terraria-tshock"]},
+    {"id":"garrys-mod","images":["docker.io/ceifa/garrysmod"],"seeds":["garrys-mod-construct","garrys-mod-flatgrass"]}
+  ]
+}

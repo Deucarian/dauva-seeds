@@ -344,6 +344,29 @@ out-of-order responses. The proof must show that exactly one mutation is
 created, the same identity remains recoverable, and unrelated Garden state
 stays responsive.
 
+### Mandatory game settings integration
+
+Every supported game and every Seed variant must integrate with the shared
+Garden native-settings interface. Booting a container alone is insufficient.
+Settings must be discoverable, safely editable, persisted across normal
+restarts, and verified at their actual native-file, launch-configuration or
+game-API boundary. Public listing and password controls belong here whenever
+the game supports them. Protected infrastructure and world-creation-only
+values remain explicitly restricted; no arbitrary file or shell editor is
+introduced.
+
+Settings changes obey the durable asynchronous invariant above, including
+stable identity, encrypted configuration backup, explicit restart consent,
+same-identity recovery and unknown transport outcomes. Saved while stopped,
+verified after startup and game-ready are distinct claims. An environment
+echo must not conceal an overwritten native value or prove game readiness.
+
+The required adapter, tests, catalog coverage gate and exact-image release
+checklist are in [Game settings integration](../game-settings-integration.md).
+`contracts/native-game-settings-v1.json` covers every current Seed; registry
+validation rejects an unmapped game/variant or unrecognized primary image.
+Fixture coverage does not replace authenticated real-runtime qualification.
+
 ### Dauva Seed Registry
 
 The initial registry should be Git-backed and compiled by CI into a validated,
