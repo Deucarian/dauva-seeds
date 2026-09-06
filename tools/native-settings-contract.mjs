@@ -10,6 +10,11 @@ export function nativeSettingsContractIssues(contract, seeds) {
     return errors;
   }
   const mappings = new Map();
+  if (!Array.isArray(contract.requiredWorkflowTests) || !contract.requiredWorkflowTests.length ||
+      contract.requiredWorkflowTests.some((name) => typeof name !== "string" || !/^Test[A-Za-z0-9_]+$/.test(name)) ||
+      new Set(contract.requiredWorkflowTests).size !== contract.requiredWorkflowTests.length) {
+    issue("unique named Leaf workflow regressions are required.");
+  }
   const profiles = new Set();
   const images = new Set();
   for (const profile of contract.profiles) {
@@ -52,4 +57,9 @@ export function nativeSettingsContractIssues(contract, seeds) {
     if (!profile.images.includes(repository)) issue(`${seed.id}: primary image has no matching trusted settings profile.`);
   }
   return errors;
+}
+
+export function missingWorkflowTests(contract, output) {
+  const available = new Set(output.split(/\r?\n/));
+  return contract.requiredWorkflowTests.filter((name) => !available.has(name));
 }
