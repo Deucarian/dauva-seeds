@@ -22,7 +22,17 @@ saves, logs, and administrator state. The image does not update game files on
 startup and does not enable RCON. Wine also maintains its per-user runtime
 prefix in the container; this is separate from the persistent world volume.
 
-## Native settings contract (runtime 1.2.1)
+## Native settings contract (runtime 1.2.2)
+
+Real settings/recreation testing on September 6 found that Wine registry
+inspection could start a headless wineserver before the upstream asynchronous
+Xvfb launch. Unity then exited with `Failed to create batch mode window`.
+The launcher now establishes a confirmed Xvfb display before the first Wine
+invocation, exports DISPLAY consistently and waits for registry inspection to
+finish. It verifies an initial Steam installation, with at most two sequential
+attempts in the same directory after an unsuccessful installer process exits.
+No existing installation is automatically updated and an incomplete install
+cannot fall through into game launch.
 
 The image advertises DAUVA_SETTINGS_PROFILE_VERSION=1. Once a compatible Leaf
 has preserved the effective host/game settings in the persistent Settings
