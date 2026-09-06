@@ -7,7 +7,15 @@
     "TestReadbackTransportBoundariesRemainUnknownAndResumeSameIdentity",
     "TestMinecraftWorldReadbackBoundariesAndLostAcceptance",
     "TestMinecraftStoppedSaveCarriesDurableWorldStartupCommand",
-    "TestTerrariaCommentedTemplateExposesActualLaunchSettings"
+    "TestTerrariaCommentedTemplateExposesActualLaunchSettings",
+    "TestValheimPublicVisibilityUsesRuntimeBooleanContract",
+    "TestNumericLaunchValuesCannotBecomeBooleanObjectOrNull",
+    "TestEnshroudedPresetSelectionIsExplicitAndInactiveValuesCannotApply",
+    "TestEnshroudedCustomFractionsHaveReviewedBounds",
+    "TestEnshroudedPresetRewriteCannotHideIgnoredCustomValue",
+    "TestSatisfactoryRealResponseCasingAndAmbiguity",
+    "TestSatisfactoryGameSaveBoundariesResumeOneSaveBeforeRestart",
+    "TestSatisfactoryWorldChangeInvalidatesSnapshotAndAcceptedApply"
   ],
   "profiles": [
     {"id":"minecraft","images":["ghcr.io/itzg/minecraft-server","docker.io/itzg/minecraft-server"],"seeds":["minecraft-fabric","minecraft-paper"]},
