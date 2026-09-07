@@ -24,7 +24,9 @@
     "TestSourceRulesBoundedParsingAndOutOfOrderFragments",
     "TestSourceQueryEndpointUsesOnlyObservedPrivatePorts",
     "TestValheimPasswordValidationRejectsBeforeAcceptanceOrStop",
-    "TestValheimPasswordFileOverrideIsPreserved"
+    "TestValheimPasswordFileOverrideIsPreserved",
+    "TestProjectZomboidOwnedRuntimeContractAndVariants",
+    "TestProjectZomboidStartupOverwriteCannotPassVerification"
   ],
   "profiles": [
     {"id":"minecraft","images":["ghcr.io/itzg/minecraft-server","docker.io/itzg/minecraft-server"],"seeds":["minecraft-fabric","minecraft-paper"]},
@@ -34,7 +36,7 @@
     {"id":"core-keeper","images":["docker.io/escaping/core-keeper-dedicated"],"seeds":["core-keeper","core-keeper-hard"]},
     {"id":"enshrouded","images":["docker.io/sknnr/enshrouded-dedicated-server"],"seeds":["enshrouded"]},
     {"id":"enshrouded-wine","images":["docker.io/mornedhels/enshrouded-server"],"seeds":["enshrouded-wine"]},
-    {"id":"project-zomboid","images":["docker.io/sknnr/project-zomboid-server"],"seeds":["project-zomboid-private","project-zomboid-community"]},
+    {"id":"project-zomboid","images":["docker.io/sknnr/project-zomboid-server","ghcr.io/deucarian/dauva-project-zomboid-runtime"],"seeds":["project-zomboid-private","project-zomboid-community"]},
     {"id":"satisfactory","images":["docker.io/wolveix/satisfactory-server"],"seeds":["satisfactory","satisfactory-experimental"]},
     {"id":"terraria","images":["docker.io/brammys/terraria"],"seeds":["terraria-vanilla"]},
     {"id":"terraria-tshock","images":["docker.io/finallf/terraria"],"seeds":["terraria-tshock"]},

@@ -69,6 +69,17 @@ Existing lifecycle receipts do not prove that settings work in the real game.
 Do not invent a receipt, turn a fixture test into a real-game qualification,
 or remove an older runtime's capability gate to make the editor appear ready.
 
+Leaf 0.10.7 adds the separately owned
+`ghcr.io/deucarian/dauva-project-zomboid-runtime` repository to the existing PZ
+adapter; it preserves the upstream UID, native paths and startup bindings.
+`PUBLIC_SERVER` still controls native `Open`, **not** Steam listing `Public`.
+Keep those independent controls, both private/community defaults, protected
+world identity, password masking/clear, sandbox persistence and rejection of
+startup overwrites in the named PZ regressions. The full shared workflow must
+run for every trusted image repository, not just one representative per profile.
+This allowlist is not image authentication or catalog promotion: new exact Seed
+versions, per-variant qualification and signed proof are still required.
+
 Supported settings means every safely representable field from installed
 native files, plus reviewed launch options and supported game API settings.
 Keep networking, paths, execution, authentication infrastructure and existing
