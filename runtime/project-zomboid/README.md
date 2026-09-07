@@ -46,3 +46,7 @@ variants in separate disposable persistent worlds, including gameplay settings,
 password handling, native readback and second ordinary restarts. Any published
 image requires a new exact Seed version, authenticated proof and the governed
 promotion flow. Do not replace an owner's running world using this candidate.
+
+See [the bounded manual qualification record](qualification-20260907.md) for
+both candidate variants. It records what was observed and what remains unproven;
+it does not authorize catalog promotion.
