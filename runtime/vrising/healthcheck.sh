@@ -17,3 +17,15 @@ if grep -Fq "CryptographicException: Couldn't access random source." "$log_file"
   printf '%s\n' 'V Rising cannot save: Wine cryptography failed.' >&2
   exit 1
 fi
+# The game can still generate a world, autosave and log Startup Completed after
+# this authoritative Steam initialization failure. Neither a save nor a bound
+# UDP socket makes that process joinable. Match the game's fatal messages, not
+# generic DNS/connection timeouts that can occur during normal operation.
+if grep -Fq \
+  -e 'Waited for GameServer LogOn for over 30 seconds. Fatal error.' \
+  -e 'Failed to initialize SteamNetworking' \
+  -e 'SteamNetworking Server API was not initialized when ServerSteamTransportLayer was spawned!' \
+  "$log_file"; then
+  printf '%s\n' 'V Rising networking is unavailable: Steam initialization failed.' >&2
+  exit 1
+fi

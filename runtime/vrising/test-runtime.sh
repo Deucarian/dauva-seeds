@@ -129,6 +129,39 @@ docker run --rm --entrypoint bash "$image" -Eeuo pipefail -c '
   kill "$process"
 '
 
+# An actual isolated 1.2.2 game emitted all three fatal networking messages,
+# then Startup Completed and successful autosaves, but never answered A2S_INFO.
+# Exercise every fatal message independently and in both log orders. A transient
+# DNS error alone is not that fatal game result, and a new clean log can recover.
+docker run --rm --entrypoint bash "$image" -Eeuo pipefail -c '
+  mkdir -p /vrising/data/logs
+  bash -c "exec -a VRisingServer.exe sleep 30" &
+  process=$!
+  trap "kill $process 2>/dev/null || true" EXIT
+  ready="[Server] Startup Completed - Disabling Scene Loading Systems"
+  saved="PersistenceV2 - Finished Saving to disposable-world"
+  for fatal in \
+    "Waited for GameServer LogOn for over 30 seconds. Fatal error." \
+    "Failed to initialize SteamNetworking" \
+    "SteamNetworking Server API was not initialized when ServerSteamTransportLayer was spawned!"; do
+    for order in before after; do
+      if test "$order" = before; then
+        printf "%s\n" "$fatal" "$ready" "$saved" > /vrising/data/logs/latest.log
+      else
+        printf "%s\n" "$ready" "$saved" "$fatal" > /vrising/data/logs/latest.log
+      fi
+      if /usr/local/bin/dauva-vrising-healthcheck; then
+        echo "A game with fatal Steam networking failure was reported healthy." >&2
+        exit 1
+      fi
+    done
+  done
+  printf "%s\n" "$ready" "Curl error 6: Could not resolve host" "$saved" > /vrising/data/logs/latest.log
+  /usr/local/bin/dauva-vrising-healthcheck
+  printf "%s\n" "$ready" "$saved" > /vrising/data/logs/latest.log
+  /usr/local/bin/dauva-vrising-healthcheck
+'
+
 # Reproduce the incomplete-prefix failure without starting a game or touching
 # a persistent world. Initialization must restore the missing provider.
 docker run --rm --user 1000:1000 --entrypoint bash "$image" -Eeuo pipefail -c '
