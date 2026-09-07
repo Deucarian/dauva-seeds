@@ -22,7 +22,9 @@
     "TestGarrysModRuntimeRevisionAndCustomCommandsFailClosed",
     "TestGarrysModUnknownProtectedPasswordRequiresExplicitReplacement",
     "TestSourceRulesBoundedParsingAndOutOfOrderFragments",
-    "TestSourceQueryEndpointUsesOnlyObservedPrivatePorts"
+    "TestSourceQueryEndpointUsesOnlyObservedPrivatePorts",
+    "TestValheimPasswordValidationRejectsBeforeAcceptanceOrStop",
+    "TestValheimPasswordFileOverrideIsPreserved"
   ],
   "profiles": [
     {"id":"minecraft","images":["ghcr.io/itzg/minecraft-server","docker.io/itzg/minecraft-server"],"seeds":["minecraft-fabric","minecraft-paper"]},
