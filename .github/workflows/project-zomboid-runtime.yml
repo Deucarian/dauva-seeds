@@ -1,4 +1,4 @@
-name: Check Project Zomboid compatibility runtime
+name: Check and publish Project Zomboid runtime
 
 on:
   pull_request:
@@ -27,6 +27,11 @@ jobs:
     steps:
       - name: Check out the reviewed candidate
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22"
+      - name: Check resumable publication without credentials or publishing
+        run: node --test runtime/project-zomboid/publish-runtime.test.mjs
       - name: Build and check without starting a game
         shell: bash
         run: |
@@ -39,5 +44,36 @@ jobs:
           actual="$(docker inspect --format '{{index .Config.Labels "org.opencontainers.image.version"}}' dauva-project-zomboid-runtime:check)"
           test "$actual" = "$version"
           bash runtime/project-zomboid/test-runtime.sh dauva-project-zomboid-runtime:check
-      # Candidate checks are not game/client proof or catalog promotion.
-      # This workflow deliberately has no publication credentials or push step.
+      # Pull requests and Develop have no package-write credentials.
+
+  publish:
+    if: github.repository == 'Deucarian/dauva-seeds' && github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    needs: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+    concurrency:
+      group: project-zomboid-runtime-publication
+      cancel-in-progress: false
+    steps:
+      - name: Check out the protected Main revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22"
+      - name: Sign in using this repository's short-lived package permission
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: printf '%s' "$GH_TOKEN" | docker login ghcr.io --username "$GITHUB_ACTOR" --password-stdin
+      - name: Initialize the isolated builder
+        run: |
+          docker buildx create --name pz-runtime-builder --driver docker-container --use
+          docker buildx inspect --bootstrap
+      - name: Publish and verify the exact resumable runtime identity
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node runtime/project-zomboid/publish-runtime.mjs
+      # A published image is not an authenticated game/settings proof or Seed
+      # promotion. The existing catalog and owner worlds are never modified.

@@ -3,7 +3,7 @@
 FROM docker.io/cm2network/steamcmd@sha256:45f6515d6c4dcde659c9ad6872bdbeacd1bf5c4e7f241829c4d2f28fb5eda581
 
 LABEL org.opencontainers.image.title="Dauva Project Zomboid compatibility runtime" \
-      org.opencontainers.image.version="1.0.0" \
+      org.opencontainers.image.version="1.0.1" \
       org.opencontainers.image.source="https://github.com/Deucarian/dauva-seeds" \
       org.opencontainers.image.licenses="GPL-3.0-or-later" \
       dev.dauva.upstream.revision="09c57b2bdbc67642fa2c70bfab72a7f4b822c8cd"
