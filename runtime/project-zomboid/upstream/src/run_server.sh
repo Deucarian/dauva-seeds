@@ -152,13 +152,32 @@ function test_first_run() {
     printf "\n### First run check complete.\n"
 }
 
+# Fixed Steam entry point; separated so no-game regressions can stub it.
+function run_steam_install() {
+    /home/steam/steamcmd/steamcmd.sh +runscript "$STEAM_INSTALL_FILE"
+}
+
 # Update the server
 function update_server() {
     printf "\n### Updating Project Zomboid Server...\n"
 
-    /home/steam/steamcmd/steamcmd.sh +runscript "$STEAM_INSTALL_FILE"
+    # Dauva 2026-09-07: a fresh SteamCMD install can need one initialization
+    # retry. Resume the same fixed app/path at most twice, never loop forever
+    # or report a failed update as successful because the last printf worked.
+    local attempts=1
+    local attempt
+    if [[ ! -x "$BASE_GAME_DIR/start-server.sh" || ! -s "$SERVER_VM_CONFIG" ]]; then
+        attempts=2
+    fi
+    for ((attempt=1; attempt<=attempts; attempt++)); do
+        if run_steam_install && [[ -x "$BASE_GAME_DIR/start-server.sh" && -s "$SERVER_VM_CONFIG" ]]; then
+            printf "\n### Project Zomboid Server updated.\n"
+            return 0
+        fi
+        printf '\n### Steam install attempt %s/%s did not complete.\n' "$attempt" "$attempts" >&2
+    done
 
-    printf "\n### Project Zomboid Server updated.\n"
+    return 1
 }
 
 # Apply user configuration to the server
@@ -267,7 +286,7 @@ function set_variables() {
 ## Main
 set_variables
 apply_preinstall_config
-update_server
+update_server || exit 1
 test_first_run
 apply_postinstall_config
 

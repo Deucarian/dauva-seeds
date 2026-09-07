@@ -5,8 +5,8 @@
 // License: GNU General Public License v3.0 (see LICENSE)
 ///////////////////////////////////////////////////////////////////////
 
-// Do not shutdown on a failed command
-@ShutdownOnFailedCommand 0
+// Dauva: return failure to the launcher instead of concealing an update error.
+@ShutdownOnFailedCommand 1
 
 //No password as this is unattended
 @NoPromptForPassword 1

@@ -16,10 +16,16 @@ SteamCMD at first start and are not redistributed inside this image.
 Dauva additionally applies MAX_RAM and a bounded initial heap before the first
 temporary world-generation start. The archived launcher applied its memory
 limit only afterwards. The disposable VM became unresponsive during two
-simultaneous first starts; memory pressure is suspected, not yet confirmed by
-guest logs.
+simultaneous first starts. Guest kernel logs subsequently confirmed a global
+out-of-memory kill of a Project Zomboid process. Both affected tests were
+stopped through their existing durable identities; no VM/host reboot was needed.
 The first diagnostic image did not include this hardening. Do not reuse its
 image hash as evidence for the updated source.
+
+A fresh Steam initialization may resume its same app/path once (two attempts
+maximum). Existing-install updates get one attempt, Steam command errors now
+fail explicitly, and missing launch files cannot count as successful installation.
+The launcher does not proceed into world startup after a rejected installation.
 
 Run `bash runtime/project-zomboid/test-launcher.sh` for the isolated launcher
 regressions (no Docker or game start). Run `bash runtime/project-zomboid/test-runtime.sh
