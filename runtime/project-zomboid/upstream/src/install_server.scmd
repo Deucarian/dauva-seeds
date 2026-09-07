@@ -1,0 +1,22 @@
+///////////////////////////////////////////////////////////////////////
+// Author: Renegade-Master
+// Description: SteamCMD installation script for Project Zomboid
+//   Dedicated Server
+// License: GNU General Public License v3.0 (see LICENSE)
+///////////////////////////////////////////////////////////////////////
+
+// Dauva: return failure to the launcher instead of concealing an update error.
+@ShutdownOnFailedCommand 1
+
+//No password as this is unattended
+@NoPromptForPassword 1
+
+// Set the game installation directory
+force_install_dir /home/steam/ZomboidDedicatedServer
+
+login anonymous
+
+// Install/Update the Project Zomboid Dedicated Server
+app_update 380870 -beta GAME_VERSION validate
+
+quit
