@@ -48,6 +48,18 @@ grep -Fq -- '"-Xms128m"' "$SERVER_VM_CONFIG"
 grep -Fq -- '"-XX:+UseZGC"' "$SERVER_VM_CONFIG"
 grep -Fq -- '"mainClass":"untouched"' "$SERVER_VM_CONFIG"
 
+# GC changes use the same structured write, preserving unrelated JVM flags.
+printf '%s\n' '{"vmArgs":["-Xmx8g","-XX:+UseZGC","-XX:+UseStringDeduplication"]}' > "$SERVER_VM_CONFIG"
+GC_CONFIG=G1GC
+apply_memory_budget
+grep -Fq -- '"-XX:+UseG1GC"' "$SERVER_VM_CONFIG"
+grep -Fq -- '"-XX:+UseStringDeduplication"' "$SERVER_VM_CONFIG"
+before=$(cksum < "$SERVER_VM_CONFIG")
+GC_CONFIG='G1GC;anything'
+if apply_memory_budget 2>/dev/null; then exit 1; fi
+test "$(cksum < "$SERVER_VM_CONFIG")" = "$before"
+GC_CONFIG=ZGC
+
 # A rejected first-start budget must propagate before post-install writes.
 SERVER_CONFIG="$fixture_dir/missing-config.ini"
 SERVER_RULES_CONFIG="$fixture_dir/missing-rules.lua"

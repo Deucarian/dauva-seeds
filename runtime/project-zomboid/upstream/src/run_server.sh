@@ -55,13 +55,17 @@ function apply_memory_budget() {
     fi
     # Current game files omit Xms. Insert it into the actual JSON argument
     # array, preserving unrelated values; reject ambiguous/malformed input.
-    python3 - "$SERVER_VM_CONFIG" "$MAX_RAM" <<'DAUVA_JVM'
+    python3 - "$SERVER_VM_CONFIG" "$MAX_RAM" "${GC_CONFIG:-ZGC}" <<'DAUVA_JVM'
 import json
 import os
 import stat
 import sys
 
-path, budget = sys.argv[1:]
+path, budget, collector = sys.argv[1:]
+collectors = ('ZGC', 'G1GC', 'ParallelGC', 'SerialGC', 'ShenandoahGC')
+if collector not in collectors:
+    raise ValueError('Unsupported managed garbage collector')
+collector_flags = tuple('-XX:+Use' + value for value in collectors)
 def unique_object(pairs):
     result = {}
     for key, value in pairs:
@@ -80,8 +84,10 @@ if not isinstance(args, list) or len(args) > 512 or not all(isinstance(arg, str)
     raise ValueError('Unexpected launch arguments')
 if sum(arg.startswith('-Xmx') for arg in args) != 1 or sum(arg.startswith('-Xms') for arg in args) > 1:
     raise ValueError('Ambiguous managed heap arguments')
-remaining = [arg for arg in args if not arg.startswith(('-Xmx', '-Xms'))]
-document['vmArgs'] = ['-Xmx' + budget, '-Xms128m'] + remaining
+if sum(arg in collector_flags for arg in args) > 1:
+    raise ValueError('Ambiguous garbage collector arguments')
+remaining = [arg for arg in args if not arg.startswith(('-Xmx', '-Xms')) and arg not in collector_flags]
+document['vmArgs'] = ['-Xmx' + budget, '-Xms128m', '-XX:+Use' + collector] + remaining
 temp = path + '.dauva-jvm-' + str(os.getpid())
 try:
     with open(temp, 'x', encoding='utf-8') as stream:
@@ -171,8 +177,8 @@ function apply_postinstall_config() {
 
     # Dauva applies both heap limits before every start, including first run.
 
-    # Set the GC for the JVM (advanced, some crashes can be fixed with a different GC algorithm)
-    sed -i "s/-XX:+Use.*/-XX:+Use${GC_CONFIG}\",/g" "${SERVER_VM_CONFIG}"
+    # Dauva sets the selected GC structurally with the heap before each start.
+    # A line-oriented replacement can truncate a compact JSON launch document.
 
     printf "\n### Post Install Configuration applied.\n"
 }
