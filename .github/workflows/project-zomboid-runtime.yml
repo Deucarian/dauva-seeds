@@ -1,0 +1,43 @@
+name: Check Project Zomboid compatibility runtime
+
+on:
+  pull_request:
+    branches: [develop, main]
+    paths:
+      - ".github/workflows/project-zomboid-runtime.yml"
+      - "runtime/project-zomboid/**"
+  push:
+    branches: [develop, main]
+    paths:
+      - ".github/workflows/project-zomboid-runtime.yml"
+      - "runtime/project-zomboid/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: project-zomboid-runtime-check-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out the reviewed candidate
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Build and check without starting a game
+        shell: bash
+        run: |
+          version="$(tr -d '[:space:]' < runtime/project-zomboid/VERSION)"
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          docker build --platform linux/amd64 \
+            --file runtime/project-zomboid/Dockerfile \
+            --tag dauva-project-zomboid-runtime:check \
+            runtime/project-zomboid
+          actual="$(docker inspect --format '{{index .Config.Labels "org.opencontainers.image.version"}}' dauva-project-zomboid-runtime:check)"
+          test "$actual" = "$version"
+          bash runtime/project-zomboid/test-runtime.sh dauva-project-zomboid-runtime:check
+      # Candidate checks are not game/client proof or catalog promotion.
+      # This workflow deliberately has no publication credentials or push step.

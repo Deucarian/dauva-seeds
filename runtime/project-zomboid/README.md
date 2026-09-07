@@ -26,11 +26,20 @@ A fresh Steam initialization may resume its same app/path once (two attempts
 maximum). Existing-install updates get one attempt, Steam command errors now
 fail explicitly, and missing launch files cannot count as successful installation.
 The launcher does not proceed into world startup after a rejected installation.
+The current game's launch file has a maximum heap but no initial heap entry.
+Dauva edits the real JSON argument array, adds the initial limit, and selects a
+reviewed garbage collector without discarding unrelated flags or truncating
+compact JSON. Malformed or ambiguous launch files fail before world startup.
 
 Run `bash runtime/project-zomboid/test-launcher.sh` for the isolated launcher
 regressions (no Docker or game start). Run `bash runtime/project-zomboid/test-runtime.sh
 <exact-image>` for candidate-image dependency and launcher checks. Neither is
 real-game qualification. The candidate has not been published or promoted.
+The repository's Project Zomboid workflow runs these same no-game checks for
+pull requests and changes on Develop/Main. It does not publish an image or
+alter the catalog. When archiving this directory on Windows for a Linux build,
+use `git -c core.autocrlf=false archive`; a subtree archive does not inherit its
+parent directory's shell line-ending attributes.
 
 This directory is not a Seed promotion or runtime proof. Qualify both current
 variants in separate disposable persistent worlds, including gameplay settings,
