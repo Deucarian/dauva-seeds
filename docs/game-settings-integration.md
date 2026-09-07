@@ -55,6 +55,14 @@ requires an explicit replacement or clear, never a guessed value. Preserve and
 protect custom launch commands, map, game mode and persistence selectors. These
 named regressions require Leaf 0.10.5 or newer; fixtures are not signed game proof.
 
+Leaf 0.10.6 additionally requires pre-acceptance validation of Valheim join
+passwords for vanilla and BepInEx: at least five characters and no generic clear.
+Explain this limit in the field help; reject invalid changes before stopping the
+game. An existing SERVER_PASS_FILE overrides environment values and must make
+that password control read-only. Do not infer disabled password enforcement just
+because a mod loader is installed. Supported password changes still require
+masked readback and persistence through a second ordinary restart.
+
 This inventory is **source coverage metadata**, not signed runtime proof. It
 does not alter released Seed manifests or authenticate a new image digest.
 Existing lifecycle receipts do not prove that settings work in the real game.
