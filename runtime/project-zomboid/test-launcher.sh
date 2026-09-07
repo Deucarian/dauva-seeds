@@ -33,12 +33,28 @@ done
 
 # Unknown launch formats fail closed, without starting the game.
 MAX_RAM=4096m
-for content in '{"vmArgs":["-Xmx8192m"]}' '{"vmArgs":["-Xms8192m"]}' '{}'; do
+for content in '{"vmArgs":["-Xms8192m"]}' '{}' 'not-json' '{"vmArgs":["-Xmx8g","-Xmx4g"]}' '{"vmArgs":["-Xmx8g","-Xms8g","-Xms4g"]}' '{"vmArgs":[],"vmArgs":["-Xmx8g"]}'; do
     printf '%s\n' "$content" > "$SERVER_VM_CONFIG"
     before=$(cksum < "$SERVER_VM_CONFIG")
-    if apply_memory_budget; then exit 1; fi
+    if apply_memory_budget 2>/dev/null; then exit 1; fi
     test "$(cksum < "$SERVER_VM_CONFIG")" = "$before"
 done
+
+# The observed current Steam launch file has Xmx but no Xms.
+printf '%s\n' '{"vmArgs":["-Xmx8g","-XX:+UseZGC"],"mainClass":"untouched"}' > "$SERVER_VM_CONFIG"
+apply_memory_budget
+grep -Fq -- '"-Xmx4096m"' "$SERVER_VM_CONFIG"
+grep -Fq -- '"-Xms128m"' "$SERVER_VM_CONFIG"
+grep -Fq -- '"-XX:+UseZGC"' "$SERVER_VM_CONFIG"
+grep -Fq -- '"mainClass":"untouched"' "$SERVER_VM_CONFIG"
+
+# A rejected first-start budget must propagate before post-install writes.
+SERVER_CONFIG="$fixture_dir/missing-config.ini"
+SERVER_RULES_CONFIG="$fixture_dir/missing-rules.lua"
+TIMEOUT=60
+MAX_RAM=invalid
+if test_first_run 2>/dev/null; then exit 1; fi
+MAX_RAM=4096m
 
 # Prove the first start receives the limit, not only post-install startup.
 reset_fixture

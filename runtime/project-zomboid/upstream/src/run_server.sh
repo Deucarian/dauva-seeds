@@ -53,12 +53,53 @@ function apply_memory_budget() {
         printf '\n### Managed JVM memory must be at least 128 MiB.\n' >&2
         return 1
     fi
-    # Refuse an unexpected launch file instead of silently keeping its heap.
-    grep -Eq '"-Xmx[^"[:space:]]+"' "$SERVER_VM_CONFIG" && \
-        grep -Eq '"-Xms[^"[:space:]]+"' "$SERVER_VM_CONFIG" || return 1
-    sed -i -E \
-        "s/\"-Xmx[^\"]*\"/\"-Xmx${MAX_RAM}\"/g; s/\"-Xms[^\"]*\"/\"-Xms128m\"/g" \
-        "$SERVER_VM_CONFIG" || return 1
+    # Current game files omit Xms. Insert it into the actual JSON argument
+    # array, preserving unrelated values; reject ambiguous/malformed input.
+    python3 - "$SERVER_VM_CONFIG" "$MAX_RAM" <<'DAUVA_JVM'
+import json
+import os
+import stat
+import sys
+
+path, budget = sys.argv[1:]
+def unique_object(pairs):
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError('Duplicate launch property')
+        result[key] = value
+    return result
+
+source_stat = os.lstat(path)
+if not stat.S_ISREG(source_stat.st_mode) or source_stat.st_size > 1024 * 1024:
+    raise ValueError('Unexpected launch file')
+with open(path, encoding='utf-8') as stream:
+    document = json.load(stream, object_pairs_hook=unique_object)
+args = document.get('vmArgs') if isinstance(document, dict) else None
+if not isinstance(args, list) or len(args) > 512 or not all(isinstance(arg, str) for arg in args):
+    raise ValueError('Unexpected launch arguments')
+if sum(arg.startswith('-Xmx') for arg in args) != 1 or sum(arg.startswith('-Xms') for arg in args) > 1:
+    raise ValueError('Ambiguous managed heap arguments')
+remaining = [arg for arg in args if not arg.startswith(('-Xmx', '-Xms'))]
+document['vmArgs'] = ['-Xmx' + budget, '-Xms128m'] + remaining
+temp = path + '.dauva-jvm-' + str(os.getpid())
+try:
+    with open(temp, 'x', encoding='utf-8') as stream:
+        os.fchmod(stream.fileno(), stat.S_IMODE(source_stat.st_mode))
+        json.dump(document, stream, separators=(',', ':'), ensure_ascii=False)
+        stream.write('\n')
+        stream.flush()
+        os.fsync(stream.fileno())
+    os.replace(temp, path)
+    directory = os.open(os.path.dirname(path), os.O_DIRECTORY)
+    try:
+        os.fsync(directory)
+    finally:
+        os.close(directory)
+finally:
+    if os.path.exists(temp):
+        os.unlink(temp)
+DAUVA_JVM
 }
 
 # Start the Server
@@ -142,7 +183,7 @@ function test_first_run() {
 
     if [[ ! -f "$SERVER_CONFIG" ]] || [[ ! -f "$SERVER_RULES_CONFIG" ]]; then
         printf "\n### This is the first run.\nStarting server for %s seconds\n" "$TIMEOUT"
-        start_server
+        start_server || return 1
         TIMEOUT=0
     else
         printf "\n### This is not the first run.\n"
@@ -287,7 +328,7 @@ function set_variables() {
 set_variables
 apply_preinstall_config
 update_server || exit 1
-test_first_run
+test_first_run || exit 1
 apply_postinstall_config
 
 # Intercept termination signals to stop the server gracefully
