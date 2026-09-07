@@ -1,4 +1,4 @@
-# Project Zomboid compatibility runtime — candidate only
+# Project Zomboid compatibility runtime — unpromoted
 
 The released upstream image cannot load the current Steam server binary because
 its libstdc++ lacks GLIBCXX_3.4.29. This rebuild uses a pinned current SteamCMD
@@ -34,10 +34,11 @@ compact JSON. Malformed or ambiguous launch files fail before world startup.
 Run `bash runtime/project-zomboid/test-launcher.sh` for the isolated launcher
 regressions (no Docker or game start). Run `bash runtime/project-zomboid/test-runtime.sh
 <exact-image>` for candidate-image dependency and launcher checks. Neither is
-real-game qualification. The candidate has not been published or promoted.
-The repository's Project Zomboid workflow runs these same no-game checks for
-pull requests and changes on Develop/Main. It does not publish an image or
-alter the catalog. When archiving this directory on Windows for a Linux build,
+real-game qualification. The repository's Project Zomboid workflow runs these
+same no-game checks for pull requests and changes on Develop/Main. Pull
+requests and Develop have read-only credentials; only the protected Main
+publication job can publish to Dauva's own registry identity. No job alters
+the catalog. When archiving this directory on Windows for a Linux build,
 use `git -c core.autocrlf=false archive`; a subtree archive does not inherit its
 parent directory's shell line-ending attributes.
 
@@ -50,3 +51,39 @@ promotion flow. Do not replace an owner's running world using this candidate.
 See [the bounded manual qualification record](qualification-20260907.md) for
 both candidate variants. It records what was observed and what remains unproven;
 it does not authorize catalog promotion.
+
+## Runtime publication (1.0.1)
+
+The only publication target is
+`ghcr.io/deucarian/dauva-project-zomboid-runtime`. Version 1.0.1 adds the governed
+publication path; it does not change the previously tested launcher behavior.
+The old local diagnostic `docker.io/sknnr` alias must never be pushed as if
+Dauva owned upstream's repository. The original 1.0.0 manual result is not an
+authenticated or exact-image qualification for a newly published 1.0.1 digest.
+
+The protected Main job first checks the image, then publishes an OCI candidate
+under a source-commit-bound reference with provenance and an SBOM. It pulls and
+tests that exact registry digest before assigning the semantic-version tag.
+Both tags and the runtime source-tree identity are checked on resume. An
+existing semantic version with another source tree is a conflict, never an
+overwrite. One publication job runs at a time; timeout/lost-response recovery
+reconciles the same candidate/version references. The named 10/20/100-second
+lost-response tests use controllable clocks. Only an authenticated authoritative
+manifest-not-found response permits first publication; authorization failures,
+rate limits and timeouts remain unknown observations.
+
+GitHub creates new container packages as private by default. The owner must
+set this one package's visibility to Public before the job can confirm anonymous
+access and assign its version tag. If it pauses there, keep the candidate and
+rerun the same workflow revision after correcting visibility. Do not rebuild,
+repush another identity, publish credentials, or weaken anonymous-access checks.
+This one-time package setting is not Leaf or server enrollment.
+
+The publication result is explicitly **not Seed proof**. The trusted Leaf
+profile/catalog must separately allow this exact new repository, both variants
+need exact-image settings/client/lifecycle qualification and authenticated proof,
+and a new Seed version must use the governed release bundle. Existing owner
+worlds, legacy images and production Seed manifests remain untouched.
+
+Publication behavior follows [Docker's same-manifest copy contract](https://docs.docker.com/reference/cli/docker/buildx/imagetools/create/)
+and [GitHub's package authentication/visibility contract](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry).
