@@ -1,0 +1,73 @@
+{
+  "date": "2026-09-10",
+  "status": "candidate evidence, not signed Seed promotion or client qualification",
+  "source": "codex/game-settings-ux-20260910; local uncommitted candidate",
+  "test": "TestDisposableGameRestartAnnouncements",
+  "binarySha256": "d80010748d2ab3697d45562e81245ee765cb9ff30be1d2f9fafaf69d3c18c399",
+  "environment": "Debian Linux amd64; no AVX; disposable owned containers only",
+  "versions": {
+    "goLeaf": "0.11.0",
+    "linuxLeaf": "0.19.0",
+    "hosting": "1.20.0",
+    "api": "2.30.0",
+    "garden": "2.42.0+148",
+    "registry": "0.21.0"
+  },
+  "runs": [
+    {
+      "profile": "factorio",
+      "image": "docker.io/factoriotools/factorio@sha256:f7942281d7d3a54fd7e5b1aca57428fce4f035aabdb1cb798473f7b78778fb49",
+      "seconds": 23.85,
+      "announcement": "sent",
+      "result": "passed",
+      "sameContainer": true,
+      "freshStartupAfterRestart": true,
+      "announcementAfterRestart": true,
+      "clientDisplayVerified": false,
+      "existingWorldUsed": false,
+      "publishedPorts": false,
+      "hostBindMounts": false,
+      "testContainerAndAnonymousVolumesRemoved": true
+    },
+    {
+      "profile": "terraria",
+      "image": "docker.io/brammys/terraria@sha256:5b33a335dd6b250caa4858b00388102bcf87a02b311e6635fd013d3a564a430a",
+      "seconds": 66.04,
+      "announcement": "submitted",
+      "result": "passed",
+      "sameContainer": true,
+      "freshStartupAfterRestart": true,
+      "announcementAfterRestart": true,
+      "clientDisplayVerified": false,
+      "existingWorldUsed": false,
+      "publishedPorts": false,
+      "hostBindMounts": false,
+      "testContainerAndAnonymousVolumesRemoved": true
+    },
+    {
+      "profile": "terraria-tshock",
+      "image": "docker.io/finallf/terraria@sha256:218ad68436005fc533e037ee7186ee60a9055c6460a91d9ff9ffc8282b0fd040",
+      "seconds": 146.41,
+      "announcement": "submitted",
+      "result": "passed",
+      "sameContainer": true,
+      "freshStartupAfterRestart": true,
+      "announcementAfterRestart": true,
+      "clientDisplayVerified": false,
+      "existingWorldUsed": false,
+      "publishedPorts": false,
+      "hostBindMounts": false,
+      "testContainerAndAnonymousVolumesRemoved": true
+    }
+  ],
+  "limitations": [
+    "Terraria submitted means console socket write, not game execution acknowledgment.",
+    "No connected game client; no player-visible warning or player reconnect proof.",
+    "Pinned container digest does not by itself pin game downloads performed by an entrypoint; no exact Steam/game build qualification asserted.",
+    "Only newly created disposable test containers enabled safe stdin; no existing runtime was altered.",
+    "No live V Rising operation, runtime upgrade, save write or backup modification.",
+    "V Rising exact runtime qualification needs a suitable isolated AVX-capable runner.",
+    "Two .NET Docker integration tests remain skipped on Windows; four separate Go Docker fixture cases passed earlier.",
+    "First strengthened rerun rejected ISO log timestamps at Docker API; test harness corrected to Unix seconds.nanoseconds before the three passing reruns."
+  ]
+}

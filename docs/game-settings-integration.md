@@ -8,6 +8,26 @@ Settings panel, with changes that persist through subsequent normal restarts.
 
 ## Coverage and honest boundaries
 
+The shared editor must organize settings into useful categories, offer search,
+separate explanations from lock reasons and retain native keys as optional
+technical detail. Presentation metadata is not authority to change types,
+constraints, secrets or protected values. Use the shared review and Leaf-owned
+countdown for settings-triggered and ordinary Garden planned restarts; follow
+[restart announcement rules and the current transport inventory](restart-announcements.md).
+Unknown advanced effects must be described as not yet reviewed, not guessed.
+Add reviewed descriptions when integrating new settings; never substitute the
+same Seed-update instruction for every setting's actual explanation.
+
+Garden's `docs/game-settings-presentation.md` describes the reusable metadata
+contract and reference attributions. Before adding an image/variant, capture a
+names-only native settings inventory (no values, account IDs or credentials),
+add it to the Garden presentation coverage fixtures, and require specific help
+for every exposed key. Include locked and creation-only fields. Scope meanings
+by game and source; a role password, account password and join password are not
+interchangeable. Do not claim coverage for arbitrary future plugins from a
+passing current inventory. Run Garden's presentation and responsive review tests
+alongside the mandatory Registry and Leaf workflow checks below.
+
 `contracts/native-game-settings-v1.json` maps all 10 current game families and
 20 Seed variants to 12 trusted Leaf profiles. Both Enshrouded runtimes and both
 Terraria runtimes have separate profiles; other variants share their game's
