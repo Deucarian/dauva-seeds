@@ -211,6 +211,26 @@ The bounded [PvE/PvP observations](evidence/vrising-inplace-20260911/README.md)
 include actual game queries, subsequent restarts, password clear, save/load,
 negative cases and the limits of those checks.
 
+Leaf 0.11.2 also supports the pre-existing-world layout with a persistent game
+file but no host override. The original, exactly qualified startup contract
+must still be present. The installed game must supply readable host defaults
+with complete, typed world/access/network fields; the current effective
+startup inputs are materialized along with those defaults. First Apply warns
+that it creates the missing host file. It records that original absence in the
+encrypted recovery plan, re-reads after the graceful stop, and creates the file
+with the persistent game file's owner and private permissions. It never writes
+a world or creates configuration while merely opening the editor.
+
+Once native startup handling is installed, a missing host file is lost
+configuration, not permission to fall back to defaults. Post-start verification
+still requires actual native files. Missing game files, incomplete or malformed
+defaults, unsafe world names, and modified startup contracts stay gated.
+Both variants require missing-host workflow coverage in addition to the
+existing two-file cases; qualifying an artificial two-file baseline alone is
+insufficient for this first-Apply path.
+The [missing-host PvE/PvP qualification](evidence/vrising-host-bootstrap-20260911/README.md)
+records actual first Apply, game queries and subsequent ordinary restarts.
+
 ## Historical release boundary (2026-09-06)
 
 The shared Garden editor and API path already exist. Leaf 0.10.2 adds stopped
