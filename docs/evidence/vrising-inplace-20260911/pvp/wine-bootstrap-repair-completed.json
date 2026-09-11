@@ -1,0 +1,9 @@
+{
+  "operationId": "dc3eb0df1fe54197a6b93bddb6f3103d",
+  "serverId": "88bb1236a63c55a894b0f7143971b324",
+  "state": "completed",
+  "scope": "Initialize missing Wine cryptographic registry, disposable test only; no game files or startup scripts changed",
+  "backupSha256": "6893c28f03e86fe68ee5ffd1e9d6e89e29c79f32ab6e2b733ea2fbe430063d34",
+  "containerId": "2dc578376ea88be68a5bfe4e23761a3a173256195b3e073ec83738eb657d517a",
+  "settingsOperationSucceeded": false
+}

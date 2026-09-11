@@ -1,0 +1,67 @@
+{
+  "variant": "pvp",
+  "observedAtUtc": "2026-09-11T00:51:04.319058+00:00",
+  "serverId": "88bb1236a63c55a894b0f7143971b324",
+  "containerId": "2dc578376ea88be68a5bfe4e23761a3a173256195b3e073ec83738eb657d517a",
+  "image": "ghcr.io/deucarian/dauva-vrising-runtime@sha256:09ca6c70c19be749f0a55f278400a6c68a414122d8f9a8929c3f6a94b4914b0e",
+  "startedAt": "2026-09-11T00:50:47.257508487Z",
+  "runtime": "running",
+  "health": "healthy",
+  "native": {
+    "maxPlayers": 10,
+    "publicSteam": false,
+    "publicEOS": false,
+    "passwordPresent": false,
+    "saveName": "dauva-world",
+    "teleportBoundItems": true,
+    "gameMode": "PvP"
+  },
+  "saveFiles": 1,
+  "startupEvidence": [
+    "2026-09-11T00:50:52.752583962Z ProjectM.ServerHostSettings - 'MaxConnectedUsers' ('System.Int32') overridden by Process Environment Variable 'VR_MAX_USERS' - New value: 10",
+    "2026-09-11T00:50:52.752849589Z ProjectM.ServerHostSettings - 'ListOnSteam' ('System.Boolean') overridden by Process Environment Variable 'VR_LIST_ON_STEAM' - New value: False",
+    "2026-09-11T00:50:52.754946903Z ProjectM.ServerHostSettings - 'ListOnEOS' ('System.Boolean') overridden by Process Environment Variable 'VR_LIST_ON_EOS' - New value: False",
+    "2026-09-11T00:50:52.754960323Z   \"MaxConnectedUsers\": 10,",
+    "2026-09-11T00:50:52.755013952Z   \"ListOnSteam\": false,",
+    "2026-09-11T00:50:52.755135971Z   \"ListOnEOS\": false,",
+    "2026-09-11T00:50:52.768747705Z   \"GameModeType\": 1,",
+    "2026-09-11T00:50:52.768850864Z   \"TeleportBoundItems\": true,",
+    "2026-09-11T00:50:54.683013176Z   \"GameModeType\": 1,",
+    "2026-09-11T00:50:54.683255122Z   \"TeleportBoundItems\": true,",
+    "2026-09-11T00:50:54.686484299Z   \"GameModeType\": 1,",
+    "2026-09-11T00:50:54.686666256Z   \"TeleportBoundItems\": true,",
+    "2026-09-11T00:50:54.689903337Z   \"GameModeType\": 1,",
+    "2026-09-11T00:50:54.690033785Z   \"TeleportBoundItems\": true,",
+    "2026-09-11T00:50:59.294052189Z PersistenceV2 - Loading save at Z:\\vrising\\data\\Saves\\v4\\dauva-world\\AutoSave_0.save.gz.",
+    "2026-09-11T00:51:01.056442782Z PersistenceV2 - Finished Loading 274738 Entities spread over 139 Archetypes.",
+    "2026-09-11T00:51:02.106842346Z [Server] Startup Completed - Disabling Scene Loading Systems"
+  ],
+  "startupScriptSha256": "f07119701636a31e1983290179cf4cbd5c87609159e4b82a1d89c4d1ee9beed3",
+  "lifecycle": [
+    {
+      "id": "2f27713cbc9d56f8a4526f29c6427359",
+      "action": "stop",
+      "state": "completed"
+    },
+    {
+      "id": "f0ff6b3118a85f848028ad296640efa4",
+      "action": "start",
+      "state": "completed"
+    },
+    {
+      "id": "cb9998a437db59f9afaf3df04282a69c",
+      "action": "start",
+      "state": "completed"
+    },
+    {
+      "id": "ad004317ca875fa7be8d9c6c0ea4905e",
+      "action": "start",
+      "state": "completed"
+    },
+    {
+      "id": "c4594005e6f256849c73051143497cff",
+      "action": "stop",
+      "state": "completed"
+    }
+  ]
+}
