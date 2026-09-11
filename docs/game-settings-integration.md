@@ -228,6 +228,8 @@ defaults, unsafe world names, and modified startup contracts stay gated.
 Both variants require missing-host workflow coverage in addition to the
 existing two-file cases; qualifying an artificial two-file baseline alone is
 insufficient for this first-Apply path.
+The [missing-host PvE/PvP qualification](evidence/vrising-host-bootstrap-20260911/README.md)
+records actual first Apply, game queries and subsequent ordinary restarts.
 
 ## Historical release boundary (2026-09-06)
 
