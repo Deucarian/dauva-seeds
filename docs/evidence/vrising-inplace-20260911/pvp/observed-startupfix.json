@@ -1,0 +1,18 @@
+{
+  "httpStatus": 200,
+  "result": {
+    "id": "2c0cd83c17d150e3b89d297946c1f808",
+    "serverId": "88bb1236a63c55a894b0f7143971b324",
+    "state": "failed",
+    "phase": "failed",
+    "message": "Settings were not changed: the game exceeded its save/stop grace period. Its prior running state has been restored.",
+    "revision": 32,
+    "createdAtUtc": "2026-09-11T00:42:29.989767388Z",
+    "updatedAtUtc": "2026-09-11T00:48:35.330131414Z",
+    "completedAtUtc": "2026-09-11T00:48:35.330131704Z",
+    "restartNeeded": false,
+    "backupId": "2c0cd83c17d150e3b89d297946c1f808",
+    "stopNotBeforeUtc": "2026-09-11T00:43:29.989767388Z",
+    "announcementStatus": "unavailable"
+  }
+}

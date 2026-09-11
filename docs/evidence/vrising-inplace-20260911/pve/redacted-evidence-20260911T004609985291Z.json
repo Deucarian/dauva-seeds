@@ -1,0 +1,80 @@
+{
+  "variant": "pve",
+  "observedAtUtc": "2026-09-11T00:46:09.984751+00:00",
+  "serverId": "5105f3024a9757059a1dc8fc27b349e9",
+  "containerId": "5d4123bfc6ef9f34b50c9fb9019119358bc53aee8c76065bcbc14e52a390edb3",
+  "image": "ghcr.io/deucarian/dauva-vrising-runtime@sha256:09ca6c70c19be749f0a55f278400a6c68a414122d8f9a8929c3f6a94b4914b0e",
+  "startedAt": "2026-09-11T00:32:31.222180853Z",
+  "runtime": "exited",
+  "health": "unhealthy",
+  "native": {
+    "maxPlayers": 12,
+    "publicSteam": false,
+    "publicEOS": false,
+    "passwordPresent": false,
+    "saveName": "dauva-world",
+    "teleportBoundItems": false,
+    "gameMode": "PvE"
+  },
+  "saveFiles": 4,
+  "startupEvidence": [
+    "2026-09-11T00:32:36.673726840Z   \"MaxConnectedUsers\": 12,",
+    "2026-09-11T00:32:36.674224134Z   \"ListOnSteam\": false,",
+    "2026-09-11T00:32:36.675645062Z   \"ListOnEOS\": false,",
+    "2026-09-11T00:32:36.690921440Z   \"GameModeType\": 0,",
+    "2026-09-11T00:32:36.691161423Z   \"TeleportBoundItems\": false,",
+    "2026-09-11T00:32:38.161589043Z   \"GameModeType\": 0,",
+    "2026-09-11T00:32:38.161914429Z   \"TeleportBoundItems\": false,",
+    "2026-09-11T00:32:42.638399844Z PersistenceV2 - Loading save at Z:\\vrising\\data\\Saves\\v4\\dauva-world\\AutoSave_11.save.gz.",
+    "2026-09-11T00:32:44.306402410Z PersistenceV2 - Finished Loading 274280 Entities spread over 138 Archetypes.",
+    "2026-09-11T00:32:45.400054330Z [Server] Startup Completed - Disabling Scene Loading Systems"
+  ],
+  "startupScriptSha256": "26f3a7676a73fb8a2bab042fb66d189ceb1626398bbe70e4a78d02add51a08c7",
+  "lifecycle": [
+    {
+      "id": "9e64d89108f55275bc1c50f704fa3935",
+      "action": "start",
+      "state": "completed"
+    },
+    {
+      "id": "1cbc3b4e3e6f520ea71f721950d0c089",
+      "action": "stop",
+      "state": "completed"
+    },
+    {
+      "id": "de35a5ac06965873a9ccacdd5b84913a",
+      "action": "start",
+      "state": "completed"
+    },
+    {
+      "id": "c3728a338c32514eac8570f9979694c6",
+      "action": "stop",
+      "state": "completed"
+    },
+    {
+      "id": "851158e7c34952e68fb5edf817ecf009",
+      "action": "stop",
+      "state": "completed"
+    },
+    {
+      "id": "9c53dad593965c9691574f0d7d0ff9f0",
+      "action": "start",
+      "state": "completed"
+    },
+    {
+      "id": "d49148277cd5585a8f01553eb572a3ab",
+      "action": "stop",
+      "state": "completed"
+    },
+    {
+      "id": "0f140cc8833e5eecbaba607cca3f8d36",
+      "action": "stop",
+      "state": "completed"
+    },
+    {
+      "id": "2767a81a02e953808a4850f5533bd62e",
+      "action": "start",
+      "state": "completed"
+    }
+  ]
+}

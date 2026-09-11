@@ -1,0 +1,18 @@
+{
+  "httpStatus": 200,
+  "result": {
+    "id": "baa0bc8707de5a67a53c2214a1e3b664",
+    "serverId": "5105f3024a9757059a1dc8fc27b349e9",
+    "state": "completed",
+    "phase": "completed",
+    "message": "Saved configuration and startup options verified; the game health check passed.",
+    "revision": 38,
+    "createdAtUtc": "2026-09-11T00:11:20.427757645Z",
+    "updatedAtUtc": "2026-09-11T00:12:47.829407144Z",
+    "completedAtUtc": "2026-09-11T00:12:47.829407364Z",
+    "restartNeeded": false,
+    "backupId": "baa0bc8707de5a67a53c2214a1e3b664",
+    "stopNotBeforeUtc": "2026-09-11T00:12:20.427757645Z",
+    "announcementStatus": "unavailable"
+  }
+}

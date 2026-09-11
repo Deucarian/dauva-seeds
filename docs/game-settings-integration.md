@@ -187,7 +187,31 @@ Unknown observations retain the same durable operation; only authoritative
 terminal outcomes may be shown as completed or failed. Secret values must not
 enter public snapshots, operation messages, logs or browser persistence.
 
-## Current release boundary (2026-09-06)
+## Existing V Rising native-file compatibility (2026-09-11)
+
+Leaf 0.11.1 adds a positive compatibility qualification for the existing V Rising
+1.1.0 digest (`09ca6c70c19be749f0a55f278400a6c68a414122d8f9a8929c3f6a94b4914b0e`).
+Disabling its two generators is insufficient: the game itself also reads
+`VR_*` environment overrides. The adapter checks the exact image, fixed launch
+paths/command, writable data mount, existing host/game files and six reviewed
+startup-script hashes. The first Apply must back up the original launcher and
+install the exact hash-pinned compatibility block that removes only the game's
+non-infrastructure overrides. Only after that block is present may readback
+ignore stale creation inputs. It uses the shared backup/countdown/stop/readback/
+restart operation and explicitly warns about the first startup change.
+
+That plan must preserve the same container and Docker environment and must never call
+replacement or retained-container cleanup. This retains existing Wine repairs.
+Both PvE and PvP have full workflow fixtures, including password keep/change/
+clear, protected world/port fields, subsequent restarts, and 10/20/100-second
+countdown/reconnect cases. Changed or unknown startup contracts remain gated.
+Fixture coverage is not real-game proof; record disposable exact-image checks
+separately before releasing this adapter. No Seed recipe/image changes here.
+The bounded [PvE/PvP observations](evidence/vrising-inplace-20260911/README.md)
+include actual game queries, subsequent restarts, password clear, save/load,
+negative cases and the limits of those checks.
+
+## Historical release boundary (2026-09-06)
 
 The shared Garden editor and API path already exist. Leaf 0.10.2 adds stopped
 readback and native-file verification that cannot be fooled by startup

@@ -2,6 +2,12 @@
   "schemaVersion": "dauva.dev/native-game-settings-contract/v1",
   "leafCapability": "native-game-settings-v1",
   "requiredWorkflowTests": [
+    "TestVRisingFirstInPlaceApplyPatchesGameEnvironmentOverrides",
+    "TestVRisingInPlaceUsesNativeFilesNotStaleEnvironment",
+    "TestVRisingInPlaceQualificationFailsClosed",
+    "TestVRisingInPlaceCountdownPersistsWithoutContainerReplacement",
+    "TestVRisingInPlaceQualificationLostBeforeWritingNeverRecreates",
+    "TestVRisingInPlaceSecretKeepChangeClearBothVariants",
     "TestTerrariaRestartConsoleIsFixedPrivateAndNeverClaimsPlayerDelivery",
     "TestRestartConsoleDeadlineClosesUpgradedConnection",
     "TestRestartNoticeSchedule",
