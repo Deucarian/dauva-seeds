@@ -1,0 +1,60 @@
+{
+  "variant": "pvp",
+  "observedAtUtc": "2026-09-11T00:52:52.445073+00:00",
+  "serverId": "88bb1236a63c55a894b0f7143971b324",
+  "containerId": "2dc578376ea88be68a5bfe4e23761a3a173256195b3e073ec83738eb657d517a",
+  "image": "ghcr.io/deucarian/dauva-vrising-runtime@sha256:09ca6c70c19be749f0a55f278400a6c68a414122d8f9a8929c3f6a94b4914b0e",
+  "startedAt": "2026-09-11T00:52:11.759553742Z",
+  "runtime": "running",
+  "health": "healthy",
+  "native": {
+    "maxPlayers": 12,
+    "publicSteam": true,
+    "publicEOS": true,
+    "passwordPresent": true,
+    "saveName": "dauva-world",
+    "teleportBoundItems": false,
+    "gameMode": "PvP"
+  },
+  "saveFiles": 2,
+  "startupEvidence": [
+    "2026-09-11T00:52:17.238905130Z   \"MaxConnectedUsers\": 12,",
+    "2026-09-11T00:52:17.238921790Z   \"ListOnSteam\": true,",
+    "2026-09-11T00:52:17.240210359Z   \"ListOnEOS\": true,",
+    "2026-09-11T00:52:17.250045044Z   \"GameModeType\": 1,",
+    "2026-09-11T00:52:17.250201352Z   \"TeleportBoundItems\": false,",
+    "2026-09-11T00:52:18.679980139Z   \"GameModeType\": 1,",
+    "2026-09-11T00:52:18.679991788Z   \"TeleportBoundItems\": false,",
+    "2026-09-11T00:52:23.181546787Z PersistenceV2 - Loading save at Z:\\vrising\\data\\Saves\\v4\\dauva-world\\AutoSave_1.save.gz.",
+    "2026-09-11T00:52:24.820142968Z PersistenceV2 - Finished Loading 274749 Entities spread over 141 Archetypes.",
+    "2026-09-11T00:52:25.875161619Z [Server] Startup Completed - Disabling Scene Loading Systems"
+  ],
+  "startupScriptSha256": "26f3a7676a73fb8a2bab042fb66d189ceb1626398bbe70e4a78d02add51a08c7",
+  "lifecycle": [
+    {
+      "id": "2f27713cbc9d56f8a4526f29c6427359",
+      "action": "stop",
+      "state": "completed"
+    },
+    {
+      "id": "f0ff6b3118a85f848028ad296640efa4",
+      "action": "start",
+      "state": "completed"
+    },
+    {
+      "id": "cb9998a437db59f9afaf3df04282a69c",
+      "action": "start",
+      "state": "completed"
+    },
+    {
+      "id": "ad004317ca875fa7be8d9c6c0ea4905e",
+      "action": "start",
+      "state": "completed"
+    },
+    {
+      "id": "c4594005e6f256849c73051143497cff",
+      "action": "stop",
+      "state": "completed"
+    }
+  ]
+}
